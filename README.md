@@ -7,7 +7,7 @@ I'll try to keep the news up to date and dirstribute news in my blog at http://w
 ## Project's structure
 
 ```
-- fastsring
+- faststring
 	- core 			<- the optimized String types
 	- benchmarks 	<- benchmarks of the core types compared to the original ones
 	- yabt			<- benchmark tool to run the benchmarks
