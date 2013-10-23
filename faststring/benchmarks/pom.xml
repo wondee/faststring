@@ -11,14 +11,31 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>de.unifrankfurt.faststring</groupId>
+			<artifactId>core</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
 			<groupId>com.google.caliper</groupId>
 			<artifactId>caliper</artifactId>
 			<version>1.0-beta-SNAPSHOT</version>
 		</dependency>
 		<dependency>
+			<groupId>org.perfidix</groupId>
+			<artifactId>perfidix</artifactId>
+			<version>3.6.6</version>
+		</dependency>
+		<dependency>
 			<groupId>de.unifrankfurt.faststring</groupId>
-			<artifactId>core</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<artifactId>yabt</artifactId>
+			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.google.guava</groupId>
+					<artifactId>guava</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 	</dependencies>
 </project>
