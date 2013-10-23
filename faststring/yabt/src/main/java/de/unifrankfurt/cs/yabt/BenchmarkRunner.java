@@ -14,10 +14,9 @@ public class BenchmarkRunner {
 
 	public static final String JVM_ARG_GC_OUTPUT = "-verbose:gc";
 	public static final String JVM_ARG_COMPILATION_OUTPUT = "-XX:+PrintCompilation";
-	public static final String JVM_ARG_SERVER = "-server";
 
 	static {
-		NEEDED_JVM_ARGS = Arrays.asList(JVM_ARG_GC_OUTPUT, JVM_ARG_COMPILATION_OUTPUT, JVM_ARG_SERVER);
+		NEEDED_JVM_ARGS = Arrays.asList(JVM_ARG_GC_OUTPUT, JVM_ARG_COMPILATION_OUTPUT);
 	}
 
 	public static void main(String[] args) {

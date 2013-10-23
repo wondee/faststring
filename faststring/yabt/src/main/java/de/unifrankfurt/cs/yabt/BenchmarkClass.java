@@ -39,7 +39,7 @@ public class BenchmarkClass<T> {
 		instantiateClass();
 		result = new Result(runs, measureRuns);
 
-		System.out.println("starting initial wam-phase");
+		System.out.println("starting initial warm-up phase");
 
 		for (Method m : benchmarks) {
 			System.out.println("starting warm-up phase for benchmark " + m.getName());
