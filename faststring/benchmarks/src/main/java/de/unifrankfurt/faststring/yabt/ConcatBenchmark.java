@@ -5,7 +5,7 @@ import de.unifrankfurt.cs.yabt.BeforeEveryCall;
 import de.unifrankfurt.cs.yabt.Benchmark;
 import de.unifrankfurt.cs.yabt.BenchmarkRunner;
 
-public class ConcatBenchmark {
+public final class ConcatBenchmark {
 
 	String base;
 	String prefix;

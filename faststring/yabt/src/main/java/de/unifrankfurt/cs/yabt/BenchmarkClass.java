@@ -46,6 +46,8 @@ public class BenchmarkClass<T> {
 			doWarmUp(warmUpRuns, m);
 		}
 
+		System.out.println("--- warm up is over now its getting hot in here...");
+
 		for (int i = 0; i < runs; i++) {
 			System.out.println("Starting run " + i);
 
