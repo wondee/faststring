@@ -13,15 +13,14 @@ public class BenchmarkRunner {
 
 	public static final List<String> NEEDED_JVM_ARGS;
 
-	public static final String JVM_ARG_GC_OUTPUT = "-verbose:gc";
 	public static final String JVM_ARG_COMPILATION_OUTPUT = "-XX:+PrintCompilation";
 
 	static {
-		NEEDED_JVM_ARGS = Arrays.asList(JVM_ARG_GC_OUTPUT, JVM_ARG_COMPILATION_OUTPUT);
+		NEEDED_JVM_ARGS = Arrays.asList(JVM_ARG_COMPILATION_OUTPUT);
 	}
 
 	public static void main(String[] args) {
-		
+
 	}
 
 	public static void start(Class<?> benchmarkClass) {
@@ -30,9 +29,9 @@ public class BenchmarkRunner {
 	}
 
 	private static <T> void createBenchmark(Class<T> benchmarkClass) {
-		
+
 		Experiment<T> benchmark = new Experiment<>(benchmarkClass);
-				
+
 		benchmark.runBenchmarkClass(5, DEFAULT_WARM_UP_RUNS, DEFAULT_MEASURE_RUNS, DEFAULT_INIT_RUNS );
 	}
 
