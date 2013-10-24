@@ -9,7 +9,7 @@ import java.util.Set;
 
 import org.apache.commons.math.stat.StatUtils;
 
-public class BenchmarkClass<T> {
+public class Experiment<T> implements GcListener {
 
 	private T benchmarkInstance;
 
@@ -20,7 +20,10 @@ public class BenchmarkClass<T> {
 
 	private Result result;
 
-	public BenchmarkClass(Class<T> benchmarkClass) {
+	private Boolean gcRunned;
+
+
+	public Experiment(Class<T> benchmarkClass) {
 		this.benchmarkClass = benchmarkClass;
 
 		instantiateClass();
@@ -54,9 +57,11 @@ public class BenchmarkClass<T> {
 			for (Method m : benchmarks) {
 
 				System.out.println("starting measurement of " + m.getName());
-
+				
+		
 				double[] results = measure(measureRuns, m);
-
+				
+				
 				System.out.println("mean: " + StatUtils.mean(results) + ";  " + StatUtils.variance(results));
 
 			}
@@ -66,12 +71,20 @@ public class BenchmarkClass<T> {
 
 	private double[] measure(int measureRuns, Method m) {
 		double[] results = new double[measureRuns];
-		for (int i = 0; i < measureRuns; i++) {
-			invokeBeforeCalls();
-
-			results[i] = invokeBenchmark(m);
-		}
-
+		
+		do {
+			resetGcRunned();
+			
+			for (int i = 0; i < measureRuns; i++) {
+				invokeBeforeCalls();
+	
+				results[i] = invokeBenchmark(m);
+			}
+			if (gcRunned()) {
+				System.err.println("GC run while runnig the benchmark, measurement will be repeated");
+			}
+			
+		} while(gcRunned());
 		return results;
 
 	}
@@ -118,5 +131,26 @@ public class BenchmarkClass<T> {
 			throw new IllegalStateException(e);
 		}
 
+	}
+
+	@Override
+	public void gcRun() {
+		setGcRunned(true);
+	}
+
+	void resetGcRunned() {
+		setGcRunned(false);
+	}
+	
+	boolean gcRunned() {
+		synchronized (gcRunned) {
+			return gcRunned;
+		}
+	}
+	
+	public void setGcRunned(Boolean gcRunned) {
+		synchronized (gcRunned) {
+			this.gcRunned = gcRunned;
+		}
 	}
 }

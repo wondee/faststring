@@ -7,8 +7,8 @@ import java.util.List;
 
 public class BenchmarkRunner {
 
-	public static final int DEFAULT_WARM_UP_RUNS = 1000000;
-	public static final int DEFAULT_MEASURE_RUNS = 200000;
+	public static final int DEFAULT_WARM_UP_RUNS = 500000;
+	public static final int DEFAULT_MEASURE_RUNS = 20000;
 
 	public static final List<String> NEEDED_JVM_ARGS;
 
@@ -20,10 +20,24 @@ public class BenchmarkRunner {
 	}
 
 	public static void main(String[] args) {
-
+		
 	}
 
 	public static void start(Class<?> benchmarkClass) {
+		checkJVMSettings();
+		createBenchmark(benchmarkClass);
+	}
+
+	private static <T> void createBenchmark(Class<T> benchmarkClass) {
+		
+		Experiment<T> benchmark = new Experiment<>(benchmarkClass);
+		
+		new GcWatcher().registerListener(benchmark);
+		
+		benchmark.runBenchmarkClass(5, DEFAULT_WARM_UP_RUNS, DEFAULT_MEASURE_RUNS);
+	}
+
+	private static void checkJVMSettings() {
 		List<String> arguments = ManagementFactory.getRuntimeMXBean().getInputArguments();
 
 		for (String arg : NEEDED_JVM_ARGS) {
@@ -31,9 +45,5 @@ public class BenchmarkRunner {
 				throw new IllegalStateException("the running JVM has to be launched with the following argument: " + arg);
 			}
 		}
-
-
-		BenchmarkClass<?> benchmark = new BenchmarkClass<>(benchmarkClass);
-		benchmark.runBenchmarkClass(5, DEFAULT_WARM_UP_RUNS, DEFAULT_MEASURE_RUNS);
 	}
 }
