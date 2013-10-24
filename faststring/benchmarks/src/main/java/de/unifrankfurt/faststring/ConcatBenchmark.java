@@ -1,6 +1,6 @@
-package de.unifrankfurt.faststring.yabt;
+package de.unifrankfurt.faststring;
 
-import static de.unifrankfurt.faststring.perifidix.Constants.STRING_10;
+import static de.unifrankfurt.faststring.Constants.STRING_10;
 import de.unifrankfurt.cs.yabt.BeforeEveryCall;
 import de.unifrankfurt.cs.yabt.Benchmark;
 import de.unifrankfurt.cs.yabt.BenchmarkRunner;
