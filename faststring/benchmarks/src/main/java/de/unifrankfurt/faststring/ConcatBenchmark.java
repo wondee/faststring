@@ -1,9 +1,9 @@
 package de.unifrankfurt.faststring;
 
 import static de.unifrankfurt.faststring.Constants.STRING_10;
-import de.unifrankfurt.cs.yabt.BeforeEveryCall;
-import de.unifrankfurt.cs.yabt.Benchmark;
-import de.unifrankfurt.cs.yabt.BenchmarkRunner;
+import de.unifrankfurt.faststring.yabt.BeforeEveryCall;
+import de.unifrankfurt.faststring.yabt.Benchmark;
+import de.unifrankfurt.faststring.yabt.BenchmarkRunner;
 
 public final class ConcatBenchmark {
 

@@ -1,4 +1,4 @@
-package de.unifrankfurt.cs.yabt;
+package de.unifrankfurt.faststring.yabt;
 
 import java.util.Map;
 
