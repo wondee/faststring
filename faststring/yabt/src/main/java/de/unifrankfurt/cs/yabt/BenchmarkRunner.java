@@ -7,9 +7,9 @@ import java.util.List;
 
 public class BenchmarkRunner {
 
-	public static final int DEFAULT_INIT_RUNS = 3;
-	public static final int DEFAULT_WARM_UP_RUNS = 500000;
-	public static final int DEFAULT_MEASURE_RUNS = 200000;
+	public static final int DEFAULT_INIT_RUNS = 5;
+	public static final int DEFAULT_WARM_UP_RUNS = 1000000;
+	public static final int DEFAULT_MEASURE_RUNS = 500000;
 
 	public static final List<String> NEEDED_JVM_ARGS;
 

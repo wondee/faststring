@@ -18,8 +18,6 @@ public class Experiment<T> {
 	private Set<Method> beforeCall;
 	private Set<Method> benchmarks;
 
-	private Result result;
-
 
 	public Experiment(Class<T> benchmarkClass) {
 		this.benchmarkClass = benchmarkClass;
@@ -36,9 +34,9 @@ public class Experiment<T> {
 
 	}
 
-	public void runBenchmarkClass(int runs, int warmUpRuns, int measureRuns, int initRuns) {
+	public Result runBenchmarkClass(int runs, int warmUpRuns, int measureRuns, int initRuns) {
 		instantiateClass();
-		result = new Result(runs, measureRuns);
+		Result result = new Result(runs);
 
 		System.out.println("starting initial warm-up phase");
 
@@ -67,11 +65,15 @@ public class Experiment<T> {
 
 				double[] results = measure(measureRuns, m);
 
+				result.set(i, m.getName(), results);
+
 				System.out.println("mean: " + StatUtils.mean(results) + ";  " + StatUtils.variance(results));
 
 			}
 
 		}
+
+		return result;
 	}
 
 	private double[] measure(int measureRuns, Method m) {
@@ -122,10 +124,10 @@ public class Experiment<T> {
 			for (Method beforeMethod : beforeCall) {
 				beforeMethod.invoke(benchmarkInstance);
 			}
-		} catch (IllegalAccessException | IllegalArgumentException
+		} catch (IllegalAccessException
+				| IllegalArgumentException
 				| InvocationTargetException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new IllegalStateException(e);
 		}
 
 	}
@@ -137,7 +139,8 @@ public class Experiment<T> {
 			m.invoke(benchmarkInstance);
 			long measurement = System.nanoTime() - before;
 			return measurement;
-		} catch (IllegalAccessException | IllegalArgumentException
+		} catch (IllegalAccessException
+				| IllegalArgumentException
 				| InvocationTargetException e) {
 			throw new IllegalStateException(e);
 		}

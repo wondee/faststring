@@ -7,13 +7,11 @@ import com.google.common.collect.Maps;
 public class Result {
 
 	private Map<String, double[][]> resultMap;
-	private int measurementRuns;
 	private int runs;
 
-	Result(int runs, int measurementRuns) {
+	Result(int runs) {
 		resultMap = Maps.newHashMap();
 		this.runs = runs;
-		this.measurementRuns = measurementRuns;
 	}
 
 	void set(int run, int measurement, String name, double value) {
@@ -25,7 +23,12 @@ public class Result {
 	}
 
 	private void initializeMap(String name) {
-		resultMap.put(name, new double[runs][measurementRuns]);
+		resultMap.put(name, new double[runs][]);
+
+	}
+
+	public void set(int i, String name, double[] results) {
+		resultMap.get(name)[i] = results;
 
 	}
 
