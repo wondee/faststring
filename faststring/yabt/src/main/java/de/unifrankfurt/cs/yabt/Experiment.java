@@ -19,7 +19,7 @@ public class Experiment<T> {
 	private Set<Method> benchmarks;
 
 	private Result result;
-	
+
 
 	public Experiment(Class<T> benchmarkClass) {
 		this.benchmarkClass = benchmarkClass;
@@ -52,21 +52,21 @@ public class Experiment<T> {
 		for (int i = 0; i < initRuns; i++) {
 			System.out.println("Starting test run " + i);
 			for (Method m : benchmarks) {
-				measure(measureRuns, m);
+				measure(measureRuns, m, true);
 			}
 		}
-		
+
 		System.out.println("--- test runs over " + runs + " measurement runs are started now...");
-		
+
 		for (int i = 0; i < runs; i++) {
 			System.out.println("Starting run " + i);
 
 			for (Method m : benchmarks) {
 
 				System.out.println("starting measurement of " + m.getName());
-				
+
 				double[] results = measure(measureRuns, m);
-				
+
 				System.out.println("mean: " + StatUtils.mean(results) + ";  " + StatUtils.variance(results));
 
 			}
@@ -75,23 +75,27 @@ public class Experiment<T> {
 	}
 
 	private double[] measure(int measureRuns, Method m) {
+		return measure(measureRuns, m, false);
+	}
+
+	private double[] measure(int measureRuns, Method m, boolean soft) {
 		double[] results = new double[measureRuns];
-		
+
 		GcWatcher watcher = new GcWatcher();
-		
+
 		do {
 			watcher.reset();
 			for (int i = 0; i < measureRuns; i++) {
 				invokeBeforeCalls();
-	
+
 				results[i] = invokeBenchmark(m);
 			}
-			if (watcher.wasGcActive()) {
+			if (!soft && watcher.wasGcActive()) {
 				System.err.println("GC run while runnig the benchmark, measurement will be repeated");
 			}
-			
-		} while(watcher.wasGcActive());
-		
+
+		} while(!soft && watcher.wasGcActive());
+
 		return results;
 
 	}
