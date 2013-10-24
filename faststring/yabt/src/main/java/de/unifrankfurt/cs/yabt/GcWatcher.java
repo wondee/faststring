@@ -4,30 +4,23 @@ import java.lang.ref.WeakReference;
 
 class GcWatcher {
 
-	@SuppressWarnings("unused")
-	private WeakReference<GcNotifier> weakRef;
-	private GcListener listener;
+	private WeakReference<Dummy> weakRef;
 	
 	GcWatcher() {
-		reset();
+		initWeakRef();
 	}
 
-	void registerListener(GcListener listener) {
-		this.listener = listener;
+	private void initWeakRef() {
+		weakRef = new WeakReference<>(new Dummy());
+	}
+
+	synchronized boolean wasGcActive() {
+		return (weakRef.get() == null);
 	}
 	
-	private synchronized void reset() {
-		weakRef = new WeakReference<GcNotifier>(new GcNotifier());
+	synchronized void reset() {		
+		initWeakRef();
 	}
 	
-	class GcNotifier {
-		
-		@Override
-		protected void finalize() throws Throwable {
-			if (listener != null) {
-				listener.gcRun();
-			}
-			reset();
-		}
-	}
+	class Dummy { }
 }

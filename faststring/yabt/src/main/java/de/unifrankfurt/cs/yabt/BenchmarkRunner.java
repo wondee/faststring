@@ -7,8 +7,9 @@ import java.util.List;
 
 public class BenchmarkRunner {
 
+	public static final int DEFAULT_INIT_RUNS = 3;
 	public static final int DEFAULT_WARM_UP_RUNS = 500000;
-	public static final int DEFAULT_MEASURE_RUNS = 20000;
+	public static final int DEFAULT_MEASURE_RUNS = 200000;
 
 	public static final List<String> NEEDED_JVM_ARGS;
 
@@ -31,10 +32,8 @@ public class BenchmarkRunner {
 	private static <T> void createBenchmark(Class<T> benchmarkClass) {
 		
 		Experiment<T> benchmark = new Experiment<>(benchmarkClass);
-		
-		new GcWatcher().registerListener(benchmark);
-		
-		benchmark.runBenchmarkClass(5, DEFAULT_WARM_UP_RUNS, DEFAULT_MEASURE_RUNS);
+				
+		benchmark.runBenchmarkClass(5, DEFAULT_WARM_UP_RUNS, DEFAULT_MEASURE_RUNS, DEFAULT_INIT_RUNS );
 	}
 
 	private static void checkJVMSettings() {

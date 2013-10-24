@@ -9,7 +9,7 @@ import java.util.Set;
 
 import org.apache.commons.math.stat.StatUtils;
 
-public class Experiment<T> implements GcListener {
+public class Experiment<T> {
 
 	private T benchmarkInstance;
 
@@ -19,9 +19,7 @@ public class Experiment<T> implements GcListener {
 	private Set<Method> benchmarks;
 
 	private Result result;
-
-	private Boolean gcRunned;
-
+	
 
 	public Experiment(Class<T> benchmarkClass) {
 		this.benchmarkClass = benchmarkClass;
@@ -38,7 +36,7 @@ public class Experiment<T> implements GcListener {
 
 	}
 
-	public void runBenchmarkClass(int runs, int warmUpRuns, int measureRuns) {
+	public void runBenchmarkClass(int runs, int warmUpRuns, int measureRuns, int initRuns) {
 		instantiateClass();
 		result = new Result(runs, measureRuns);
 
@@ -49,8 +47,17 @@ public class Experiment<T> implements GcListener {
 			doWarmUp(warmUpRuns, m);
 		}
 
-		System.out.println("--- warm up is over now its getting hot in here...");
+		System.out.println("--- warm up is over " + initRuns + " test runs are started now...");
 
+		for (int i = 0; i < initRuns; i++) {
+			System.out.println("Starting test run " + i);
+			for (Method m : benchmarks) {
+				measure(measureRuns, m);
+			}
+		}
+		
+		System.out.println("--- test runs over " + runs + " measurement runs are started now...");
+		
 		for (int i = 0; i < runs; i++) {
 			System.out.println("Starting run " + i);
 
@@ -58,9 +65,7 @@ public class Experiment<T> implements GcListener {
 
 				System.out.println("starting measurement of " + m.getName());
 				
-		
 				double[] results = measure(measureRuns, m);
-				
 				
 				System.out.println("mean: " + StatUtils.mean(results) + ";  " + StatUtils.variance(results));
 
@@ -72,19 +77,21 @@ public class Experiment<T> implements GcListener {
 	private double[] measure(int measureRuns, Method m) {
 		double[] results = new double[measureRuns];
 		
+		GcWatcher watcher = new GcWatcher();
+		
 		do {
-			resetGcRunned();
-			
+			watcher.reset();
 			for (int i = 0; i < measureRuns; i++) {
 				invokeBeforeCalls();
 	
 				results[i] = invokeBenchmark(m);
 			}
-			if (gcRunned()) {
+			if (watcher.wasGcActive()) {
 				System.err.println("GC run while runnig the benchmark, measurement will be repeated");
 			}
 			
-		} while(gcRunned());
+		} while(watcher.wasGcActive());
+		
 		return results;
 
 	}
@@ -131,26 +138,5 @@ public class Experiment<T> implements GcListener {
 			throw new IllegalStateException(e);
 		}
 
-	}
-
-	@Override
-	public void gcRun() {
-		setGcRunned(true);
-	}
-
-	void resetGcRunned() {
-		setGcRunned(false);
-	}
-	
-	boolean gcRunned() {
-		synchronized (gcRunned) {
-			return gcRunned;
-		}
-	}
-	
-	public void setGcRunned(Boolean gcRunned) {
-		synchronized (gcRunned) {
-			this.gcRunned = gcRunned;
-		}
 	}
 }
