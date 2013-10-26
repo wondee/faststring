@@ -4,6 +4,8 @@ import java.lang.management.ManagementFactory;
 import java.util.Arrays;
 import java.util.List;
 
+import de.unifrankfurt.faststring.yabt.export.FileExporter;
+
 
 public class BenchmarkRunner {
 
@@ -32,7 +34,10 @@ public class BenchmarkRunner {
 
 		Experiment<T> benchmark = new Experiment<>(benchmarkClass);
 
-		benchmark.runBenchmarkClass(5, DEFAULT_WARM_UP_RUNS, DEFAULT_MEASURE_RUNS, DEFAULT_INIT_RUNS );
+		Result result = benchmark.runBenchmarkClass(5, DEFAULT_WARM_UP_RUNS, DEFAULT_MEASURE_RUNS, DEFAULT_INIT_RUNS );
+
+		FileExporter exporter = new FileExporter("c:/dev/master", "concat");
+		exporter.export(result);
 	}
 
 	private static void checkJVMSettings() {

@@ -15,20 +15,15 @@ public class Result {
 		this.runs = runs;
 	}
 
-	void set(int run, int measurement, String name, double value) {
-		if (!resultMap.containsKey(name)) {
-			initializeMap(name);
-		}
-
-		resultMap.get(name)[run][measurement] = value;
-	}
-
 	private void initializeMap(String name) {
 		resultMap.put(name, new double[runs][]);
 
 	}
 
 	void set(int i, String name, double[] results) {
+		if (!resultMap.containsKey(name)) {
+			initializeMap(name);
+		}
 		resultMap.get(name)[i] = results;
 
 	}

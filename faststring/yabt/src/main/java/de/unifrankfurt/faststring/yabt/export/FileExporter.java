@@ -10,19 +10,17 @@ import java.text.DecimalFormat;
 
 import de.unifrankfurt.faststring.yabt.Result;
 
+public class FileExporter implements ExportStrategy {
 
-public class FileExporter implements ExportStrategy{
-
-	private Path path;
+	private String path;
 	private String prefix;
 
 	private DecimalFormat df = new DecimalFormat("#");
 
 	public FileExporter(String path, String prefix) {
-		this.path = Paths.get(path);
+		this.path = path;
 		this.prefix = prefix;
 	}
-
 
 	@Override
 	public void export(Result result) {
@@ -30,10 +28,12 @@ public class FileExporter implements ExportStrategy{
 		try {
 
 			for (String name : result.names()) {
-				BufferedWriter writer = Files.newBufferedWriter(path, Charset.defaultCharset());
+				BufferedWriter writer = Files.newBufferedWriter(
+						createFileName(name), Charset.defaultCharset());
 				for (int run = 0; run < result.runs(); run++) {
 					for (int m = 0; m < result.measurments(name, run); m++) {
 						writer.write(df.format(result.get(name, run, m)));
+						writer.write(";");
 					}
 
 					writer.write(String.format("%n"));
@@ -44,6 +44,25 @@ public class FileExporter implements ExportStrategy{
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+
+	}
+
+	private Path createFileName(String name) {
+		try {
+
+			Path dir = Paths.get(path);
+			if (!Files.exists(dir)) {
+				Files.createDirectory(dir);
+			}
+
+			Path file = Paths.get(path, prefix + name + ".csv");
+			if (!Files.exists(file)) {
+				Files.createFile(file);
+			}
+			return file;
+		} catch (IOException e) {
+			throw new IllegalStateException(e);
 		}
 
 	}
