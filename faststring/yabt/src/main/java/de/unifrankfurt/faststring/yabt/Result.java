@@ -44,5 +44,9 @@ public class Result {
 		return resultMap.get(name)[run][m];
 	}
 
+	public double[] results(String name, int run) {
+		return resultMap.get(name)[run];
+	}
+
 
 }
