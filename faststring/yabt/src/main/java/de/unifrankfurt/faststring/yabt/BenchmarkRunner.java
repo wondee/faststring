@@ -2,15 +2,16 @@ package de.unifrankfurt.faststring.yabt;
 
 import java.lang.management.ManagementFactory;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import de.unifrankfurt.faststring.yabt.export.ExportStrategy;
-import de.unifrankfurt.faststring.yabt.export.FileExporter;
 import de.unifrankfurt.faststring.yabt.export.PrintStreamExporter;
 
 
 public class BenchmarkRunner {
 
+	public static final int DEFAULT_RUNS = 5;
 	public static final int DEFAULT_INIT_RUNS = 5;
 	public static final int DEFAULT_WARM_UP_RUNS = 500000;
 	public static final int DEFAULT_MEASURE_RUNS = 20000;
@@ -28,20 +29,25 @@ public class BenchmarkRunner {
 	}
 
 	public static void start(Class<?> benchmarkClass) {
-		checkJVMSettings();
-		createBenchmark(benchmarkClass);
+		start(benchmarkClass, DEFAULT_RUNS, DEFAULT_WARM_UP_RUNS, DEFAULT_INIT_RUNS, DEFAULT_MEASURE_RUNS);
 	}
 
-	private static <T> void createBenchmark(Class<T> benchmarkClass) {
+	public static void start(Class<?> benchmarkClass, int runs, int warmUps, int init, int measure) {
+		checkJVMSettings();
+		createBenchmark(benchmarkClass, runs, warmUps, init, measure, Arrays.asList(new PrintStreamExporter()));
+	}
+
+	private static <T> void createBenchmark(Class<T> benchmarkClass, int runs, int warmUps, int init, int measure, Collection<? extends ExportStrategy> exporters) {
 
 		Experiment<T> benchmark = new Experiment<>(benchmarkClass);
 
-		Result result = benchmark.runBenchmarkClass(5, DEFAULT_WARM_UP_RUNS, DEFAULT_MEASURE_RUNS, DEFAULT_INIT_RUNS );
+		Result result = benchmark.runBenchmarkClass(runs, warmUps, measure, init);
 
 
-		//		FileExporter exporter = new FileExporter("c:/dev/master", "concat");
-		ExportStrategy exporter = new PrintStreamExporter();
-		exporter.export(result);
+		for (ExportStrategy exporter : exporters) {
+			exporter.export(result);
+		}
+
 	}
 
 	private static void checkJVMSettings() {

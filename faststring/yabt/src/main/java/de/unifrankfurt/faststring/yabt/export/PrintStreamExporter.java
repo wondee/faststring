@@ -30,6 +30,7 @@ public class PrintStreamExporter implements ExportStrategy {
 				double mean = StatUtils.mean(results);
 				double variance = StatUtils.variance(results, mean);
 				double max = StatUtils.max(results);
+
 				printf("%d\t %f\t %f\t %f", run, mean, variance, max);
 
 			}
