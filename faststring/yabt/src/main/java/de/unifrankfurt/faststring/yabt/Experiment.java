@@ -6,10 +6,11 @@ import static org.reflections.ReflectionUtils.withAnnotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.math.stat.StatUtils;
+import com.google.common.base.Stopwatch;
 
-public class Experiment<T> {
+public final class Experiment<T> {
 
 	private T benchmarkInstance;
 
@@ -67,8 +68,6 @@ public class Experiment<T> {
 
 				result.set(i, m.getName(), results);
 
-				System.out.println("mean: " + StatUtils.mean(results) + ";  " + StatUtils.variance(results));
-
 			}
 
 		}
@@ -89,7 +88,6 @@ public class Experiment<T> {
 			watcher.reset();
 			for (int i = 0; i < measureRuns; i++) {
 				invokeBeforeCalls();
-
 				results[i] = invokeBenchmark(m);
 			}
 			if (!soft && watcher.wasGcActive()) {
@@ -134,11 +132,14 @@ public class Experiment<T> {
 
 	private long invokeBenchmark(Method m) {
 		try {
-			long before = System.nanoTime();
+//			long before = System.nanoTime();
+
+			Stopwatch sw = Stopwatch.createStarted();
 
 			m.invoke(benchmarkInstance);
-			long measurement = System.nanoTime() - before;
-			return measurement;
+//			long measurement = System.nanoTime() - before;
+			return sw.elapsed(TimeUnit.NANOSECONDS);
+//			return measurement;
 		} catch (IllegalAccessException
 				| IllegalArgumentException
 				| InvocationTargetException e) {

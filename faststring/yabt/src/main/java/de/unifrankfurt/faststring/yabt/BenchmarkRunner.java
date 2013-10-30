@@ -55,7 +55,7 @@ public class BenchmarkRunner {
 
 		for (String arg : NEEDED_JVM_ARGS) {
 			if (!arguments.contains(arg)) {
-				throw new IllegalStateException("the running JVM has to be launched with the following argument: " + arg);
+				System.err.println("the running JVM has to be launched with the following argument: " + arg);
 			}
 		}
 	}

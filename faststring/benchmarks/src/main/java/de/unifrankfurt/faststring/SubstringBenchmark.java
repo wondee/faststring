@@ -30,6 +30,6 @@ public class SubstringBenchmark {
 
 
 	public static void main(String[] args) {
-		BenchmarkRunner.start(SubstringBenchmark.class, 5, 500000, 5, 200000);
+		BenchmarkRunner.start(SubstringBenchmark.class);
 	}
 }
