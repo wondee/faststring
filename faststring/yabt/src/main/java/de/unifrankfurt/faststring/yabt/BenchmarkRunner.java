@@ -6,15 +6,16 @@ import java.util.Collection;
 import java.util.List;
 
 import de.unifrankfurt.faststring.yabt.export.ExportStrategy;
+import de.unifrankfurt.faststring.yabt.export.FileExporter;
 import de.unifrankfurt.faststring.yabt.export.PrintStreamExporter;
 
 
 public class BenchmarkRunner {
 
 	public static final int DEFAULT_RUNS = 5;
-	public static final int DEFAULT_INIT_RUNS = 5;
+	public static final int DEFAULT_INIT_RUNS = 10;
 	public static final int DEFAULT_WARM_UP_RUNS = 500000;
-	public static final int DEFAULT_MEASURE_RUNS = 20000;
+	public static final int DEFAULT_MEASURE_RUNS = 1000;
 
 	public static final List<String> NEEDED_JVM_ARGS;
 
@@ -34,7 +35,7 @@ public class BenchmarkRunner {
 
 	public static void start(Class<?> benchmarkClass, int runs, int warmUps, int init, int measure) {
 		checkJVMSettings();
-		createBenchmark(benchmarkClass, runs, warmUps, init, measure, Arrays.asList(new PrintStreamExporter()));
+		createBenchmark(benchmarkClass, runs, warmUps, init, measure, Arrays.asList(new PrintStreamExporter(), new FileExporter("c:/tmp", "abc")));
 	}
 
 	private static <T> void createBenchmark(Class<T> benchmarkClass, int runs, int warmUps, int init, int measure, Collection<? extends ExportStrategy> exporters) {

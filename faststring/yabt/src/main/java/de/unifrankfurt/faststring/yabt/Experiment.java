@@ -6,9 +6,8 @@ import static org.reflections.ReflectionUtils.withAnnotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
-import com.google.common.base.Stopwatch;
+import org.apache.commons.math.stat.StatUtils;
 
 public final class Experiment<T> {
 
@@ -16,9 +15,20 @@ public final class Experiment<T> {
 
 	private Class<T> benchmarkClass;
 
-	private Set<Method> beforeCall;
+	private Set<Method> inits;
 	private Set<Method> benchmarks;
 
+	private Measurement initCallMeasurement = new Measurement() {
+		
+		@Override
+		void run() {
+			for (Method m : inits) {
+				invokeMethod(m, true);
+			}
+		}
+	};
+	
+	
 
 	public Experiment(Class<T> benchmarkClass) {
 		this.benchmarkClass = benchmarkClass;
@@ -31,73 +41,81 @@ public final class Experiment<T> {
 	@SuppressWarnings("unchecked")
 	private void findMethods(Class<T> benchmarkClass) {
 		benchmarks = getAllMethods(benchmarkClass, withAnnotation(Benchmark.class));
-		beforeCall = getAllMethods(benchmarkClass, withAnnotation(BeforeEveryCall.class));
+		inits = getAllMethods(benchmarkClass, withAnnotation(Init.class));
 
 	}
 
-	public Result runBenchmarkClass(int runs, int warmUpRuns, int measureRuns, int initRuns) {
+	public Result runBenchmarkClass(int measureIterations, int warmUpRuns, int measureRuns, int warmUpIterations) {
 		instantiateClass();
-		Result result = new Result(runs);
 
 		System.out.println("starting initial warm-up phase");
 
-		for (Method m : benchmarks) {
-			System.out.println("starting warm-up phase for benchmark " + m.getName());
-			doWarmUp(warmUpRuns, m);
+		for (int i = 0; i < warmUpIterations; i++) {
+			System.out.println("starting warm-up iteration " + i + " of " + warmUpIterations);
+			for (Method m : benchmarks) {
+				doWarmUp(warmUpRuns, m);
+			}
 		}
+		
+		System.out.println("warm up is over starting test runs");
 
-		System.out.println("--- warm up is over " + initRuns + " test runs are started now...");
-
-		for (int i = 0; i < initRuns; i++) {
+		Result result = new Result(measureIterations);
+		
+		for (int i = 0; i < measureIterations; i++) {
 			System.out.println("Starting test run " + i);
-			for (Method m : benchmarks) {
-				measure(measureRuns, m, true);
-			}
+			measureBenchmarks(result, i, measureRuns, 0);
+			
 		}
-
-		System.out.println("--- test runs over " + runs + " measurement runs are started now...");
-
-		for (int i = 0; i < runs; i++) {
+		
+		if (result.equals(null)) {
+			System.out.println("just for avoiding deadcode analysis");
+		}
+		
+		double initTime = measureInitMethods(measureRuns);
+		
+		System.out.println("estimated init time is " + initTime + " ms");
+		
+		result = new Result(measureIterations);
+		
+		for (int i = 0; i < measureIterations; i++) {
 			System.out.println("Starting run " + i);
-
-			for (Method m : benchmarks) {
-
-				System.out.println("starting measurement of " + m.getName());
-
-				double[] results = measure(measureRuns, m);
-
-				result.set(i, m.getName(), results);
-
-			}
-
+			measureBenchmarks(result, i, measureRuns, initTime);
+			
 		}
 
 		return result;
 	}
+	
 
-	private double[] measure(int measureRuns, Method m) {
-		return measure(measureRuns, m, false);
+	private void measureBenchmarks(Result result, int i, int measureRuns, double initTime) {
+		
+		for (Method m : benchmarks) {
+			Measurement measurement = createBenchmarkMeasurement(m, initTime);
+			double[] results = measureWithoutGc(measureRuns, measurement);
+			
+			result.set(i, m.getName(), results);
+		}
 	}
 
-	private double[] measure(int measureRuns, Method m, boolean soft) {
-		double[] results = new double[measureRuns];
-
-		GcWatcher watcher = new GcWatcher();
-
-		do {
-			watcher.reset();
-			for (int i = 0; i < measureRuns; i++) {
-				invokeBeforeCalls();
-				results[i] = invokeBenchmark(m);
+	private Measurement createBenchmarkMeasurement(final Method m, final double initTime) {
+		return new Measurement() {
+			@Override
+			void run() {
+				invokeInits();
+				invokeMethod(m);
 			}
-			if (!soft && watcher.wasGcActive()) {
-				System.err.println("GC run while runnig the benchmark, measurement will be repeated");
+			@Override
+			double afterMeasurement(double value) {
+				return value - initTime;
 			}
+		};
+	}
 
-		} while(!soft && watcher.wasGcActive());
-
-		return results;
-
+	private double measureInitMethods(int iterations) {
+		
+		double[] results = measureWithoutGc(iterations, initCallMeasurement);
+		return StatUtils.mean(results);
+		
 	}
 
 	private void instantiateClass() {
@@ -110,36 +128,54 @@ public final class Experiment<T> {
 		}
 	}
 
+	private double[] measureWithoutGc(int measureRuns, Measurement measurement) {
+		double[] results = new double[measureRuns];
+		GcWatcher watcher = new GcWatcher();
+		do {
+			watcher.reset();
+			for (int i = 0; i < measureRuns; i++) {
+				results[i] = measurement.measure();
+			}
+			if (watcher.wasGcActive()) {
+				System.err.println("GC run while runnig the benchmark, measurement will be repeated");
+			}
+			
+		} while(watcher.wasGcActive());
+		
+		return results;
+	}
+	
 	private void doWarmUp(int runs, Method m) {
 		for (int i = 0; i < runs; i++) {
-			invokeBeforeCalls();
-			invokeBenchmark(m);
+			invokeInits();
+			invokeMethod(m);
 		}
 	}
 
-	private void invokeBeforeCalls() {
+	private void invokeInits() {
+		for (Method beforeMethod : inits) {
+			invokeMethod(beforeMethod, true);
+		}
+	}
+
+	
+	
+	private void invokeMethod(Method m) {
+		invokeMethod(m, false);
+	}
+
+	/**
+	 * use the returned object to avoid deleting of dead code
+	 * @param m the method to invoke
+	 */
+	private void invokeMethod(Method m, boolean nullable) {
 		try {
-			for (Method beforeMethod : beforeCall) {
-				beforeMethod.invoke(benchmarkInstance);
+
+			Object o = m.invoke(benchmarkInstance);
+			if (o == null && !nullable) {
+				System.err.println("returned value was null. This bias the result. The called method was " + m);
 			}
-		} catch (IllegalAccessException
-				| IllegalArgumentException
-				| InvocationTargetException e) {
-			throw new IllegalStateException(e);
-		}
-
-	}
-
-	private long invokeBenchmark(Method m) {
-		try {
-//			long before = System.nanoTime();
-
-			Stopwatch sw = Stopwatch.createStarted();
-
-			m.invoke(benchmarkInstance);
-//			long measurement = System.nanoTime() - before;
-			return sw.elapsed(TimeUnit.NANOSECONDS);
-//			return measurement;
+			
 		} catch (IllegalAccessException
 				| IllegalArgumentException
 				| InvocationTargetException e) {
