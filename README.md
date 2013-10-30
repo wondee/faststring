@@ -2,7 +2,7 @@
 
 This project is a is build in the context of my master thesis. The goal is to create a system which is able to optimize performance of the String operations in a compiled Java application or library. 
 
-I'll try to keep the you up to date and dirstribute news in my blog at http://wondee.github.io.
+I'll try to keep the you up to date and dirstribute news in my blog at http://wondee.info.
 
 ## Project's structure
 
