@@ -136,7 +136,12 @@ public final class Experiment<T> {
 
 			Stopwatch sw = Stopwatch.createStarted();
 
-			m.invoke(benchmarkInstance);
+			Object o = m.invoke(benchmarkInstance);
+
+			if (null == o) {
+				System.err.println("o is null...");
+			}
+
 //			long measurement = System.nanoTime() - before;
 			return sw.elapsed(TimeUnit.NANOSECONDS);
 //			return measurement;
