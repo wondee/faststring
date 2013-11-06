@@ -55,4 +55,27 @@ public class SubstringTest {
 
 		assertEquals(exp, act);
 	}
+	
+	@Test
+	public void testLength() {
+		int start = 3;
+		int end = 12;
+		
+		int act = _testee.substring(start, end).length();
+		int exp = original.substring(start, end).length();
+		
+		assertEquals(exp, act);
+	}
+	
+	@Test
+	public void testCharAt() {
+		int start = 5;
+		int end = 15;
+		
+		int index = 4;
+		
+		char act = _testee.substring(start, end).charAt(index);
+		char exp = original.substring(start, end).charAt(index);
+		assertEquals(exp, act);
+	}
 }

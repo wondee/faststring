@@ -3,7 +3,7 @@ package de.unifrankfurt.faststrings.core;
 
 import java.util.Arrays;
 
-public final class SubstringString {
+public final class SubstringString implements CharSequence {
 
 	private char[] string;
 
@@ -29,13 +29,27 @@ public final class SubstringString {
 		return new SubstringString(string, from + start, start + to);
 	}
 
-	// TODO: Does this method get dispatched because it's overwritten??
 	public String toString() {
 		return String.valueOf(Arrays.copyOfRange(string, start, end));
 	}
 
 	char[] charArray() {
 		return string;
+	}
+
+	@Override
+	public int length() {
+		return end - start;
+	}
+
+	@Override
+	public char charAt(int index) {
+		return string[start + index];
+	}
+
+	@Override
+	public CharSequence subSequence(int start, int end) {
+		return substring(start, end);
 	}
 
 }
