@@ -31,7 +31,7 @@ public final class Experiment<T> {
 	@SuppressWarnings("unchecked")
 	private void findMethods(Class<T> benchmarkClass) {
 		benchmarks = getAllMethods(benchmarkClass, withAnnotation(Benchmark.class));
-		beforeCall = getAllMethods(benchmarkClass, withAnnotation(BeforeEveryCall.class));
+		beforeCall = getAllMethods(benchmarkClass, withAnnotation(Init.class));
 
 	}
 

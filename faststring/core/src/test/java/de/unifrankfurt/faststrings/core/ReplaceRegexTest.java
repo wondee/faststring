@@ -24,7 +24,7 @@ public class ReplaceRegexTest {
 		SubstringString replacementS = new SubstringString(replacement);
 
 		String exp = original.replaceAll(regex, replacement);
-		String act = _testee.replaceAll(regex, replacementS);
+		String act = _testee.replaceAll(regex, replacementS).toString();
 
 		assertEquals(exp, act);
 	}
@@ -36,7 +36,7 @@ public class ReplaceRegexTest {
 		SubstringString replacementS = new SubstringString(replacement);
 
 		String exp = original.replaceAll(regex, replacement);
-		String act = _testee.replaceAll(regex, replacementS);
+		String act = _testee.replaceAll(regex, replacementS).toString();
 
 		assertEquals(exp, act);
 	}
@@ -48,7 +48,7 @@ public class ReplaceRegexTest {
 		SubstringString replacementS = new SubstringString(replacement);
 
 		String exp = original.replaceAll(regex, replacement);
-		String act = _testee.replaceAll(regex, replacementS);
+		String act = _testee.replaceAll(regex, replacementS).toString();
 
 		assertEquals(exp, act);
 	}

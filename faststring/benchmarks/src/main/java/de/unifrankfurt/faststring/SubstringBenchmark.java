@@ -1,6 +1,6 @@
 package de.unifrankfurt.faststring;
 
-import de.unifrankfurt.faststring.yabt.BeforeEveryCall;
+import de.unifrankfurt.faststring.yabt.Init;
 import de.unifrankfurt.faststring.yabt.Benchmark;
 import de.unifrankfurt.faststring.yabt.BenchmarkRunner;
 import de.unifrankfurt.faststrings.core.SubstringString;
@@ -13,7 +13,7 @@ public class SubstringBenchmark {
 	int start = 5;
 	int end = 10;
 
-	@BeforeEveryCall
+	@Init
 	public void init() {
 		base_ = new SubstringString(base);
 	}
