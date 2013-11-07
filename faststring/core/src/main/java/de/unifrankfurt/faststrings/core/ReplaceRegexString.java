@@ -10,7 +10,7 @@ public final class ReplaceRegexString implements CharSequence {
 
 //	private char[] appendix;
 
-	private int size;
+//	private int size;
 
 	public ReplaceRegexString(String value) {
 		this(new SubstringString(value));
@@ -18,7 +18,7 @@ public final class ReplaceRegexString implements CharSequence {
 
 	public ReplaceRegexString(SubstringString string) {
 		this.string = string;
-		size = string.charArray().length;
+//		size = string.charArray().length;
 	}
 
 	@Override
