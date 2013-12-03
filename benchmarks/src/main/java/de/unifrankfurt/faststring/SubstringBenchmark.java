@@ -29,7 +29,4 @@ public class SubstringBenchmark {
 	}
 
 
-	public static void main(String[] args) {
-		BenchmarkRunner.start(SubstringBenchmark.class);
-	}
 }

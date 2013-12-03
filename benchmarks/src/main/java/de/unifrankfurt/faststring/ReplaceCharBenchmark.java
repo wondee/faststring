@@ -28,7 +28,4 @@ public class ReplaceCharBenchmark {
 	}
 
 
-	public static void main(String[] args) {
-		BenchmarkRunner.start(ReplaceCharBenchmark.class);
-	}
 }

@@ -32,8 +32,4 @@ public class ReplaceRegexBenchmark {
 	}
 
 
-	public static void main(String[] args) {
-		BenchmarkRunner.start(ReplaceRegexBenchmark.class);
-	}
-
 }
