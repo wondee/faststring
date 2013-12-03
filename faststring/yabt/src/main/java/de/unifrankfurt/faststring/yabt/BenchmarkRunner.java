@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.List;
 
 import de.unifrankfurt.faststring.yabt.export.ExportStrategy;
+import de.unifrankfurt.faststring.yabt.export.FileExporter;
 import de.unifrankfurt.faststring.yabt.export.PrintStreamExporter;
 
 
@@ -34,7 +35,7 @@ public class BenchmarkRunner {
 
 	public static void start(Class<?> benchmarkClass, int runs, int warmUps, int init, int measure) {
 		checkJVMSettings();
-		createBenchmark(benchmarkClass, runs, warmUps, init, measure, Arrays.asList(new PrintStreamExporter()));
+		createBenchmark(benchmarkClass, runs, warmUps, init, measure, Arrays.asList(new PrintStreamExporter(), new FileExporter("out", benchmarkClass.getSimpleName())));
 	}
 
 	private static <T> void createBenchmark(Class<T> benchmarkClass, int runs, int warmUps, int init, int measure, Collection<? extends ExportStrategy> exporters) {
