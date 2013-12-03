@@ -1,0 +1,55 @@
+package de.unifrankfurt.faststrings.core;
+
+
+import java.util.Arrays;
+
+public final class SubstringString implements CharSequence {
+
+	private char[] string;
+
+	private int start;
+	private int end;
+
+	public SubstringString(String value) {
+		this(value.toCharArray(), 0, value.length());
+	}
+
+	public SubstringString(char[] string, int start, int end) {
+		this.string = string;
+		this.start = start;
+		this.end = end;
+	}
+
+	public SubstringString substring(int pos) {
+		return substring(pos, end);
+	}
+
+
+	public SubstringString substring(int from, int to) {
+		return new SubstringString(string, from + start, start + to);
+	}
+
+	public String toString() {
+		return String.valueOf(Arrays.copyOfRange(string, start, end));
+	}
+
+	char[] charArray() {
+		return string;
+	}
+
+	@Override
+	public int length() {
+		return end - start;
+	}
+
+	@Override
+	public char charAt(int index) {
+		return string[start + index];
+	}
+
+	@Override
+	public CharSequence subSequence(int start, int end) {
+		return substring(start, end);
+	}
+
+}
