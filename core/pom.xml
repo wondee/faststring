@@ -5,8 +5,8 @@
     <artifactId>faststring</artifactId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
-  <artifactId>core</artifactId>
-  <name>faststring core implemenations</name>
+  <artifactId>faststring-core</artifactId>
+  <name>faststring core implementations</name>
 
 
 </project>
