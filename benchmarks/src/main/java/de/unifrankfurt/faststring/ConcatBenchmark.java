@@ -1,8 +1,8 @@
 package de.unifrankfurt.faststring;
 
 import static de.unifrankfurt.faststring.Constants.STRING_10;
-import de.unifrankfurt.faststring.yabt.Benchmark;
-import de.unifrankfurt.faststring.yabt.Init;
+import de.unifrankfurt.faststring.yabt.annotation.Benchmark;
+import de.unifrankfurt.faststring.yabt.annotation.Init;
 
 public final class ConcatBenchmark {
 

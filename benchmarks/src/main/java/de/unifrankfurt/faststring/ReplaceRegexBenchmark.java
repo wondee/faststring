@@ -5,9 +5,8 @@ import static de.unifrankfurt.faststring.Constants.REGEX;
 import static de.unifrankfurt.faststring.Constants.REPLACEMENT;
 import static de.unifrankfurt.faststring.Constants.REPLACEMENT_;
 import static de.unifrankfurt.faststring.Constants.REPLACE_BASE_STRING;
-import de.unifrankfurt.faststring.yabt.Benchmark;
-import de.unifrankfurt.faststring.yabt.BenchmarkRunner;
-import de.unifrankfurt.faststring.yabt.Init;
+import de.unifrankfurt.faststring.yabt.annotation.Benchmark;
+import de.unifrankfurt.faststring.yabt.annotation.Init;
 import de.unifrankfurt.faststrings.core.ReplaceRegexString;
 
 public class ReplaceRegexBenchmark {

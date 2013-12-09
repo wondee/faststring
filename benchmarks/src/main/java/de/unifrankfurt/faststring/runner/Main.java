@@ -31,7 +31,7 @@ public class Main {
 			Class<?> benchmarkToRun = BENCHMARKS.get(args[0]);
 
 			if (benchmarkToRun != null) {
-//				BenchmarkRunner.start(benchmarkToRun);
+				BenchmarkRunner.start(benchmarkToRun);
 			} else {
 				printUsage();
 				throw new IllegalArgumentException(args[0] + " not found as a benchmark");

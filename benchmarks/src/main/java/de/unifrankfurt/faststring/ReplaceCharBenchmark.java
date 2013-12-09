@@ -1,9 +1,9 @@
 package de.unifrankfurt.faststring;
 
 import static de.unifrankfurt.faststring.Constants.*;
-import de.unifrankfurt.faststring.yabt.Init;
-import de.unifrankfurt.faststring.yabt.Benchmark;
 import de.unifrankfurt.faststring.yabt.BenchmarkRunner;
+import de.unifrankfurt.faststring.yabt.annotation.Benchmark;
+import de.unifrankfurt.faststring.yabt.annotation.Init;
 import de.unifrankfurt.faststrings.core.ReplaceCharString;
 
 public class ReplaceCharBenchmark {
