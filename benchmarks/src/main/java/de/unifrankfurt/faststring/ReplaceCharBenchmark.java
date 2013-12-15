@@ -1,11 +1,14 @@
 package de.unifrankfurt.faststring;
 
-import static de.unifrankfurt.faststring.Constants.*;
-import de.unifrankfurt.faststring.yabt.BenchmarkRunner;
+import static de.unifrankfurt.faststring.Constants.NEW_CHAR;
+import static de.unifrankfurt.faststring.Constants.OLD_CHAR;
+import static de.unifrankfurt.faststring.Constants.REPLACE_BASE_STRING;
 import de.unifrankfurt.faststring.yabt.annotation.Benchmark;
+import de.unifrankfurt.faststring.yabt.annotation.BenchmarkConfig;
 import de.unifrankfurt.faststring.yabt.annotation.Init;
 import de.unifrankfurt.faststrings.core.ReplaceCharString;
 
+@BenchmarkConfig(name="replaceChar")
 public class ReplaceCharBenchmark {
 
 	private String base;

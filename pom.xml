@@ -8,8 +8,8 @@
 	<name>system for optimize string manipulation operations</name>
   
     <modules>
-        <module>faststring-core</module>
-        <module>faststring-benchmarks</module>
+        <module>core</module>
+        <module>benchmarks</module>
     </modules>
 	
 	<properties>

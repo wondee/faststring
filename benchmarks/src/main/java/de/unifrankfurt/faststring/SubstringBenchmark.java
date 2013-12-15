@@ -1,9 +1,11 @@
 package de.unifrankfurt.faststring;
 
 import de.unifrankfurt.faststring.yabt.annotation.Benchmark;
+import de.unifrankfurt.faststring.yabt.annotation.BenchmarkConfig;
 import de.unifrankfurt.faststring.yabt.annotation.Init;
 import de.unifrankfurt.faststrings.core.SubstringString;
 
+@BenchmarkConfig(name="substring")
 public class SubstringBenchmark {
 
 	String base = Constants.STRING_20;
