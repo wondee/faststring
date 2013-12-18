@@ -1,9 +1,9 @@
 package de.unifrankfurt.faststring;
 
-import de.unifrankfurt.faststring.yabt.annotation.Benchmark;
-import de.unifrankfurt.faststring.yabt.annotation.BenchmarkConfig;
-import de.unifrankfurt.faststring.yabt.annotation.Init;
-import de.unifrankfurt.faststrings.core.SubstringString;
+import de.unifrankfurt.faststring.core.SubstringString;
+import de.unifrankfurt.yabt.annotation.Benchmark;
+import de.unifrankfurt.yabt.annotation.BenchmarkConfig;
+import de.unifrankfurt.yabt.annotation.Init;
 
 @BenchmarkConfig(name="substring")
 public class SubstringBenchmark {

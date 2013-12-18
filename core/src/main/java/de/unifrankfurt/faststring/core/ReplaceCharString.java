@@ -1,4 +1,4 @@
-package de.unifrankfurt.faststrings.core;
+package de.unifrankfurt.faststring.core;
 
 
 /**

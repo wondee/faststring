@@ -4,6 +4,9 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
+import de.unifrankfurt.faststring.core.StringListBuilder;
+import de.unifrankfurt.faststring.core.SubstringString;
+
 public class StringListBuilderTest {
 
 	StringListBuilder __testee;

@@ -5,6 +5,8 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import de.unifrankfurt.faststring.core.SubstringString;
+
 public class SubstringTest {
 
 	String original = "abcdefghijklmnopqrstuvwxyz";

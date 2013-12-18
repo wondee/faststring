@@ -1,6 +1,6 @@
 package de.unifrankfurt.faststring;
 
-import de.unifrankfurt.faststrings.core.SubstringString;
+import de.unifrankfurt.faststring.core.SubstringString;
 
 public class Constants {
 

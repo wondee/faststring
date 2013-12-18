@@ -4,8 +4,8 @@ import de.unifrankfurt.faststring.ConcatBenchmark;
 import de.unifrankfurt.faststring.ReplaceCharBenchmark;
 import de.unifrankfurt.faststring.ReplaceRegexBenchmark;
 import de.unifrankfurt.faststring.SubstringBenchmark;
-import de.unifrankfurt.faststring.yabt.BenchmarkSuite;
-import de.unifrankfurt.faststring.yabt.CommandLineUtil;
+import de.unifrankfurt.yabt.BenchmarkSuite;
+import de.unifrankfurt.yabt.CommandLineUtil;
 
 public class Main {
 

@@ -3,10 +3,10 @@ package de.unifrankfurt.faststring;
 import static de.unifrankfurt.faststring.Constants.NEW_CHAR;
 import static de.unifrankfurt.faststring.Constants.OLD_CHAR;
 import static de.unifrankfurt.faststring.Constants.REPLACE_BASE_STRING;
-import de.unifrankfurt.faststring.yabt.annotation.Benchmark;
-import de.unifrankfurt.faststring.yabt.annotation.BenchmarkConfig;
-import de.unifrankfurt.faststring.yabt.annotation.Init;
-import de.unifrankfurt.faststrings.core.ReplaceCharString;
+import de.unifrankfurt.faststring.core.ReplaceCharString;
+import de.unifrankfurt.yabt.annotation.Benchmark;
+import de.unifrankfurt.yabt.annotation.BenchmarkConfig;
+import de.unifrankfurt.yabt.annotation.Init;
 
 @BenchmarkConfig(name="replaceChar")
 public class ReplaceCharBenchmark {

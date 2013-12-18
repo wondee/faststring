@@ -1,7 +1,11 @@
 package de.unifrankfurt.faststrings.core;
 
 import static org.junit.Assert.*;
+
 import org.junit.Test;
+
+import de.unifrankfurt.faststring.core.StringTreeBuilder;
+import de.unifrankfurt.faststring.core.SubstringString;
 
 public class StringTreeBuilderTest {
 	

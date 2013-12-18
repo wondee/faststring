@@ -5,6 +5,9 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import de.unifrankfurt.faststring.core.ReplaceRegexString;
+import de.unifrankfurt.faststring.core.SubstringString;
+
 
 public class ReplaceRegexTest {
 
