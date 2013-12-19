@@ -59,7 +59,7 @@
 
 		<dependency>
 			<groupId>de.unifrankfurt.yabt</groupId>
-			<artifactId>yabt</artifactId>
+			<artifactId>yabt-core</artifactId>
 			<version>0.1</version>
 		</dependency>
 	</dependencies>
