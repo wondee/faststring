@@ -1,4 +1,4 @@
-package de.unifrankfurt.faststring.transformer;
+package de.unifrankfurt.faststring.analysis;
 
 import static org.objectweb.asm.Opcodes.ASM5;
 
@@ -33,11 +33,13 @@ public class RemoveDeadCodeAdapter extends MethodVisitor {
 			AbstractInsnNode[] insns = mn.instructions.toArray();
 			for (int i = 0; i < frames.length; ++i) {
 				if (frames[i] == null && !(insns[i] instanceof LabelNode)) {
+					
+					System.out.println("found dead code");
 					mn.instructions.remove(insns[i]);
 				}
 			}
 		} catch (AnalyzerException ignored) {
 		}
-		mn.accept(next);
+//		mn.accept(next);
 	}
 }

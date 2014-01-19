@@ -1,4 +1,4 @@
-package de.unifrankfurt.faststring.transformer;
+package de.unifrankfurt.faststring.analysis;
 
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
@@ -16,7 +16,7 @@ public class MyMethodVisitor extends MethodVisitor{
                     String desc) {
             System.out.printf("%d, %s, %s, %s\n", opcode, owner, name, desc);
             
-            Type type = Type.getType(owner);
+            Type type = Type.getObjectType(owner);
             
             System.out.println(type.getClassName());
     }

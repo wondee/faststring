@@ -1,4 +1,4 @@
-package de.unifrankfurt.faststring.transformer;
+package de.unifrankfurt.faststring.analysis;
 
 import static org.objectweb.asm.Opcodes.ASM5;
 
@@ -9,6 +9,8 @@ import org.objectweb.asm.MethodVisitor;
 
 public class MyClassVisitor extends ClassVisitor{
 
+	String owner;
+	
 	public MyClassVisitor() {
 		super(ASM5, null);
 	}
@@ -16,7 +18,7 @@ public class MyClassVisitor extends ClassVisitor{
 	@Override
 	public void visit(int version, int access, String name, String signature,
 			String superName, String[] interfaces) {
-		
+		owner = name;
 		System.out.println(name);
 		
 	}
@@ -24,7 +26,10 @@ public class MyClassVisitor extends ClassVisitor{
 	public MethodVisitor visitMethod(int access, String name, String desc,
 			String signature, String[] exceptions) {
 		System.out.printf("%d, %s, %s, %s, %s\n", access, name, desc, signature, Arrays.toString(exceptions));
-		return new MyMethodVisitor();
+//		return new MyMethodVisitor();
+		
+		return new RemoveDeadCodeAdapter(owner, access, name, desc, null);
 	}
+
 	
 }
