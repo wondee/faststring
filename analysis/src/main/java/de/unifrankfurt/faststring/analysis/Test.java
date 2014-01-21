@@ -8,7 +8,7 @@ public class Test {
 
 	public static void main(String[] args) throws IOException {
 		ClassReader reader = new ClassReader(
-				"de.unifrankfurt.faststring.transformer.GreetingService");
+				"de.unifrankfurt.faststring.analysis.MyTestClass");
 		
 		reader.accept(new MyClassVisitor(), 0);
 		

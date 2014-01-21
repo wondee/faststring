@@ -26,9 +26,7 @@ public class MyClassVisitor extends ClassVisitor{
 	public MethodVisitor visitMethod(int access, String name, String desc,
 			String signature, String[] exceptions) {
 		System.out.printf("%d, %s, %s, %s, %s\n", access, name, desc, signature, Arrays.toString(exceptions));
-//		return new MyMethodVisitor();
-		
-		return new RemoveDeadCodeAdapter(owner, access, name, desc, null);
+		return new MyMethodVisitor();
 	}
 
 	

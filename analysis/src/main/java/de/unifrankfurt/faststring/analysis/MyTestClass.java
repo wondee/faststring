@@ -10,13 +10,13 @@ public class MyTestClass {
 		return getMessage(name1 + " und " + name2);
 	}
 	
-	
-	public boolean someMethod() {
-		int i = 6;
+	public void doSomething() {
+		String a = "Hallo Welt!";
 		
-		if (i == 5) {
-			return true;
-		} else 
-			return false;
+		String b = a.substring(6);
+		
+		for(int i = 0; i < 5; i++) {
+			System.out.println(b);
+		}
 	}
 }
