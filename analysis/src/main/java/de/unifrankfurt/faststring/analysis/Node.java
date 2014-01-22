@@ -7,7 +7,7 @@ import org.objectweb.asm.tree.analysis.Frame;
 
 public class Node extends Frame {
 
-	Set<Node> successors = new HashSet<>();
+	private Set<Node> successors = new HashSet<>();
 
 	public Node(int nLocals, int nStack) {
 		super(nLocals, nStack);
@@ -19,6 +19,16 @@ public class Node extends Frame {
 
 	public void add(Node n) {
 		successors.add(n);
+	}
+
+	public int outSize() {
+		return successors.size();
+		
+	}
+	
+	@Override
+	public String toString() {
+		return super.toString();
 	}
 	
 }

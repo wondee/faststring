@@ -28,6 +28,13 @@
 			<artifactId>asm-analysis</artifactId>
 			<version>${asm.version}</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.ow2.asm</groupId>
+			<artifactId>asm-util</artifactId>
+			<version>${asm.version}</version>
+			<debug>true</debug>
+		</dependency>
 	</dependencies>
 
 </project>
