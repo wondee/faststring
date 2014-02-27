@@ -1,8 +1,11 @@
 package de.unifrankfurt.faststring.analysis;
 
+import java.util.Arrays;
 import java.util.Map;
 
+import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.analysis.Analyzer;
+import org.objectweb.asm.tree.analysis.AnalyzerException;
 import org.objectweb.asm.tree.analysis.Frame;
 
 public class ControlFlowAnalyzer extends Analyzer {
@@ -24,4 +27,12 @@ public class ControlFlowAnalyzer extends Analyzer {
 		s.add((Node) getFrames()[dst]);
 	}
 
+
+	public Node[] analyze(String owner, MethodNode m) throws AnalyzerException {
+		Frame[] frames = super.analyze(owner, m);
+		
+		return Arrays.copyOf(frames, frames.length, Node[].class);
+		
+	}
+	
 }

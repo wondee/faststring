@@ -21,8 +21,8 @@ public class Node extends Frame {
 		successors.add(n);
 	}
 
-	public int outSize() {
-		return successors.size();
+	public Set<Node> successors() {
+		return successors;
 		
 	}
 	
