@@ -43,7 +43,7 @@ public class StringTreeBuilder {
 	public String toString() {
 		StringBuilder builder = new StringBuilder(length);
 
-		Stack<Node> stack = new Stack<>();
+		Stack<Node> stack = new Stack<Node>();
 		stack.push(root);
 
 		while (!stack.isEmpty()) {

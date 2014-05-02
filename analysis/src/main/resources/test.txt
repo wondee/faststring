@@ -1,0 +1,2 @@
+Primordial,Java,stdlib,none
+Application,Java,binaryDir,/home/markus/dev/master/faststring/analysis/target/test-classes
