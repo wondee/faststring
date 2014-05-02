@@ -1,9 +1,8 @@
 package de.unifrankfurt.faststring.analysis.wala;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Iterator;
 
-import com.google.common.collect.Lists;
 import com.ibm.wala.classLoader.IClass;
 import com.ibm.wala.classLoader.IMethod;
 import com.ibm.wala.ipa.callgraph.AnalysisCache;
@@ -13,13 +12,16 @@ import com.ibm.wala.ipa.callgraph.impl.Everywhere;
 import com.ibm.wala.ipa.cha.ClassHierarchy;
 import com.ibm.wala.ssa.DefUse;
 import com.ibm.wala.ssa.IR;
+import com.ibm.wala.ssa.ISSABasicBlock;
 import com.ibm.wala.ssa.SSAAbstractInvokeInstruction;
+import com.ibm.wala.ssa.SSACFG;
 import com.ibm.wala.ssa.SSAInstruction;
 import com.ibm.wala.types.ClassLoaderReference;
 import com.ibm.wala.types.MethodReference;
 import com.ibm.wala.types.TypeReference;
 import com.ibm.wala.util.WalaException;
 import com.ibm.wala.util.config.AnalysisScopeReader;
+import com.ibm.wala.util.graph.traverse.BFSPathFinder;
 import com.ibm.wala.util.strings.Atom;
 
 
@@ -30,8 +32,6 @@ public class WalaTest {
 	
 	public static void main(String[] args) throws IOException, WalaException {
 		AnalysisScope scope = AnalysisScopeReader.readJavaScope("src/main/resources/test.txt", null, WalaTest.class.getClassLoader());
-		
-		
 		
 		// build a type hierarchy
 	    System.out.println("building class hierarchy...");
@@ -46,75 +46,66 @@ public class WalaTest {
 	    		
 	    		System.out.println("-- Class: " + clazz.getName());
 	    		for (IMethod m : clazz.getDeclaredMethods()) {
-	    			List<Integer> substringReceiver = Lists.newLinkedList();
+//	    			List<Integer> substringReceiver = Lists.newLinkedList();
 	    			
 	    			System.out.println("--- Method: " + m.getName());
 	    			
-	    			// Build the IR and cache it.
+	    			// Build the IR from cache.
 	    			IR ir = cache.getSSACache().findOrCreateIR(m, Everywhere.EVERYWHERE, options.getSSAOptions());
 	    			DefUse defUse = cache.getSSACache().findOrCreateDU(m, Everywhere.EVERYWHERE, options.getSSAOptions()) ;
-	    			int length = ir.getInstructions().length;
+	    			SSACFG controlFlowGraph = ir.getControlFlowGraph();
 	    			
 	    			
-	    			
-	    			for (int v = 0; v < length; v++) {
-//						System.out.println("instruction: " + instruction);
+	    			for (int i = 0; i < ir.getInstructions().length; i++) {
 	    				
-						
-//						if (instruction != null) {
-//							for (int defIndex = 0; defIndex < instruction.getNumberOfDefs(); defIndex++) {
-//								System.out.println(instruction.getDef(defIndex));
-//							}
-//							
-//						}
-	    				
-	    				
-	    				SSAInstruction def = defUse.getDef(v);
-	    				
-//	    				System.out.println(v + "; " + instruction);
-	    				
-	    				if (def != null) {
-							if (def instanceof SSAAbstractInvokeInstruction) {
-								SSAAbstractInvokeInstruction invokeIns = (SSAAbstractInvokeInstruction) def;
+	    				// get the i'th instruction
+	    				SSAInstruction ins = ir.getInstructions()[i];
+	    				// some instructions are null... don't know why
+	    				if (ins != null) {
+	    					// if this is an invocation
+							if (ins instanceof SSAAbstractInvokeInstruction) {
+								SSAAbstractInvokeInstruction invokeIns = (SSAAbstractInvokeInstruction) ins;
 								MethodReference target = invokeIns.getDeclaredTarget();
 								TypeReference targetType = target.getDeclaringClass();
-								System.out.println(targetType);
+								// and the target object is a String and no static call
 								if (targetType.equals(STRING_TYPE) && !invokeIns.isStatic()) {
 									
+									// get the method name and the receivers index
+									// TODO: distinguish which method is actually called
 									Atom methodName = target.getName();
 									int receiver = invokeIns.getReceiver();
-									System.out.println("methodName: " + methodName + "; called on " + receiver);
+									System.out.println(i + ":= methodName: " + methodName + "; called on " + receiver);
+//									System.out.println("instruction: " + ins);
+																		
+									// get all uses of the receiver
+									Iterator<SSAInstruction> uses = defUse.getUses(receiver);
+									
+									System.out.println("uses for " + receiver + ": ");
+									while (uses.hasNext()) {
+										
+										SSAInstruction use = uses.next();
+										// get the block of the call graph for this use instruction
+										ISSABasicBlock targetBlock = ir.getBasicBlockForInstruction(use);
+										// get the block of the method call
+										ISSABasicBlock source = controlFlowGraph.getBlockForInstruction(i);
+										// create a breadth first search to check if the use is located after the method call
+										BFSPathFinder<ISSABasicBlock> bfsPathFinder = 
+												new BFSPathFinder<ISSABasicBlock>(controlFlowGraph, source, targetBlock);
+										
+										// print out if this use is located after the method call
+										System.out.println("is used afterwards:  " + (bfsPathFinder.find() == null));
+										
+									}
 									
 									
-									substringReceiver.add(receiver);
+									
 								}
 							}
-							
-							
-//							TypeReference type = inference.getType(v).getTypeReference();
-//							if (type != null && type.equals(TypeReference.JavaLangString)) {
-//								System.out.println(v + " is a String type!!!");
-//								
-//								strings.add(v);
-//								
-//								Iterator<SSAInstruction> uses = defUse.getUses(v);
-//								while (uses.hasNext()) {
-//									System.out.println("uses: " + uses.next());
-//								}
-//								
-//								
-//							} else {
-//								System.out.println(v + " is a " + type);
-//								
-//							}
 	    				}
 	    					
 					}
 	    			
-	    			System.out.println("substring receiver: " + substringReceiver);
-	    			
-//	    			System.err.println(ir.toString());
-	    			
+//	    			System.out.println("substring receiver: " + substringReceiver);	    			
 	    			
 //	    			printToPDF(cha, ir, m, clazz);
 	    			
