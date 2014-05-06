@@ -13,14 +13,12 @@ import org.junit.Test;
  */
 public class TestConnectAlgorithm extends BaseAnalysisTest {
 
-//	private static final Logger LOG = LoggerFactory.getLogger(TestConnectAlgorithm.class);
 	
 	private final static String TEST_CLASS = "ConnectTestClass";
 	
 	
 	@Test
 	public void simpleTest() {
-		
 		IRAnalyzer analyzer = new IRAnalyzer(getIR(TEST_CLASS, "simple"));
 				
 		assertTrue(analyzer.isConnected(4, 7));
@@ -39,9 +37,19 @@ public class TestConnectAlgorithm extends BaseAnalysisTest {
 		
 		assertTrue(analyzer.isConnected(19, 25));
 		assertTrue(analyzer.isConnected(9, 29));
-		
-		
 
+	}
+	
+	public void loopTest() {
+		IRAnalyzer analyzer = new IRAnalyzer(getIR(TEST_CLASS, "loopTest"));
+		
+		assertTrue(analyzer.isConnected(17, 16));
+		assertTrue(analyzer.isConnected(16, 16));
+		assertTrue(analyzer.isConnected(8, 18));
+		
+		assertFalse(analyzer.isConnected(17, 4));
+		assertFalse(analyzer.isConnected(18, 16));
+		assertFalse(analyzer.isConnected(18, 8));
 	}
 	
 }

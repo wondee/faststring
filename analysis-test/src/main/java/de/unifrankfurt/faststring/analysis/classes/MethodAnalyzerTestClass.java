@@ -36,4 +36,40 @@ public class MethodAnalyzerTestClass {
 		
 	}
 	
+	public String phi1(boolean is) {
+		String a = "abc";
+		String b = "defg";
+		
+		String c = b.substring(3);
+		
+		if (is) {
+			c = a.substring(4);
+		}
+		
+		if (!is) {
+			c = a.substring(2);
+		}
+		
+		c.substring(3);
+		
+		return c;
+	}
+	
+	public String phi2(boolean is) {
+		String a = "abc";
+		String b = "defg";
+		
+		String c = b.substring(3);
+		
+		if (is) {
+			c = a.substring(4);
+		} else {
+			c = a.substring(2);
+		}
+		
+		c.substring(3);
+		
+		return c;
+	}
+	
 }

@@ -1,7 +1,10 @@
 package de.unifrankfurt.faststring.analysis.wala;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.Test;
@@ -14,30 +17,39 @@ public class TestMethodAnalyzer extends BaseAnalysisTest {
 	
 	@Test
 	public void testSimpleIfSubstring() {
-		
-		Set<Integer> candidates = findCandidates("simpleIfSubstring");
-		
-		assertEquals(1, candidates.size());
-		assertTrue(candidates.contains(4));
-		
+		assertList(Arrays.asList(4), findCandidates("simpleIfSubstring"));
 	}
 	
 	@Test
 	public void testReturnOfUsed() {
-		Set<Integer> candidates = findCandidates("returnOfUsed");
-		
-		assertTrue(candidates.isEmpty());
-		
+		assertListEmpty(findCandidates("returnOfUsed"));
 	}
 	
 	@Test
 	public void testDoIf() {
-		Set<Integer> candidates = findCandidates("doIf");
-		
-		assertEquals(1, candidates.size());
-		assertTrue(candidates.contains(7));
+		assertList(Arrays.asList(7), findCandidates("doIf"));
+	}
+	
+	@Test
+	public void testPhi1() {
+		assertList(Arrays.asList(5), findCandidates("phi1"));
+	}
+	
+	@Test
+	public void testPhi2() {
+		assertList(Arrays.asList(4, 5), findCandidates("phi2"));
+	}
+	
+	private void assertListEmpty(Set<Integer> candidates) {
+		assertTrue(candidates.isEmpty());
 		
 	}
+
+	private void assertList(List<Integer> expected, Set<Integer> candidates) {
+		assertTrue(candidates.containsAll(expected));
+		assertEquals(candidates.size(), expected.size());
+	}
+	
 	
 	private Set<Integer> findCandidates(String method) {
 		return __testee.findCandidates(getIR(TEST_CLASS, method).getMethod());

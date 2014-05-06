@@ -18,7 +18,6 @@ import com.ibm.wala.ssa.SSAAbstractInvokeInstruction;
 import com.ibm.wala.ssa.SSAInstruction;
 import com.ibm.wala.types.MethodReference;
 import com.ibm.wala.types.TypeReference;
-import com.ibm.wala.util.strings.Atom;
 
 public class MethodAnalyzer {
 
@@ -55,9 +54,8 @@ public class MethodAnalyzer {
 						
 						// get the method name and the receivers index
 						// TODO: distinguish which method is actually called
-						Atom methodName = target.getName();
 						int receiver = invokeIns.getReceiver();
-						LOG.debug("instruction id {} : methodName: {}; called on v{}", i, methodName, receiver);																		
+						LOG.debug("instruction id {} : methodName: {}; called on v{}", i, target.getName(), receiver);																		
 						
 						// first check if there are any uses
 						if (defUse.getNumberOfUses(receiver) > 0) {
@@ -68,12 +66,13 @@ public class MethodAnalyzer {
 							while (uses.hasNext()) {
 								
 								SSAInstruction use = uses.next();
-								String[] localNames = ir.getLocalNames(i, receiver);
-								
 								boolean usedLater = analyzer.isConnected(i, use);
 								
+								analyzer.findIndexForInstruction(use);
+								
 								// print out if this use is located after the method call
-								LOG.debug("receiver v{} (local names: {}) is used later: {}", receiver, localNames, usedLater);
+								LOG.debug("use in instruction {} is used later: {}", 
+										analyzer.findIndexForInstruction(use), usedLater);
 								
 								substringReceiver.add(receiver, usedLater);
 								
