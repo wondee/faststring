@@ -51,7 +51,7 @@ public abstract class BaseAnalysisTest {
 					BaseAnalysisTest.class.getClassLoader());
 		}
 		if (classHierachy == null) {
-			LOG.info("creating class hierachy");
+			LOG.info("creating class hierachy...");
 			
 			classHierachy  = ClassHierarchy.make(scope);
 		}

@@ -1,6 +1,6 @@
 package de.unifrankfurt.faststring.analysis.classes;
 
-public class SimpleIfClass {
+public class MethodAnalyzerTestClass {
 
 	public String simpleIfSubstring(boolean is) {
 		String a = "axyz";

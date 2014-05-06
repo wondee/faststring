@@ -6,6 +6,9 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.ibm.wala.classLoader.IMethod;
 import com.ibm.wala.ipa.callgraph.AnalysisCache;
 import com.ibm.wala.ipa.callgraph.AnalysisOptions;
@@ -20,13 +23,15 @@ import com.ibm.wala.util.strings.Atom;
 
 public class MethodAnalyzer {
 
+	private static final Logger LOG = LoggerFactory.getLogger(MethodAnalyzer.class);
+	
 	private AnalysisCache cache = new AnalysisCache();
 	private AnalysisOptions options = new AnalysisOptions();
 	
 	public Set<Integer> findCandidates(IMethod m) {
 		UseRegister substringReceiver = new UseRegister();
 		
-		System.out.println("--- Method: " + m.getName());
+		LOG.debug("analyzing Method: {}", m.getSignature());
 		
 		// Build the IR from cache.
 		IR ir = cache.getSSACache().findOrCreateIR(m, Everywhere.EVERYWHERE, options.getSSAOptions());
