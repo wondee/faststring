@@ -10,8 +10,8 @@
     <modules>
         <module>core</module>
         <module>benchmarks</module>
-	<module>analysis</module>
-	<module>analysis-test</module>
+		<module>analysis</module>
+		<module>analysis-test</module>
     </modules>
 	
 	<properties>

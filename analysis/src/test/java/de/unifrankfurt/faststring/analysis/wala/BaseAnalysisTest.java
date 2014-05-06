@@ -23,6 +23,13 @@ import com.ibm.wala.ssa.IR;
 import com.ibm.wala.util.WalaException;
 import com.ibm.wala.util.config.AnalysisScopeReader;
 
+/**
+ * base test class for all analysis test cases. Takes care creating the {@link ClassHierarchy} and
+ * provides methods for easily retrieving {@link IR}s and {@link IClass}es
+ * 
+ * @author markus
+ *
+ */
 public abstract class BaseAnalysisTest {
 
 	private static final Logger LOG = LoggerFactory.getLogger(BaseAnalysisTest.class);

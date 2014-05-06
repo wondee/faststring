@@ -30,6 +30,14 @@ public class TestMethodAnalyzer extends BaseAnalysisTest {
 		
 	}
 	
+	@Test
+	public void testDoIf() {
+		Set<Integer> candidates = findCandidates("doIf");
+		
+		assertEquals(1, candidates.size());
+		assertTrue(candidates.contains(7));
+		
+	}
 	
 	private Set<Integer> findCandidates(String method) {
 		return __testee.findCandidates(getIR(TEST_CLASS, method).getMethod());

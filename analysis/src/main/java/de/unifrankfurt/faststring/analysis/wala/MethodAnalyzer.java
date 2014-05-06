@@ -1,8 +1,7 @@
 package de.unifrankfurt.faststring.analysis.wala;
 
-import static de.unifrankfurt.faststring.analysis.wala.IRUtil.*;
+import static de.unifrankfurt.faststring.analysis.wala.IRUtil.STRING_TYPE;
 
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -31,7 +30,7 @@ public class MethodAnalyzer {
 	public Set<Integer> findCandidates(IMethod m) {
 		UseRegister substringReceiver = new UseRegister();
 		
-		LOG.debug("analyzing Method: {}", m.getSignature());
+		LOG.info("analyzing Method: {}", m.getSignature());
 		
 		// Build the IR from cache.
 		IR ir = cache.getSSACache().findOrCreateIR(m, Everywhere.EVERYWHERE, options.getSSAOptions());
@@ -58,7 +57,7 @@ public class MethodAnalyzer {
 						// TODO: distinguish which method is actually called
 						Atom methodName = target.getName();
 						int receiver = invokeIns.getReceiver();
-						System.out.println(i + ":= methodName: " + methodName + "; called on " + receiver);																		
+						LOG.debug("instruction id {} : methodName: {}; called on v{}", i, methodName, receiver);																		
 						
 						// first check if there are any uses
 						if (defUse.getNumberOfUses(receiver) > 0) {
@@ -66,7 +65,6 @@ public class MethodAnalyzer {
 							// get all uses of the receiver
 							Iterator<SSAInstruction> uses = defUse.getUses(receiver);
 							
-							System.out.println("uses for " + receiver + ": ");
 							while (uses.hasNext()) {
 								
 								SSAInstruction use = uses.next();
@@ -75,9 +73,7 @@ public class MethodAnalyzer {
 								boolean usedLater = analyzer.isConnected(i, use);
 								
 								// print out if this use is located after the method call
-								System.out.println(receiver + "(" + Arrays.toString(localNames) + ") is used later:  " + usedLater);
-								
-								
+								LOG.debug("receiver v{} (local names: {}) is used later: {}", receiver, localNames, usedLater);
 								
 								substringReceiver.add(receiver, usedLater);
 								
@@ -95,9 +91,9 @@ public class MethodAnalyzer {
 		}
 		// return the SSA variable names for this method
 		Set<Integer> candidates = substringReceiver.getCandidates();
-		System.out.println("substring receiver: " + candidates);	    			
+		LOG.debug("returning candidates: {}", candidates);	    			
 		
-		System.out.println("parameters: " + Arrays.toString(ir.getParameterValueNumbers()));
+//		System.out.println("parameters: " + Arrays.toString(ir.getParameterValueNumbers()));
 		
 		
 		return candidates;

@@ -5,7 +5,8 @@ import com.ibm.wala.types.TypeReference;
 
 public final class IRUtil {
 
-	public static final TypeReference STRING_TYPE = TypeReference.findOrCreate(ClassLoaderReference.Application, "Ljava/lang/String");
+	public static final TypeReference STRING_TYPE = TypeReference.findOrCreate(
+			ClassLoaderReference.Application, "Ljava/lang/String");
 	
 	
 	private IRUtil() {
