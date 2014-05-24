@@ -3,19 +3,24 @@ package de.unifrankfurt.faststring.analysis.wala;
 import static de.unifrankfurt.faststring.analysis.wala.IRUtil.STRING_TYPE;
 
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Queue;
 import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Queues;
 import com.ibm.wala.classLoader.IMethod;
-import com.ibm.wala.ipa.callgraph.AnalysisCache;
-import com.ibm.wala.ipa.callgraph.AnalysisOptions;
-import com.ibm.wala.ipa.callgraph.impl.Everywhere;
 import com.ibm.wala.ssa.DefUse;
 import com.ibm.wala.ssa.IR;
 import com.ibm.wala.ssa.SSAAbstractInvokeInstruction;
 import com.ibm.wala.ssa.SSAInstruction;
+import com.ibm.wala.ssa.SSAPhiInstruction;
 import com.ibm.wala.types.MethodReference;
 import com.ibm.wala.types.TypeReference;
 
@@ -23,20 +28,135 @@ public class MethodAnalyzer {
 
 	private static final Logger LOG = LoggerFactory.getLogger(MethodAnalyzer.class);
 	
-	private AnalysisCache cache = new AnalysisCache();
-	private AnalysisOptions options = new AnalysisOptions();
+	private TargetApplication targetApp;
 	
-	public Set<Integer> findCandidates(IMethod m) {
-		UseRegister substringReceiver = new UseRegister();
+	private IMethod method;
+
+	private IR ir;
+
+	private DefUse defUse;
+
+	
+	public MethodAnalyzer(TargetApplication targetApplication, IMethod m) {
+		method = m;
+		targetApp = targetApplication;
 		
-		LOG.info("analyzing Method: {}", m.getSignature());
+		ir = targetApp.findIRForMethod(method);
+		defUse = targetApp.findDefUseForMethod(method);
+	}
+	
+	
+	public Set<Integer> findCandidates() {
+		LOG.info("analyzing Method: {}", method.getSignature());
 		
-		// Build the IR from cache.
-		IR ir = cache.getSSACache().findOrCreateIR(m, Everywhere.EVERYWHERE, options.getSSAOptions());
+		// get all references that are called with substring
+		Queue<Use> stringUses = findStringsUses();
 		
-		DefUse defUse = cache.getSSACache().findOrCreateDU(m, Everywhere.EVERYWHERE, options.getSSAOptions()) ;	    			
+		Map<Integer, List<Integer>> stringCalls = checkForPhis(stringUses);
 		
+		UseRegister substringReceiver = checkCandidates(stringCalls);
+		
+		// return the SSA variable names for this method
+		Set<Integer> candidates = substringReceiver.getCandidates();
+		LOG.debug("returning candidates: {}", candidates);	    			
+		
+//		System.out.println("parameters: " + Arrays.toString(ir.getParameterValueNumbers()));
+		
+		
+		return candidates;
+		
+	}
+
+
+	private Map<Integer, List<Integer>> checkForPhis(Queue<Use> stringUses) {
+		Map<Integer, List<Integer>> stringCalls = Maps.newHashMap();
+		
+		Queue<Use> q = Queues.newArrayDeque(stringUses);
+		
+		for (Use use : stringUses) {
+			stringCalls.put(use.insIndex, Lists.newArrayList(use.ref));
+		}
+		
+		while (!q.isEmpty()) {
+			Use use = q.remove();
+			
+			SSAInstruction def = defUse.getDef(use.ref);
+			
+			if (def instanceof SSAPhiInstruction) {
+				for (int i = 0; i < def.getNumberOfUses(); i++) {
+					int pointerShadow = def.getUse(i);
+					int insIndex = use.insIndex;
+					List<Integer> pointers = stringCalls.get(insIndex);
+					if (!pointers.contains(pointerShadow)) {
+						pointers.add(pointerShadow);
+						q.add(new Use(pointerShadow, insIndex));
+					}
+				}
+				
+			}
+			
+			Iterator<SSAInstruction> usesIter = defUse.getUses(use.ref);
+			
+			while (usesIter.hasNext()) {
+				SSAInstruction ins = usesIter.next();
+				if (ins instanceof SSAPhiInstruction) {
+					int pointerShadow = ins.getDef();
+					int insIndex = use.insIndex;
+					List<Integer> pointers = stringCalls.get(insIndex);
+					if (!pointers.contains(pointerShadow)) {
+						pointers.add(pointerShadow);
+						q.add(new Use(pointerShadow, insIndex));
+					}
+				}
+				
+			}
+			
+			
+		}
+	
+		return stringCalls;
+	}
+
+	private UseRegister checkCandidates(Map<Integer, List<Integer>> stringCalls) {
+		
+		UseRegister register = new UseRegister();
 		IRAnalyzer analyzer = new IRAnalyzer(ir);
+		
+		for (Entry<Integer, List<Integer>> call : stringCalls.entrySet()) {
+			
+			Queue<Integer> vs = Queues.newArrayDeque(call.getValue());
+			
+			while (!vs.isEmpty()) {
+				Integer v = vs.remove();
+				Integer insIndex = call.getKey();
+				Iterator<SSAInstruction> uses = defUse.getUses(v);
+				while (uses.hasNext()) {
+					
+					SSAInstruction use = uses.next();
+					if (!(use instanceof SSAPhiInstruction)) {
+						boolean usedLater = analyzer.isConnected(insIndex, use);
+						
+						register.add(v, usedLater);
+					} else {
+						Boolean pointerShadow = register.getCandidate(use.getDef());
+						if (pointerShadow == null) {
+							vs.add(v);
+						} else {
+							register.add(v, pointerShadow);
+						}
+					}
+				}
+			}
+			
+		}
+		
+		return register;
+
+	}
+
+
+	private Queue<Use> findStringsUses() {
+		Queue<Use> stringUses = Queues.newArrayDeque();
 		
 		for (int i = 0; i < ir.getInstructions().length; i++) {
 			
@@ -57,45 +177,32 @@ public class MethodAnalyzer {
 						int receiver = invokeIns.getReceiver();
 						LOG.debug("instruction id {} : methodName: {}; called on v{}", i, target.getName(), receiver);																		
 						
-						// first check if there are any uses
-						if (defUse.getNumberOfUses(receiver) > 0) {
-						
-							// get all uses of the receiver
-							Iterator<SSAInstruction> uses = defUse.getUses(receiver);
-							
-							while (uses.hasNext()) {
-								
-								SSAInstruction use = uses.next();
-								boolean usedLater = analyzer.isConnected(i, use);
-								
-								analyzer.findIndexForInstruction(use);
-								
-								// print out if this use is located after the method call
-								LOG.debug("use in instruction {} is used later: {}", 
-										analyzer.findIndexForInstruction(use), usedLater);
-								
-								substringReceiver.add(receiver, usedLater);
-								
-							}
-							
-						} else {
-							substringReceiver.add(receiver, false);
-							
-						}
+						stringUses.add(new Use(receiver, i));
 						
 					}
 				}
 			}
 				
 		}
-		// return the SSA variable names for this method
-		Set<Integer> candidates = substringReceiver.getCandidates();
-		LOG.debug("returning candidates: {}", candidates);	    			
+		return stringUses;
+	}
+
+	private class Use {
 		
-//		System.out.println("parameters: " + Arrays.toString(ir.getParameterValueNumbers()));
+		int ref;
+		int insIndex;
 		
+		Use(int receiver, int insIndex) {
+			super();
+			this.ref = receiver;
+			this.insIndex = insIndex;
+		}
+
 		
-		return candidates;
+		@Override
+		public String toString() {
+			return "Use [receiver=" + ref + ", insIndex=" + insIndex + "]";
+		}
 		
 	}
 	

@@ -166,4 +166,17 @@ BB7
 		}
 	}
 	
+	public String[] phi1(boolean is) {
+		String a = "";
+		
+		String b = a;
+		if (is) {
+			b = "had";
+		}
+		
+		a.substring(4);
+		
+		return new String[]{b};
+	}
+	
 }

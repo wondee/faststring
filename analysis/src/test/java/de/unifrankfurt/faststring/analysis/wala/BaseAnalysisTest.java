@@ -2,7 +2,6 @@ package de.unifrankfurt.faststring.analysis.wala;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
@@ -13,15 +12,10 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.ImmutableMap.Builder;
 import com.ibm.wala.classLoader.IClass;
 import com.ibm.wala.classLoader.IMethod;
-import com.ibm.wala.ipa.callgraph.AnalysisCache;
-import com.ibm.wala.ipa.callgraph.AnalysisOptions;
-import com.ibm.wala.ipa.callgraph.AnalysisScope;
-import com.ibm.wala.ipa.callgraph.impl.Everywhere;
 import com.ibm.wala.ipa.cha.ClassHierarchy;
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
 import com.ibm.wala.ssa.IR;
 import com.ibm.wala.util.WalaException;
-import com.ibm.wala.util.config.AnalysisScopeReader;
 
 /**
  * base test class for all analysis test cases. Takes care creating the {@link ClassHierarchy} and
@@ -39,48 +33,33 @@ public abstract class BaseAnalysisTest {
 	private static final String TEST_SCOPE_FILE = TEST_RES + "testScope.txt";
 	private static final String TEST_EXCLUSION_FILE = TEST_RES + "testExclusion.txt";	
 	
-	private static AnalysisScope scope = null;
-
-	private static ClassHierarchy classHierachy = null;
+	private static TargetApplication targetApplication;
 
 	private static Map<String, IClass> testClassMap = null;
-
-	private static AnalysisCache cache = new AnalysisCache();
-	private static AnalysisOptions options = new AnalysisOptions();
 	
 	@BeforeClass
 	public static void loadClassHierachie() throws IOException, ClassHierarchyException {
-		if (scope == null) {
-			LOG.info("initializing analysis scope");
-			
-			scope = AnalysisScopeReader.readJavaScope(TEST_SCOPE_FILE, 
-					new File(TEST_EXCLUSION_FILE), 
-					BaseAnalysisTest.class.getClassLoader());
+		if (targetApplication == null) {
+			targetApplication = new TargetApplication(TEST_SCOPE_FILE,TEST_EXCLUSION_FILE);
 		}
-		if (classHierachy == null) {
-			LOG.info("creating class hierachy...");
-			
-			classHierachy  = ClassHierarchy.make(scope);
-		}
+		
 	}
 	
 	private static void initTestClasses() {
-		checkNotNull(classHierachy, "classHierachy is null. This might be "
+		checkNotNull(targetApplication, "classHierachy is null. This might be "
 				+ "cause by not calling loadClassHierachie before");
 		
-		LOG.info("initializing test classes");
+		LOG.info("createing test classes map");
 
 		Builder<String, IClass> builder = new Builder<String, IClass>();
 		
-		for (IClass cl : classHierachy) {
-			if (scope.isApplicationLoader(cl.getClassLoader())) {
+		for (IClass cl : targetApplication.getApplicationClasses()) {
 				
-				String className = cl.getName().getClassName().toString();
+			String className = cl.getName().getClassName().toString();
+			
+			LOG.info("test class {} found", className);
+			builder.put(className, cl);
 				
-				LOG.info("test class {} found", className);
-				builder.put(className, cl);
-				
-			}	
 		}
 		
 		testClassMap = builder.build();
@@ -112,7 +91,8 @@ public abstract class BaseAnalysisTest {
 		Builder<String, IR> builder = new Builder<String, IR>();
 		
 		for (IMethod m : lookUpClass(name).getDeclaredMethods()) {
-			IR ir = cache.getSSACache().findOrCreateIR(m, Everywhere.EVERYWHERE, options.getSSAOptions());
+			
+			IR ir = targetApplication.findIRForMethod(m);
 			
 			builder.put(m.getName().toString(), ir);
 		}
@@ -141,11 +121,14 @@ public abstract class BaseAnalysisTest {
 		
 		for (String name : testClassMap.keySet()) {
 			for (IR ir : getIRsForClass(name).values()) {
-				System.out.println("---------------");
-				System.out.println(ir);
-				PDFUtil.printToPDF(classHierachy, ir);
+//				System.out.println("---------------");
+//				System.out.println(ir);
+				PDFUtil.printToPDF(targetApplication.getClassHierachy(), ir);
 			}
 		}
 	}
 	
+	public static TargetApplication getTargetApplication() {
+		return targetApplication;
+	}
 }

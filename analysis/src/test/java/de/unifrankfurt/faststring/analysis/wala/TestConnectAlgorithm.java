@@ -40,6 +40,7 @@ public class TestConnectAlgorithm extends BaseAnalysisTest {
 
 	}
 	
+	@Test
 	public void loopTest() {
 		IRAnalyzer analyzer = new IRAnalyzer(getIR(TEST_CLASS, "loopTest"));
 		
@@ -50,6 +51,12 @@ public class TestConnectAlgorithm extends BaseAnalysisTest {
 		assertFalse(analyzer.isConnected(17, 4));
 		assertFalse(analyzer.isConnected(18, 16));
 		assertFalse(analyzer.isConnected(18, 8));
+	}
+	
+	
+	@Test
+	public void phi1Test() {
+		IRAnalyzer analyzer = new IRAnalyzer(getIR(TEST_CLASS, "phi1"));	
 	}
 	
 }

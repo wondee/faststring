@@ -43,18 +43,20 @@ public final class PDFUtil {
 		String dotFile = wp.getProperty(WalaProperties.OUTPUT_DIR)
 				+ File.separatorChar + "ir.dt";
 
-
-		Graph<? extends ISSABasicBlock> g = ir.getControlFlowGraph();
-
-		NodeDecorator labels = PDFViewUtil.makeIRDecorator(ir);
-		// if (annotations != null) {
-		// labels = new ConcatenatingNodeDecorator(annotations, labels);
-		// }
-
-		g = CFGSanitizer.sanitize(ir, cha);
-
-		DotUtil.dotify(g, labels, dotFile, pdfFile, "/usr/bin/dot");
-
+		if (new File(pdfFile).exists()) {
+			System.out.println(pdfFile + " skipped");
+		} else {
+			Graph<? extends ISSABasicBlock> g = ir.getControlFlowGraph();
+	
+			NodeDecorator labels = PDFViewUtil.makeIRDecorator(ir);
+			// if (annotations != null) {
+			// labels = new ConcatenatingNodeDecorator(annotations, labels);
+			// }
+	
+			g = CFGSanitizer.sanitize(ir, cha);
+	
+			DotUtil.dotify(g, labels, dotFile, pdfFile, "/usr/bin/dot");
+		}
 	}
 
 }

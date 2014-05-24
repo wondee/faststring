@@ -1,5 +1,6 @@
 package de.unifrankfurt.faststring.analysis.wala;
 
+import java.util.Iterator;
 import java.util.List;
 
 import com.ibm.wala.ssa.IR;
@@ -15,7 +16,7 @@ public class IRAnalyzer {
 	public IRAnalyzer(IR ir) {
 		this.ir = ir;
 	}
-	
+
 	/**
 	 * checks if there is a way in the control flow graph from the given source instruction 
 	 * to the given {@link SSAInstruction}.
@@ -25,7 +26,16 @@ public class IRAnalyzer {
 	 * @return true if there is a way to the target, false otherwise
 	 */
 	public boolean isConnected(int src, SSAInstruction targetIns) {
-		return isConnected(src, findIndexForInstruction(targetIns));
+		int target = findIndexForInstruction(targetIns);
+		
+		if (target < 0) {
+			ISSABasicBlock srcBlock = ir.getControlFlowGraph().getBlockForInstruction(src);
+			ISSABasicBlock targetBlock = ir.getBasicBlockForInstruction(targetIns);
+			
+			return isConnected(srcBlock, targetBlock);
+		}
+		
+		return isConnected(src, target);
 	}
 	
 	/**
@@ -38,34 +48,45 @@ public class IRAnalyzer {
 	 */
 	public boolean isConnected(int src, int target) {
 		SSACFG graph = ir.getControlFlowGraph();
-		
+
 		ISSABasicBlock srcBlock = graph.getBlockForInstruction(src);
 		ISSABasicBlock targetBlock = graph.getBlockForInstruction(target);
-		
+
 		// src is in the same block as the target instruction and it is evaluated after src 
 		if (srcBlock.equals(targetBlock) && src < target) {
 			return true;
 		} else {
-	
-			BFSPathFinder<ISSABasicBlock> pathFinder = new BFSPathFinder<ISSABasicBlock>(
-					graph, 
-					graph.getSuccNodes(srcBlock), 
-					targetBlock);
-			
-			List<ISSABasicBlock> path = pathFinder.find();
-			
-			return path != null;
+			return isConnected(srcBlock, targetBlock);
 		}
+
 	}
 	
-
+	public boolean isConnected(ISSABasicBlock src, ISSABasicBlock target) {
+		SSACFG graph = ir.getControlFlowGraph();
+	
+		Iterator<ISSABasicBlock> succNodes = graph.getSuccNodes(src);
+		
+		BFSPathFinder<ISSABasicBlock> pathFinder = new BFSPathFinder<ISSABasicBlock>(
+				graph, 
+				succNodes, 
+				target);
+		
+		List<ISSABasicBlock> path = pathFinder.find();
+		
+		return path != null;
+		
+	}
+	
+	
 	public int findIndexForInstruction(SSAInstruction target) {
 		for (int i = 0; i < ir.getInstructions().length; i++) {
 			if (target == ir.getInstructions()[i]) {
 				return i;
 			}
 		}
-		throw new IllegalArgumentException(target + " was not found in the instruction set of the given ir");
-	}	
-	
+		
+		return -1;
+	}
+
+
 }

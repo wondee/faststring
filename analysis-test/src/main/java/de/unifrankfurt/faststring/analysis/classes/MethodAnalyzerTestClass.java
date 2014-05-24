@@ -27,49 +27,82 @@ public class MethodAnalyzerTestClass {
 		return a;
 	}
 	
-	public String doIf(boolean is) {
+	
+	public String[] phiBefore(boolean is) {
+		String a = "";
+		String b = a;
+		
+		if (is) {
+			b = "had";
+		}
+		
+		a.substring(4);
+		
+		return new String[]{b};
+	}
+	
+	public String phiAfter(boolean is) {
 		String a = "a";
 		
 		String b = "b";
 		
-		return((is) ? a : b).substring(3); 
-		
-	}
-	
-	public String phi1(boolean is) {
-		String a = "abc";
-		String b = "defg";
-		
-		String c = b.substring(3);
-		
-		if (is) {
-			c = a.substring(4);
-		}
-		
-		if (!is) {
-			c = a.substring(2);
-		}
+		String c = ((is) ? a : b);
 		
 		c.substring(3);
 		
-		return c;
+		return b;
+		
 	}
 	
-	public String phi2(boolean is) {
-		String a = "abc";
-		String b = "defg";
+	public String phiLoop(boolean is) {
+		String a = "a";
 		
-		String c = b.substring(3);
+		String b = "b";
 		
-		if (is) {
-			c = a.substring(4);
-		} else {
-			c = a.substring(2);
+		while(is) {
+			String c = ((is) ? a : b);
+			
+			b = c.substring(5);
+		}
+		return b;
+		
+	}
+	
+	public String phiLoop2(boolean is) {
+		String a = "";
+		
+		String b = "b";
+		
+		
+		while(is) {
+			
+			b = a.substring(5);
+		}
+		return b;
+		
+	}
+	
+	public String phiLoopAndIf(boolean is) {
+		String a = "a";
+		
+		String b = "b";
+		
+		String c = (is) ? a : b;
+		
+		while(is) {
+			String d = ((is) ? a : b);
+			
+			if (is) {
+				a = d.substring(3);
+			} else {
+				b = a.substring(4);
+			}
 		}
 		
-		c.substring(3);
+		c.substring(9);
 		
-		return c;
+		return b;
+		
 	}
 	
 }

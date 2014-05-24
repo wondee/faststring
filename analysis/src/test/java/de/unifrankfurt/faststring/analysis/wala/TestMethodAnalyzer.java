@@ -13,7 +13,7 @@ public class TestMethodAnalyzer extends BaseAnalysisTest {
 
 	private static final String TEST_CLASS = "MethodAnalyzerTestClass";
 	
-	private MethodAnalyzer __testee = new MethodAnalyzer();
+	private MethodAnalyzer __testee;
 	
 	@Test
 	public void testSimpleIfSubstring() {
@@ -25,19 +25,30 @@ public class TestMethodAnalyzer extends BaseAnalysisTest {
 		assertListEmpty(findCandidates("returnOfUsed"));
 	}
 	
+	
 	@Test
-	public void testDoIf() {
-		assertList(Arrays.asList(7), findCandidates("doIf"));
+	public void testPhiBefore() {
+		assertListEmpty(findCandidates("phiBefore"));
 	}
 	
 	@Test
-	public void testPhi1() {
-		assertList(Arrays.asList(5), findCandidates("phi1"));
+	public void testPhiAfter() {
+		assertList(Arrays.asList(4, 7), findCandidates("phiAfter"));
+	}
+
+	@Test
+	public void testPhiLoop() {
+		assertListEmpty(findCandidates("phiLoop"));
 	}
 	
 	@Test
-	public void testPhi2() {
-		assertList(Arrays.asList(4, 5), findCandidates("phi2"));
+	public void testPhiLoop2() {
+		assertListEmpty(findCandidates("phiLoop2"));
+	}
+	
+	@Test
+	public void testPhiLoopAndIf() {
+		assertListEmpty(findCandidates("phiLoopAndIf"));
 	}
 	
 	private void assertListEmpty(Set<Integer> candidates) {
@@ -52,7 +63,9 @@ public class TestMethodAnalyzer extends BaseAnalysisTest {
 	
 	
 	private Set<Integer> findCandidates(String method) {
-		return __testee.findCandidates(getIR(TEST_CLASS, method).getMethod());
+		__testee = new MethodAnalyzer(getTargetApplication(), getIR(TEST_CLASS, method).getMethod());
+		
+		return __testee.findCandidates();
 	}
 	
 }

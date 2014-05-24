@@ -1,7 +1,6 @@
 package de.unifrankfurt.faststring.analysis.wala;
 
 import static com.google.common.base.Predicates.equalTo;
-
 import static com.google.common.collect.Maps.filterValues;
 import static com.google.common.collect.Maps.newHashMap;
 
@@ -49,6 +48,10 @@ public class UseRegister {
 	 */
 	public Set<Integer> getCandidates() {
 		return filterValues(useMap, equalTo(false)).keySet();
+	}
+
+	public Boolean getCandidate(int def) {
+		return useMap.get(def);
 	}
 	
 }
