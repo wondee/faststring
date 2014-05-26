@@ -1,4 +1,4 @@
-package de.unifrankfurt.faststring.analysis.wala;
+package de.unifrankfurt.faststring.analysis;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -16,6 +16,9 @@ import com.ibm.wala.ipa.cha.ClassHierarchy;
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
 import com.ibm.wala.ssa.IR;
 import com.ibm.wala.util.WalaException;
+
+import de.unifrankfurt.faststring.analysis.PDFUtil;
+import de.unifrankfurt.faststring.analysis.TargetApplication;
 
 /**
  * base test class for all analysis test cases. Takes care creating the {@link ClassHierarchy} and

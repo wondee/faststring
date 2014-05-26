@@ -1,4 +1,4 @@
-package de.unifrankfurt.faststring.analysis.wala;
+package de.unifrankfurt.faststring.analysis;
 
 import java.io.File;
 import java.io.IOException;

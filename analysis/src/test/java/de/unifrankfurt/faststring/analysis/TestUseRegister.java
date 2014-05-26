@@ -1,4 +1,4 @@
-package de.unifrankfurt.faststring.analysis.wala;
+package de.unifrankfurt.faststring.analysis;
 
 import static org.junit.Assert.*;
 
@@ -8,6 +8,8 @@ import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import de.unifrankfurt.faststring.analysis.UseRegister;
 
 public class TestUseRegister {
 

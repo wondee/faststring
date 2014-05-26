@@ -1,4 +1,4 @@
-package de.unifrankfurt.faststring.analysis.wala;
+package de.unifrankfurt.faststring.analysis;
 
 import java.io.IOException;
 
@@ -19,7 +19,7 @@ public class WalaTest {
 
 			System.out.println("-- Class: " + clazz.getName());
 			for (IMethod m : clazz.getDeclaredMethods()) {
-				MethodAnalyzer analyzer = new MethodAnalyzer(targetApplication, m);
+				SubstringAnalyzer analyzer = new SubstringAnalyzer(targetApplication, m);
 				analyzer.findCandidates();
 
 			}

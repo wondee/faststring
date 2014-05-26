@@ -1,4 +1,4 @@
-package de.unifrankfurt.faststring.analysis.wala;
+package de.unifrankfurt.faststring.analysis;
 
 import static com.google.common.base.Predicates.equalTo;
 import static com.google.common.collect.Maps.filterValues;

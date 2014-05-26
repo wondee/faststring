@@ -1,4 +1,4 @@
-package de.unifrankfurt.faststring.analysis.wala;
+package de.unifrankfurt.faststring.analysis;
 
 import static com.ibm.wala.ipa.callgraph.impl.Util.*;
 

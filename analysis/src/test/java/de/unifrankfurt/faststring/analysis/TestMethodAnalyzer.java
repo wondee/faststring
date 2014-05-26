@@ -1,4 +1,4 @@
-package de.unifrankfurt.faststring.analysis.wala;
+package de.unifrankfurt.faststring.analysis;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -9,11 +9,13 @@ import java.util.Set;
 
 import org.junit.Test;
 
+import de.unifrankfurt.faststring.analysis.SubstringAnalyzer;
+
 public class TestMethodAnalyzer extends BaseAnalysisTest {
 
 	private static final String TEST_CLASS = "MethodAnalyzerTestClass";
 	
-	private MethodAnalyzer __testee;
+	private SubstringAnalyzer __testee;
 	
 	@Test
 	public void testSimpleIfSubstring() {
@@ -63,7 +65,7 @@ public class TestMethodAnalyzer extends BaseAnalysisTest {
 	
 	
 	private Set<Integer> findCandidates(String method) {
-		__testee = new MethodAnalyzer(getTargetApplication(), getIR(TEST_CLASS, method).getMethod());
+		__testee = new SubstringAnalyzer(getTargetApplication(), getIR(TEST_CLASS, method).getMethod());
 		
 		return __testee.findCandidates();
 	}

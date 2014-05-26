@@ -1,9 +1,12 @@
-package de.unifrankfurt.faststring.analysis.wala;
+package de.unifrankfurt.faststring.analysis;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
+
+import de.unifrankfurt.faststring.analysis.IRAnalyzer;
+import de.unifrankfurt.faststring.analysis.IRUtil;
 
 /**
  * test for {@link IRUtil#isConnected(com.ibm.wala.ssa.IR, int, com.ibm.wala.ssa.SSAInstruction)}
