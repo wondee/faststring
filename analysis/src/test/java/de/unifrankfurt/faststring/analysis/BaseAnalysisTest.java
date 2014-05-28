@@ -50,9 +50,9 @@ public abstract class BaseAnalysisTest {
 	
 	private static void initTestClasses() {
 		checkNotNull(targetApplication, "classHierachy is null. This might be "
-				+ "cause by not calling loadClassHierachie before");
+				+ "caused by not calling loadClassHierachie before");
 		
-		LOG.info("createing test classes map");
+		LOG.info("creating test classes map");
 
 		Builder<String, IClass> builder = new Builder<String, IClass>();
 		
@@ -124,8 +124,6 @@ public abstract class BaseAnalysisTest {
 		
 		for (String name : testClassMap.keySet()) {
 			for (IR ir : getIRsForClass(name).values()) {
-//				System.out.println("---------------");
-//				System.out.println(ir);
 				PDFUtil.printToPDF(targetApplication.getClassHierachy(), ir);
 			}
 		}

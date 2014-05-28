@@ -1,21 +1,22 @@
 package de.unifrankfurt.faststring.analysis.graph;
 
-import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
-import java.util.Queue;
+import java.util.Set;
+import java.util.Stack;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.ibm.wala.ssa.DefUse;
-import com.ibm.wala.ssa.SSAInstruction;
-import com.ibm.wala.ssa.SSAPhiInstruction;
-
-import de.unifrankfurt.faststring.analysis.model.StringReference;
+import com.google.common.collect.Sets;
 
 public class IntraproceduralPointerGraph {
 	
 	Map<Integer, PointerNode> nodes = Maps.newHashMap();
-
 	
+	public IntraproceduralPointerGraph(Map<Integer, PointerNode> nodeMap) {
+		nodes = nodeMap;
+	}
+
 	public boolean contains(Integer key) {
 		return nodes.containsKey(key);
 	}
@@ -24,71 +25,53 @@ public class IntraproceduralPointerGraph {
 		return nodes.get(ref);
 	}
 
-	public void add(PointerNode node) {
-		nodes.put(node.valueNumber(), node);
-	}
-
-	public void addEdge(int src, int target) {
-		PointerNode srcNode = nodes.get(src);
-		PointerNode targetNode = nodes.get(target);
-		srcNode.addSuccessor(targetNode);
-		targetNode.addPredecessor(srcNode);
-		
+	public boolean hasEdge(int srcNode, int targetNode) {
+		return GraphUtil.hasEdge(nodes.get(srcNode), nodes.get(targetNode));
 	}
 
 	public int size() {
 		return nodes.size();
 	}
 
-	public static IntraproceduralPointerGraph create(DefUse defUse,
-			Queue<StringReference> stringUses) {
-		IntraproceduralPointerGraph graph = new IntraproceduralPointerGraph();
+	public List<Integer> findAllPredeseccors(int valueNumber) {
+		Set<Integer> preNodes = Sets.newHashSet();
+		Set<Integer> checkedNumbers = Sets.newHashSet();
+		Stack<Integer> numbersToCheck = new Stack<Integer>();
 		
-		while (!stringUses.isEmpty()) {
-			StringReference stringUse = (StringReference) stringUses.remove();
-			int ref = stringUse.ref();
+		numbersToCheck.push(valueNumber);
+
+		while (!numbersToCheck.isEmpty()) {
+			int currentNumber = numbersToCheck.pop();
 			
-			if (!graph.contains(stringUse.ref())) {
-				graph.add(new PointerNode(stringUse.ref()));
-			}
-			
-			SSAInstruction def = defUse.getDef(ref);
-			
-			if (def instanceof SSAPhiInstruction) {
-				for (int i = 0; i < def.getNumberOfUses(); i++) {
-					int pointer = def.getUse(i);
-					
-					addToGraph(stringUses, graph, pointer);
-					graph.addEdge(pointer, ref);
-					
+			if (!checkedNumbers.contains(currentNumber)) {
+				PointerNode node = get(currentNumber);
+				
+				for (Integer i : node.getPredeseccors()) {
+					numbersToCheck.push(i);
+					preNodes.add(i);
 				}
+				
+				checkedNumbers.add(currentNumber);
 			}
 			
-			Iterator<SSAInstruction> uses = defUse.getUses(ref);
-			
-			while (uses.hasNext()) {
-				SSAInstruction use = uses.next();
-				if (use instanceof SSAPhiInstruction) {
-					int pointer = use.getDef();
-					
-					addToGraph(stringUses, graph, pointer);
-					graph.addEdge(ref, pointer);
-					
-				}
-			}
 		}
 		
-		return graph;
+		return Lists.newLinkedList(preNodes);
 	}
 	
-	private static void addToGraph(Queue<StringReference> stringUses,
-			IntraproceduralPointerGraph graph, int pointer) {
-		if (!graph.contains(pointer)) {
-			graph.add(new PointerNode(pointer));
-			
-			stringUses.add(new StringReference(pointer));
+	@Override
+	public String toString() {
+		String linebreak = System.getProperty("line.separator");
+		StringBuilder builder = new StringBuilder(linebreak);
+		
+		for (PointerNode node : nodes.values()) {
+			builder
+				.append("  ")
+				.append(node)
+				.append(linebreak);
 		}
+		
+		return builder.toString();
 	}
-	
 	
 }

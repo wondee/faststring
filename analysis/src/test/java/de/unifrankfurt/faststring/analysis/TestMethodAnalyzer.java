@@ -7,10 +7,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import de.unifrankfurt.faststring.analysis.SubstringAnalyzer;
 
+@Ignore
 public class TestMethodAnalyzer extends BaseAnalysisTest {
 
 	private static final String TEST_CLASS = "MethodAnalyzerTestClass";

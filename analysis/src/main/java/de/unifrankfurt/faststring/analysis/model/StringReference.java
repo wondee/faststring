@@ -16,7 +16,7 @@ public class StringReference {
 		
 	}
 
-	public int ref() {
+	public int valueNumber() {
 		return ref;
 	}
 

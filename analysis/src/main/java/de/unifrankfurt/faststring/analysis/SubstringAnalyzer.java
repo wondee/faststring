@@ -1,6 +1,6 @@
 package de.unifrankfurt.faststring.analysis;
 
-
+import static de.unifrankfurt.faststring.analysis.graph.GraphUtil.*;
 import static de.unifrankfurt.faststring.analysis.IRUtil.METHOD_SUBSTRING;
 import static de.unifrankfurt.faststring.analysis.IRUtil.METHOD_SUBSTRING_DEFAULT_START;
 import static de.unifrankfurt.faststring.analysis.IRUtil.STRING_TYPE;
@@ -25,6 +25,8 @@ import com.ibm.wala.ssa.IR;
 import com.ibm.wala.ssa.SSAInstruction;
 import com.ibm.wala.ssa.SSAPhiInstruction;
 
+import de.unifrankfurt.faststring.analysis.graph.GraphBuilder;
+import de.unifrankfurt.faststring.analysis.graph.GraphUtil;
 import de.unifrankfurt.faststring.analysis.graph.IntraproceduralPointerGraph;
 import de.unifrankfurt.faststring.analysis.model.StringReference;
 import de.unifrankfurt.faststring.analysis.model.StringUse;
@@ -70,9 +72,9 @@ public class SubstringAnalyzer {
 		
 		checkDefs(stringUses);
 		
-		IntraproceduralPointerGraph graph = IntraproceduralPointerGraph.create(defUse, stringUses);
+		IntraproceduralPointerGraph graph = GraphBuilder.create(defUse, stringUses);
 		
-		
+		checkDefinition(stringUses, graph);
 //		Map<Integer, List<Integer>> stringCalls = checkForPhis(stringUses);
 		
 //		UseRegister substringReceiver = checkCandidates(stringCalls);
@@ -87,10 +89,21 @@ public class SubstringAnalyzer {
 	
 
 
+	private void checkDefinition(Queue<StringReference> stringUses,
+			IntraproceduralPointerGraph graph) {
+		for (StringReference ref : stringUses) {
+			List<Integer> pointers = graph.findAllPredeseccors(ref.valueNumber());
+			
+		}
+		
+		
+	}
+
+
 	private void checkDefs(Queue<StringReference> stringUses) {
 		for (StringReference stringUse : stringUses) {
 			
-			if (params.contains(stringUse.ref())) {
+			if (params.contains(stringUse.valueNumber())) {
 				stringUse.setToParam();
 			}
 			// TODO: some possible other definitions
@@ -125,13 +138,13 @@ public class SubstringAnalyzer {
 		Queue<StringUse> q = Queues.newArrayDeque(stringUses);
 		
 		for (StringUse use : stringUses) {
-			stringCalls.put(use.insIndex(), Lists.newArrayList(use.ref()));
+			stringCalls.put(use.insIndex(), Lists.newArrayList(use.valueNumber()));
 		}
 		
 		while (!q.isEmpty()) {
 			StringUse use = q.remove();
 			
-			SSAInstruction def = defUse.getDef(use.ref());
+			SSAInstruction def = defUse.getDef(use.valueNumber());
 			
 			if (def instanceof SSAPhiInstruction) {
 				for (int i = 0; i < def.getNumberOfUses(); i++) {
@@ -146,7 +159,7 @@ public class SubstringAnalyzer {
 				
 			}
 			
-			Iterator<SSAInstruction> usesIter = defUse.getUses(use.ref());
+			Iterator<SSAInstruction> usesIter = defUse.getUses(use.valueNumber());
 			
 			while (usesIter.hasNext()) {
 				SSAInstruction ins = usesIter.next();

@@ -56,10 +56,4 @@ public class TestConnectAlgorithm extends BaseAnalysisTest {
 		assertFalse(analyzer.isConnected(18, 8));
 	}
 	
-	
-	@Test
-	public void phi1Test() {
-		IRAnalyzer analyzer = new IRAnalyzer(getIR(TEST_CLASS, "phi1"));	
-	}
-	
 }
