@@ -5,7 +5,7 @@ import org.junit.Test;
 public class TestSubstringAnalysis extends BaseAnalysisTest {
 
 	@Test
-	public void testParser() {
+	public void testDef() {
 		
 	}
 	

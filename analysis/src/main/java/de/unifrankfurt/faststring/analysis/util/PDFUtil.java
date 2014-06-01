@@ -1,4 +1,4 @@
-package de.unifrankfurt.faststring.analysis;
+package de.unifrankfurt.faststring.analysis.util;
 
 import java.io.File;
 import java.util.Properties;
@@ -52,7 +52,7 @@ public final class PDFUtil {
 			// if (annotations != null) {
 			// labels = new ConcatenatingNodeDecorator(annotations, labels);
 			// }
-	
+			System.out.println(ir);
 			g = CFGSanitizer.sanitize(ir, cha);
 	
 			DotUtil.dotify(g, labels, dotFile, pdfFile, "/usr/bin/dot");

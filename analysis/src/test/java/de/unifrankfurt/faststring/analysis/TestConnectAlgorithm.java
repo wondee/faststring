@@ -6,7 +6,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import de.unifrankfurt.faststring.analysis.IRAnalyzer;
-import de.unifrankfurt.faststring.analysis.IRUtil;
+import de.unifrankfurt.faststring.analysis.util.IRUtil;
 
 /**
  * test for {@link IRUtil#isConnected(com.ibm.wala.ssa.IR, int, com.ibm.wala.ssa.SSAInstruction)}
@@ -18,6 +18,11 @@ public class TestConnectAlgorithm extends BaseAnalysisTest {
 
 	
 	private final static String TEST_CLASS = "ConnectTestClass";
+	
+	@Test
+	public void test() {
+		System.out.println(getIR(TEST_CLASS, "simple"));
+	}
 	
 	
 	@Test

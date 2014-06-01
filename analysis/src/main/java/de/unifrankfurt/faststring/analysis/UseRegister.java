@@ -14,6 +14,7 @@ import java.util.Set;
  * @author markus
  *
  */
+@Deprecated
 public class UseRegister {
 
 	private Map<Integer, Boolean> useMap = newHashMap();

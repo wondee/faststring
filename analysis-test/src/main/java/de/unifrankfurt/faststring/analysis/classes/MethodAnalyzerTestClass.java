@@ -105,4 +105,9 @@ public class MethodAnalyzerTestClass {
 		
 	}
 	
+	public void paramDef(String a) {
+		String b = a.substring(4);
+		b.substring(3, 6);
+	}
+	
 }

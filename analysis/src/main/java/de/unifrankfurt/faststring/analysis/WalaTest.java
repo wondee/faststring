@@ -13,8 +13,8 @@ public class WalaTest {
 			CancelException {
 
 		TargetApplication targetApplication = new TargetApplication("src/main/resources/test.txt");
-
-
+		
+		
 		for (IClass clazz : targetApplication.getApplicationClasses()) {
 
 			System.out.println("-- Class: " + clazz.getName());
