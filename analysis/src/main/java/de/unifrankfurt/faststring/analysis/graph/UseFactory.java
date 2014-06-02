@@ -9,7 +9,7 @@ import com.ibm.wala.ssa.SSAReturnInstruction;
 
 import de.unifrankfurt.faststring.analysis.util.IRUtil;
 
-public class UseFactory extends DataFlowCreationStrategy<Use> implements IVisitor  {
+public class UseFactory extends DataFlowCreationVisitor<Use> implements IVisitor  {
 
 
 	private int v;
@@ -17,9 +17,9 @@ public class UseFactory extends DataFlowCreationStrategy<Use> implements IVisito
 	public UseFactory(int valueNumber) {
 		v = valueNumber;
 	}
-
+	
 	@Override
-	protected Use createInvoke(SSAInvokeInstruction invoke) {
+	public void visitInvoke(SSAInvokeInstruction invoke) {
 		Use use;
 		
 		// determine if the use refers to the receiver
@@ -34,33 +34,28 @@ public class UseFactory extends DataFlowCreationStrategy<Use> implements IVisito
 		} else {
 			use = Use.createUsedAsReceiver(invoke.getDeclaredTarget(), def, IRUtil.getUsesList(invoke, 1));
 		}
-		return use;
+		
+		setResult(use);
 	}
 	
 	@Override
-	protected Use createReturn(SSAReturnInstruction instruction) {
-		return Use.createReturned();
+	public void visitReturn(SSAReturnInstruction instruction) {
+		setResult(Use.createReturned());
 	}
 	
 	@Override
-	protected Use createPhi(SSAPhiInstruction instruction) {
-		return Use.createUsedInPhi(instruction.getDef());
-	}
-	
-	public Use create(SSAPhiInstruction phi) {
-		return Use.createUsedInPhi(phi.getDef());
+	public void visitPhi(SSAPhiInstruction instruction) {
+		setResult(Use.createUsedInPhi(instruction.getDef()));
 	}
 	
 	@Override
-	protected Use createPut(SSAPutInstruction instruction) {
-		// TODO to change when going interprozedural
-		return Use.createReturned();
+	public void visitPut(SSAPutInstruction instruction) {
+		setResult(Use.createReturned());
 	}
 	
 	@Override
-	protected Use createArrayStore(SSAArrayStoreInstruction instruction) {
-		// TODO maybe create a StoredInArrays to try to replace the whole arrays instance
-		return Use.createReturned();
+	public void visitArrayStore(SSAArrayStoreInstruction instruction) {
+		setResult(Use.createReturned());
 	}
 
 

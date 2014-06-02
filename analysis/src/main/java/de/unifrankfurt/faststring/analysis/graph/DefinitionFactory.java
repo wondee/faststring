@@ -6,17 +6,20 @@ import com.ibm.wala.ssa.SSAPhiInstruction;
 import de.unifrankfurt.faststring.analysis.util.IRUtil;
 
 
-public class DefinitionFactory extends  DataFlowCreationStrategy<Definition> {
+public class DefinitionFactory extends  DataFlowCreationVisitor<Definition> {
 	
 	
 	@Override
-	protected Definition createInvoke(SSAInvokeInstruction invoke) {
-		return Definition.createCallResultDefinition(invoke.getDeclaredTarget(), invoke.getReceiver());
+	public void visitInvoke(SSAInvokeInstruction invoke) {
+		Definition result = Definition.createCallResultDefinition(invoke.getDeclaredTarget(), invoke.getReceiver());
+		setResult(result);
 	}
-
+	
 	@Override
-	protected Definition createPhi(SSAPhiInstruction instruction) {
-		return Definition.createPhiDefinitionInfo(IRUtil.getUsesList(instruction));
+	public void visitPhi(SSAPhiInstruction instruction) {
+		Definition result = Definition.createPhiDefinitionInfo(IRUtil.getUsesList(instruction));
+		setResult(result);
+	
 	}
 	
 }
