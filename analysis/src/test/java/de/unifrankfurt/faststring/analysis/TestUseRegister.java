@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import de.unifrankfurt.faststring.analysis.UseRegister;
 
+@SuppressWarnings("deprecation")
 public class TestUseRegister {
 
 	private static final List<Integer> ALL_NUMBERS = Arrays.asList(1,2,3,4);
