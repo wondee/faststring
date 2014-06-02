@@ -31,7 +31,7 @@ public class DataFlowGraph {
 	}
 	
 
-	public Collection<StringReference> findAllStartingPoints() {
+	public Collection<StringReference> getAllLabelMatchingReferences() {
 		
 		Predicate<StringReference> p = new Predicate<StringReference>() {
 			@Override

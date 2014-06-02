@@ -106,7 +106,7 @@ public class TestDataFlowGraph extends BaseAnalysisTest {
 	}
 	
 	private Iterable<Integer> getStartingPointsAsInts(DataFlowGraph graph) {
-		return Iterables.transform(graph.findAllStartingPoints(), GraphUtil.stringReferenceToInt);
+		return Iterables.transform(graph.getAllLabelMatchingReferences(), GraphUtil.stringReferenceToInt);
 	}
 	
 	

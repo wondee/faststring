@@ -45,7 +45,7 @@ public class SubstringAnalyzer {
 		
 		DataFlowGraph graph = new DataFlowGraphBuilder(identifier, ir, defUse).createDataFlowGraph();
 		
-		Collection<StringReference> substring = graph.findAllStartingPoints();
+		Collection<StringReference> substring = graph.getAllLabelMatchingReferences();
 		
 //		if (!stringUses.isEmpty()) {
 //			DataFlowGraph graph = DataFlowGraphBuilder.create(defUse, Queues.newArrayDeque(stringUses));
