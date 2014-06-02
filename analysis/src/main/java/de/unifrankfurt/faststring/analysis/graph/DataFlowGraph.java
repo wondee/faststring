@@ -10,11 +10,17 @@ import de.unifrankfurt.faststring.analysis.label.Label;
 
 public class DataFlowGraph {
 	
-	Map<Integer, StringReference> nodes = Maps.newHashMap();
-	private Label label;
+	private final Map<Integer, StringReference> nodes;
+	private final Label label;
+	private final Predicate<StringReference> matchedLabel = new Predicate<StringReference>() {
+		@Override
+		public boolean apply(StringReference ref) {
+			return label == ref.getLabel();
+		}
+	};
 	
 	public DataFlowGraph(Label label, Map<Integer, StringReference> nodeMap) {
-		nodes = nodeMap;
+		this.nodes = nodeMap;
 		this.label = label;
 	}
 
@@ -32,14 +38,7 @@ public class DataFlowGraph {
 	
 
 	public Collection<StringReference> getAllLabelMatchingReferences() {
-		
-		Predicate<StringReference> p = new Predicate<StringReference>() {
-			@Override
-			public boolean apply(StringReference ref) {
-				return label == ref.getLabel();
-			}
-		};
-		return Maps.filterValues(nodes, p ).values();
+		return Maps.filterValues(nodes, matchedLabel).values();
 	}
 
 

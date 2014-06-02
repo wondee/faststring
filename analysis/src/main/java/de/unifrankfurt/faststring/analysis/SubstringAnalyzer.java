@@ -1,11 +1,13 @@
 package de.unifrankfurt.faststring.analysis;
 
 import java.util.Collection;
+import java.util.Queue;
 import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Sets;
 import com.ibm.wala.classLoader.IMethod;
 import com.ibm.wala.ssa.DefUse;
 import com.ibm.wala.ssa.IR;
@@ -14,6 +16,7 @@ import de.unifrankfurt.faststring.analysis.graph.DataFlowGraph;
 import de.unifrankfurt.faststring.analysis.graph.DataFlowGraphBuilder;
 import de.unifrankfurt.faststring.analysis.graph.StringReference;
 import de.unifrankfurt.faststring.analysis.label.Label;
+import de.unifrankfurt.faststring.analysis.util.UniqueQueue;
 
 public class SubstringAnalyzer {
 
@@ -39,30 +42,28 @@ public class SubstringAnalyzer {
 	}
 	
 	
-	public Set<Integer> findCandidates() {
+	public Set<StringReference> findCandidates() {
 		LOG.info("analyzing Method: {}", method.getSignature());
-		
 		
 		DataFlowGraph graph = new DataFlowGraphBuilder(identifier, ir, defUse).createDataFlowGraph();
 		
 		Collection<StringReference> substring = graph.getAllLabelMatchingReferences();
 		
-//		if (!stringUses.isEmpty()) {
-//			DataFlowGraph graph = DataFlowGraphBuilder.create(defUse, Queues.newArrayDeque(stringUses));
-//			
-//			checkDefinition(stringUses, graph);
-//			
-//			System.out.println("after checkDefinition: " + stringUses);
-//			
-//			checkUses(stringUses, graph);
-//			
-//			System.out.println("after checkUses: " + stringUses);
-//			
-//		} else {
-//			LOG.debug("no string uses found");
-//		}					
+		Set<StringReference> bubble = Sets.newHashSet(substring);
 		
-		return null;
+		if (substring.size() > 0) {
+			Queue<StringReference> refQueue = new UniqueQueue<>(substring);
+			
+			while(!refQueue.isEmpty()) {
+				refQueue.remove();
+				
+				
+			}
+			
+		} else {
+			LOG.debug("no string uses found");
+		}	
+		return bubble;
 		
 	}
 	
