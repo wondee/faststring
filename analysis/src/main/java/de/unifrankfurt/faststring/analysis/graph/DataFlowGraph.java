@@ -1,15 +1,21 @@
 package de.unifrankfurt.faststring.analysis.graph;
 
+import java.util.Collection;
 import java.util.Map;
 
+import com.google.common.base.Predicate;
 import com.google.common.collect.Maps;
+
+import de.unifrankfurt.faststring.analysis.label.Label;
 
 public class DataFlowGraph {
 	
 	Map<Integer, StringReference> nodes = Maps.newHashMap();
+	private Label label;
 	
-	public DataFlowGraph(Map<Integer, StringReference> nodeMap) {
+	public DataFlowGraph(Label label, Map<Integer, StringReference> nodeMap) {
 		nodes = nodeMap;
+		this.label = label;
 	}
 
 	public boolean contains(Integer key) {
@@ -20,22 +26,24 @@ public class DataFlowGraph {
 		return nodes.get(ref);
 	}
 
-//	public boolean hasEdge(int srcNode, int targetNode) {
-//		return GraphUtil.hasEdge(nodes.get(srcNode), nodes.get(targetNode));
-//	}
-
 	public int size() {
 		return nodes.size();
 	}
+	
 
-//	public List<Integer> findAllSuccessors(int valueNumber) {
-//		return findAll(EdgeType.S, valueNumber);
-//	}
-//	
-//	public List<Integer> findAllPredeseccors(int valueNumber) {
-//		return findAll(EdgeType.P, valueNumber);
-//	}
-//
+	public Collection<StringReference> findAllStartingPoints() {
+		
+		Predicate<StringReference> p = new Predicate<StringReference>() {
+			@Override
+			public boolean apply(StringReference ref) {
+				return label == ref.getLabel();
+			}
+		};
+		return Maps.filterValues(nodes, p ).values();
+	}
+
+
+
 //	private List<Integer> findAll(EdgeType type, int valueNumber) {
 //		Set<Integer> nodes = Sets.newHashSet();
 //		Set<Integer> checkedNumbers = Sets.newHashSet();
@@ -61,21 +69,7 @@ public class DataFlowGraph {
 //		
 //		return Lists.newLinkedList(nodes);
 //	}
-//	
-//	private List<Integer> findAllWithSelf(EdgeType type, int valueNumber) {
-//		List<Integer> list = findAll(type, valueNumber);
-//		list.add(valueNumber);
-//		
-//		return list;
-//	}
-//	
-//	public List<Integer> findAllPredeseccorsWithSelf(int valueNumber) {
-//		return findAllWithSelf(EdgeType.P, valueNumber);
-//	}
-//	
-//	public List<Integer> findAllSuccessorsWithSelf(int valueNumber) {
-//		return findAllWithSelf(EdgeType.S, valueNumber);
-//	}
+
 	
 	
 	@Override

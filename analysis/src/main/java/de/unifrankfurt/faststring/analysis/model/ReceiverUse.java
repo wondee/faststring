@@ -22,8 +22,6 @@ public class ReceiverUse extends Use {
 		for (int i = 0; i < unfilteredParams.size(); i++) {
 			
 			TypeReference parameterType = method.getParameterType(i);
-			
-			System.out.println("param type: " + parameterType);
 			if (IRUtil.STRING_TYPE.equals(parameterType)) {
 				this.params.add(unfilteredParams.get(i));
 			}

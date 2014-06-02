@@ -10,7 +10,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.Set;
 
@@ -85,19 +84,11 @@ public class DataFlowGraphBuilder {
 			checkDefinition(stringRef);
 			checkUses(stringRef);
 			
-			System.out.println(stringRef);
-			
 			refs.addAll(findNewRefs(stringRef, refMap.keySet()));
-			
-			
-		}
-		
-		for (Entry<Integer, StringReference> e : refMap.entrySet()) {
-			System.out.println(e.getKey()  + " : " + e.getValue());
 		}
 
-		DataFlowGraph graph = new DataFlowGraph(ImmutableMap.copyOf(refMap));
-		LOG.debug("created dataflow graph: {}", graph);
+		DataFlowGraph graph = new DataFlowGraph(identifier.label(), ImmutableMap.copyOf(refMap));
+		LOG.debug("created dataflow graph for {}: {}", ir.getMethod().getSignature(), graph);
 		
 		return graph;
 	}
@@ -155,7 +146,7 @@ public class DataFlowGraphBuilder {
 			int receiver = identifier.check(ins);
 			
 			if (receiver > -1) {
-				stringReference.add(new StringReference(receiver));
+				stringReference.add(new StringReference(receiver, identifier.label()));
 				
 			}
 							

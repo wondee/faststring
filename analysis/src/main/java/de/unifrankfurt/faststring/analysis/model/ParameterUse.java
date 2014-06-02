@@ -7,13 +7,13 @@ import com.ibm.wala.types.MethodReference;
 
 import de.unifrankfurt.faststring.analysis.util.IRUtil;
 
-public class ParamUse extends Use {
+public class ParameterUse extends Use {
 
 	private MethodReference method;
 	private int def;
 	private int index;
 
-	public ParamUse(MethodReference method, int def, int index) {
+	public ParameterUse(MethodReference method, int def, int index) {
 		this.method = method;
 		this.def = def;
 		this.index = index;

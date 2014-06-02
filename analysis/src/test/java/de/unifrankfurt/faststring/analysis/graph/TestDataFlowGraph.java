@@ -1,7 +1,6 @@
 package de.unifrankfurt.faststring.analysis.graph;
 
-import static de.unifrankfurt.faststring.analysis.util.IRUtil.METHOD_SUBSTRING;
-import static de.unifrankfurt.faststring.analysis.util.IRUtil.METHOD_SUBSTRING_DEFAULT_START;
+import static de.unifrankfurt.faststring.analysis.util.TestUtilities.assertList;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -9,11 +8,13 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
+import com.google.common.collect.Iterables;
 import com.ibm.wala.ssa.DefUse;
 import com.ibm.wala.ssa.IR;
 
 import de.unifrankfurt.faststring.analysis.BaseAnalysisTest;
 import de.unifrankfurt.faststring.analysis.StringCallIdentifier;
+import de.unifrankfurt.faststring.analysis.label.Label;
 import de.unifrankfurt.faststring.analysis.model.CallResultDefinition;
 import de.unifrankfurt.faststring.analysis.model.ConstantDefinition;
 import de.unifrankfurt.faststring.analysis.model.PhiDefinition;
@@ -32,16 +33,13 @@ public class TestDataFlowGraph extends BaseAnalysisTest {
 		assertTrue(graph.contains(10));
 		assertTrue(graph.contains(11));
 		
-		
-//		assertTrue(graph.hasEdge(5, 11));
-//		assertTrue(graph.hasEdge(4, 7));
-//		assertTrue(graph.hasEdge(11, 7));
-		
 		assertEquals(5, graph.size());
 
 		assertThat(graph.get(5).getDef(), instanceOf(ConstantDefinition.class));
 		assertThat(graph.get(10).getDef(), instanceOf(CallResultDefinition.class));
 		assertThat(graph.get(7).getDef(), instanceOf(PhiDefinition.class));
+		
+		assertList(getStartingPointsAsInts(graph), 7);
 	}
 
 	@Test
@@ -58,14 +56,15 @@ public class TestDataFlowGraph extends BaseAnalysisTest {
 		assertTrue(graph.contains(20));
 		assertTrue(graph.contains(23));
 		
-//		assertTrue(graph.hasEdge(22, 23));
-//		assertTrue(graph.hasEdge(20, 23));		
 		
 		assertEquals(8, graph.size());
 		
 		assertThat(graph.get(4).getDef(), instanceOf(ConstantDefinition.class));
 		assertThat(graph.get(9).getDef(), instanceOf(CallResultDefinition.class));
 		assertThat(graph.get(20).getDef(), instanceOf(CallResultDefinition.class));
+		
+
+		assertList(getStartingPointsAsInts(graph), 4, 5);
 	}
 
 	
@@ -83,13 +82,6 @@ public class TestDataFlowGraph extends BaseAnalysisTest {
 		assertTrue(graph.contains(15));
 		assertTrue(graph.contains(19));
 		
-//		assertTrue(graph.hasEdge(12, 12));
-//		assertTrue(graph.hasEdge(11, 12));
-//		assertTrue(graph.hasEdge(5, 16));
-//		assertTrue(graph.hasEdge(15, 16));
-//		assertTrue(graph.hasEdge(4, 7));
-//		assertTrue(graph.hasEdge(16, 8));
-		
 		assertEquals(9, graph.size());
 		
 
@@ -97,6 +89,8 @@ public class TestDataFlowGraph extends BaseAnalysisTest {
 		assertThat(graph.get(5).getDef(), instanceOf(ConstantDefinition.class));
 		assertThat(graph.get(12).getDef(), instanceOf(PhiDefinition.class));
 		assertThat(graph.get(19).getDef(), instanceOf(CallResultDefinition.class));
+		
+		assertList(getStartingPointsAsInts(graph), 7, 8, 12);
 	}
 
 	@Test
@@ -108,6 +102,11 @@ public class TestDataFlowGraph extends BaseAnalysisTest {
 		assertTrue(graph.contains(10));
 		
 		assertEquals(3, graph.size());
+		assertList(getStartingPointsAsInts(graph), 2, 6);
+	}
+	
+	private Iterable<Integer> getStartingPointsAsInts(DataFlowGraph graph) {
+		return Iterables.transform(graph.findAllStartingPoints(), GraphUtil.stringReferenceToInt);
 	}
 	
 	
@@ -115,7 +114,7 @@ public class TestDataFlowGraph extends BaseAnalysisTest {
 		IR ir = getIR(className, methodName);
 		DefUse defUse = new DefUse(ir);
 		
-		return new DataFlowGraphBuilder(new  StringCallIdentifier(METHOD_SUBSTRING, METHOD_SUBSTRING_DEFAULT_START), ir, defUse).createDataFlowGraph();
+		return new DataFlowGraphBuilder(new StringCallIdentifier(Label.SUBSTRING), ir, defUse).createDataFlowGraph();
 	}
 	
 }

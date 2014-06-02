@@ -10,7 +10,7 @@ public abstract class Definition extends DataFlowCreationObject {
 
 	
 	public static Definition createParamDefinition() {
-		return new ParameterDefinition();
+		return new MethodParameterDefinition();
 	}
 	
 	public static Definition createConstantDefinition() {

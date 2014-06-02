@@ -1,19 +1,22 @@
 package de.unifrankfurt.faststring.analysis;
 
-import java.util.Arrays;
 import java.util.List;
 
 import com.ibm.wala.ssa.SSAAbstractInvokeInstruction;
 import com.ibm.wala.ssa.SSAInstruction;
 import com.ibm.wala.types.MethodReference;
 
+import de.unifrankfurt.faststring.analysis.label.Label;
+
 public class StringCallIdentifier {
 
 	private List<MethodReference> methods;
+	private Label label;
 
 
-	public StringCallIdentifier(MethodReference ... ms) {
-		methods = Arrays.asList(ms);
+	public StringCallIdentifier(Label label) {
+		this.label = label;
+		methods = label.methods();
 		
 	}
 	
@@ -36,6 +39,10 @@ public class StringCallIdentifier {
 		
 		}
 		return -1;
+	}
+
+	public Label label() {
+		return label;
 	}
 	
 }

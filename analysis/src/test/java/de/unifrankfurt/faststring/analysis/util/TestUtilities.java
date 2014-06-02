@@ -10,6 +10,7 @@ import java.util.List;
 import org.hamcrest.collection.IsEmptyIterable;
 import org.hamcrest.collection.IsIterableContainingInOrder;
 
+import com.google.common.collect.Lists;
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
 
 import de.unifrankfurt.faststring.analysis.TargetApplication;
@@ -25,20 +26,20 @@ public final class TestUtilities {
 		// empty
 	}
 	
-	public static <E extends Comparable<E>> void assertList(List<E> actual, Object...expected) {
-		
-		Collections.sort(actual);
+	public static <E extends Comparable<E>> void assertList(Iterable<E> actual, Object...expected) {
+		List<E> list = Lists.newArrayList(actual);
+		Collections.sort(list);
 		Arrays.sort(expected);
 		
-		assertThat(actual, IsIterableContainingInOrder.contains(expected));
+		assertThat(list, IsIterableContainingInOrder.contains(expected));
 	}
 	
-	public static <E extends Comparable<E>> void assertList(List<E> actual, List<E> expected) {
+	public static <E extends Comparable<E>> void assertList(Iterable<E> actual, List<E> expected) {
 		assertList(actual, expected.toArray());
 	}
 	
 	
-	public static <E extends Comparable<E>> void assertListEmpty(List<E> actual) {
+	public static <E extends Comparable<E>> void assertListEmpty(Iterable<E> actual) {
 		assertThat(actual, IsEmptyIterable.emptyIterable());
 	}
 	

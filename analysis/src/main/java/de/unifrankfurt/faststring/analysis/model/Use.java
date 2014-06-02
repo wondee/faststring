@@ -9,7 +9,7 @@ import de.unifrankfurt.faststring.analysis.graph.DataFlowCreationObject;
 public abstract class Use extends DataFlowCreationObject {
 
 	public static Use createPassedAsParam(MethodReference method, int def, int index) {
-		return new ParamUse(method, def, index);
+		return new ParameterUse(method, def, index);
 	}
 	
 	public static Use createReturned() {

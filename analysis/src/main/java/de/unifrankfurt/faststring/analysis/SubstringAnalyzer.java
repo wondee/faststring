@@ -1,8 +1,6 @@
 package de.unifrankfurt.faststring.analysis;
 
-import static de.unifrankfurt.faststring.analysis.util.IRUtil.METHOD_SUBSTRING;
-import static de.unifrankfurt.faststring.analysis.util.IRUtil.METHOD_SUBSTRING_DEFAULT_START;
-
+import java.util.Collection;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -12,7 +10,10 @@ import com.ibm.wala.classLoader.IMethod;
 import com.ibm.wala.ssa.DefUse;
 import com.ibm.wala.ssa.IR;
 
+import de.unifrankfurt.faststring.analysis.graph.DataFlowGraph;
 import de.unifrankfurt.faststring.analysis.graph.DataFlowGraphBuilder;
+import de.unifrankfurt.faststring.analysis.graph.StringReference;
+import de.unifrankfurt.faststring.analysis.label.Label;
 
 public class SubstringAnalyzer {
 
@@ -26,7 +27,7 @@ public class SubstringAnalyzer {
 	private DefUse defUse;
 
 	
-	private StringCallIdentifier identifier = new StringCallIdentifier(METHOD_SUBSTRING, METHOD_SUBSTRING_DEFAULT_START);
+	private StringCallIdentifier identifier = new StringCallIdentifier(Label.SUBSTRING);
 
 	
 	public SubstringAnalyzer(TargetApplication targetApplication, IMethod m) {
@@ -42,7 +43,9 @@ public class SubstringAnalyzer {
 		LOG.info("analyzing Method: {}", method.getSignature());
 		
 		
-		new DataFlowGraphBuilder(identifier, ir, defUse).createDataFlowGraph();
+		DataFlowGraph graph = new DataFlowGraphBuilder(identifier, ir, defUse).createDataFlowGraph();
+		
+		Collection<StringReference> substring = graph.findAllStartingPoints();
 		
 //		if (!stringUses.isEmpty()) {
 //			DataFlowGraph graph = DataFlowGraphBuilder.create(defUse, Queues.newArrayDeque(stringUses));
