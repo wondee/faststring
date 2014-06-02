@@ -3,6 +3,7 @@ package de.unifrankfurt.faststring.analysis.graph;
 import com.ibm.wala.ssa.SSAInvokeInstruction;
 import com.ibm.wala.ssa.SSAPhiInstruction;
 
+import de.unifrankfurt.faststring.analysis.model.Definition;
 import de.unifrankfurt.faststring.analysis.util.IRUtil;
 
 

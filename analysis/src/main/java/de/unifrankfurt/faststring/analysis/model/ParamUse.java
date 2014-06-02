@@ -1,4 +1,4 @@
-package de.unifrankfurt.faststring.analysis.graph;
+package de.unifrankfurt.faststring.analysis.model;
 
 import java.util.List;
 

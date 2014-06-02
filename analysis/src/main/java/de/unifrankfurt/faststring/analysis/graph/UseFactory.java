@@ -7,6 +7,7 @@ import com.ibm.wala.ssa.SSAPhiInstruction;
 import com.ibm.wala.ssa.SSAPutInstruction;
 import com.ibm.wala.ssa.SSAReturnInstruction;
 
+import de.unifrankfurt.faststring.analysis.model.Use;
 import de.unifrankfurt.faststring.analysis.util.IRUtil;
 
 public class UseFactory extends DataFlowCreationVisitor<Use> implements IVisitor  {

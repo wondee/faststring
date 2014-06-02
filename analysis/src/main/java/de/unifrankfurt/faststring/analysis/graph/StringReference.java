@@ -5,6 +5,9 @@ import java.util.List;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
+import de.unifrankfurt.faststring.analysis.model.Definition;
+import de.unifrankfurt.faststring.analysis.model.Use;
+
 
 public class StringReference {
 

@@ -1,8 +1,10 @@
-package de.unifrankfurt.faststring.analysis.graph;
+package de.unifrankfurt.faststring.analysis.model;
 
 import java.util.List;
 
 import com.ibm.wala.types.MethodReference;
+
+import de.unifrankfurt.faststring.analysis.graph.DataFlowCreationObject;
 
 public abstract class Use extends DataFlowCreationObject {
 

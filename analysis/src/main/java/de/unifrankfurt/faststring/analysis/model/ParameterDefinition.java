@@ -1,4 +1,4 @@
-package de.unifrankfurt.faststring.analysis.graph;
+package de.unifrankfurt.faststring.analysis.model;
 
 
 public class ParameterDefinition extends Definition {

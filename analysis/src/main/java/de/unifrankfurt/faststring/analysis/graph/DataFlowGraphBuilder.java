@@ -29,6 +29,8 @@ import com.ibm.wala.ssa.IR;
 import com.ibm.wala.ssa.SSAInstruction;
 
 import de.unifrankfurt.faststring.analysis.StringCallIdentifier;
+import de.unifrankfurt.faststring.analysis.model.Definition;
+import de.unifrankfurt.faststring.analysis.model.Use;
 import de.unifrankfurt.faststring.analysis.util.UniqueQueue;
 
 public class DataFlowGraphBuilder {
