@@ -15,12 +15,10 @@ public abstract class DataFlowCreationVisitor<T extends DataFlowCreationObject> 
 		this.res = result;
 	}
 	
-	public T getResult() {
-		return res;
-	}
-	
-	public void reset() {
+	public T retrieveResult() {
+		T result = res;
 		res = null;
+		return result;
 	}
 	
 	public T create(SSAInstruction instruction) {
@@ -30,7 +28,7 @@ public abstract class DataFlowCreationVisitor<T extends DataFlowCreationObject> 
 			throw new UnsupportedOperationException("not implemented for " + instruction);
 		}
 		
-		return res;
+		return retrieveResult();
 	}
 	
 	

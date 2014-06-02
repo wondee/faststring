@@ -119,7 +119,6 @@ public class DataFlowGraphBuilder {
 		for (SSAInstruction ins : uses) {
 			
 			ref.addUse(useFactory.create(ins));
-			useFactory.reset();
 		}
 	}
 

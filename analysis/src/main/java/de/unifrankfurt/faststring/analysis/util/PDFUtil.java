@@ -1,6 +1,9 @@
 package de.unifrankfurt.faststring.analysis.util;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 import com.ibm.wala.cfg.CFGSanitizer;
@@ -16,6 +19,7 @@ import com.ibm.wala.viz.PDFViewUtil;
 
 public final class PDFUtil {
 
+	private static final String PRINT_PROPERTIES = "/print.properties";
 	private static final String TARGET_IRS = "target/irs";
 
 	private PDFUtil() {
@@ -23,10 +27,10 @@ public final class PDFUtil {
 	}
 
 	public static void printToPDF(ClassHierarchy cha, IR ir)
-			throws WalaException {
+			throws WalaException, IOException {
 
-		Properties wp = new Properties();
-
+		Properties wp = loadProperties();
+		
 		File file = new File(TARGET_IRS);
 
 		if (!file.exists()) {
@@ -55,8 +59,23 @@ public final class PDFUtil {
 			System.out.println(ir);
 			g = CFGSanitizer.sanitize(ir, cha);
 	
-			DotUtil.dotify(g, labels, dotFile, pdfFile, "/usr/bin/dot");
+			DotUtil.dotify(g, labels, dotFile, pdfFile, (String)wp.get("dot"));
 		}
 	}
+
+	private static Properties loadProperties() throws IOException {
+		
+		Properties wp = new Properties();
+		
+		InputStream in = PDFUtil.class.getResourceAsStream(PRINT_PROPERTIES);
+		if (in == null) {
+			throw new FileNotFoundException("no file " + PRINT_PROPERTIES + " was found on classpath");
+		}
+		wp.load(in);
+		return wp;
+		
+	}
+	
+	
 
 }

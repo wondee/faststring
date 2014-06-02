@@ -15,10 +15,8 @@ import com.ibm.wala.classLoader.IMethod;
 import com.ibm.wala.ipa.cha.ClassHierarchy;
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
 import com.ibm.wala.ssa.IR;
-import com.ibm.wala.util.WalaException;
 
-import de.unifrankfurt.faststring.analysis.TargetApplication;
-import de.unifrankfurt.faststring.analysis.util.PDFUtil;
+import de.unifrankfurt.faststring.analysis.util.TestUtilities;
 
 /**
  * base test class for all analysis test cases. Takes care creating the {@link ClassHierarchy} and
@@ -31,11 +29,6 @@ public abstract class BaseAnalysisTest {
 
 	private static final Logger LOG = LoggerFactory.getLogger(BaseAnalysisTest.class);
 	
-	private static final String TEST_RES = "src/test/resources/";
-	
-	private static final String TEST_SCOPE_FILE = TEST_RES + "testScope.txt";
-	private static final String TEST_EXCLUSION_FILE = TEST_RES + "testExclusion.txt";	
-	
 	private static TargetApplication targetApplication;
 
 	private static Map<String, IClass> testClassMap = null;
@@ -43,7 +36,7 @@ public abstract class BaseAnalysisTest {
 	@BeforeClass
 	public static void loadClassHierachie() throws IOException, ClassHierarchyException {
 		if (targetApplication == null) {
-			targetApplication = new TargetApplication(TEST_SCOPE_FILE,TEST_EXCLUSION_FILE);
+			targetApplication = TestUtilities.loadTestClasses();
 		}
 		
 	}
@@ -96,7 +89,6 @@ public abstract class BaseAnalysisTest {
 		for (IMethod m : lookUpClass(name).getDeclaredMethods()) {
 			
 			IR ir = targetApplication.findIRForMethod(m);
-			
 			builder.put(m.getName().toString(), ir);
 		}
 
@@ -110,23 +102,6 @@ public abstract class BaseAnalysisTest {
 		checkNotNull(ir, "no ir found for class %s and method %s", className, methodName);
 		
 		return ir;
-	}
-	
-	/**
-	 * main method to print out all ir for the test classes
-	 * @param args no args defined
-	 * @throws IOException 
-	 * @throws WalaException 
-	 */
-	public static void main(String[] args) throws IOException, WalaException {
-		loadClassHierachie();
-		initTestClasses();
-		
-		for (String name : testClassMap.keySet()) {
-			for (IR ir : getIRsForClass(name).values()) {
-				PDFUtil.printToPDF(targetApplication.getClassHierachy(), ir);
-			}
-		}
 	}
 	
 	public static TargetApplication getTargetApplication() {

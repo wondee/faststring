@@ -7,12 +7,14 @@ import com.ibm.wala.classLoader.IMethod;
 import com.ibm.wala.util.CancelException;
 import com.ibm.wala.util.WalaException;
 
+import de.unifrankfurt.faststring.analysis.util.TestUtilities;
+
 public class WalaTest {
 
 	public static void main(String[] args) throws IOException, WalaException,
 			CancelException {
 
-		TargetApplication targetApplication = new TargetApplication("src/main/resources/test.txt");
+		TargetApplication targetApplication = TestUtilities.loadTestClasses();
 		
 		
 		for (IClass clazz : targetApplication.getApplicationClasses()) {
