@@ -91,10 +91,10 @@ public class SubstringAnalyzer {
 		public void checkReference(StringReference ref, Queue<StringReference> refQueue) {
 			for (Use use : ref.getUses()) {
 				if (use.isCompatibleWith(identifier.label())) {
-					System.out.println(use + " is compatible");
+					System.out.println("compatible: " + use);
 					check(use, refQueue);
 				} else {
-					System.out.println(use + " is not compatible");
+					System.out.println("not compatible: " + use);
 				}
 			}
 		}
