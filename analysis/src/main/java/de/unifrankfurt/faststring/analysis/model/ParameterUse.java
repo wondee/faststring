@@ -5,6 +5,7 @@ import java.util.List;
 import com.google.common.collect.Lists;
 import com.ibm.wala.types.MethodReference;
 
+import de.unifrankfurt.faststring.analysis.label.Label;
 import de.unifrankfurt.faststring.analysis.util.IRUtil;
 
 public class ParameterUse extends Use {
@@ -25,13 +26,18 @@ public class ParameterUse extends Use {
 	}
 
 	@Override
-	public List<Integer> getNewRefs() {
+	public List<Integer> getConnectedRefs() {
 		if (method.getReturnType().equals(IRUtil.STRING_TYPE)) {
 			return Lists.newArrayList(def);			
 		} else {
 			return Lists.newArrayList();
 		}
 		
+	}
+
+	@Override
+	public boolean isCompatibleWith(Label label) {
+		return label.canBeUsedAsParamFor(method, index);
 	}
 
 }

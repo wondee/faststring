@@ -16,6 +16,8 @@ import de.unifrankfurt.faststring.analysis.graph.DataFlowGraph;
 import de.unifrankfurt.faststring.analysis.graph.DataFlowGraphBuilder;
 import de.unifrankfurt.faststring.analysis.graph.StringReference;
 import de.unifrankfurt.faststring.analysis.label.Label;
+import de.unifrankfurt.faststring.analysis.model.DataFlowObject;
+import de.unifrankfurt.faststring.analysis.model.Use;
 import de.unifrankfurt.faststring.analysis.util.UniqueQueue;
 
 public class SubstringAnalyzer {
@@ -29,8 +31,9 @@ public class SubstringAnalyzer {
 	private IR ir;
 	private DefUse defUse;
 
-	
 	private StringCallIdentifier identifier = new StringCallIdentifier(Label.SUBSTRING);
+
+	private DataFlowGraph graph;
 
 	
 	public SubstringAnalyzer(TargetApplication targetApplication, IMethod m) {
@@ -39,74 +42,82 @@ public class SubstringAnalyzer {
 		
 		ir = targetApp.findIRForMethod(method);
 		defUse = targetApp.findDefUseForMethod(method);	
+		
+		graph = new DataFlowGraphBuilder(identifier, ir, defUse).createDataFlowGraph();
 	}
 	
 	
 	public Set<StringReference> findCandidates() {
 		LOG.info("analyzing Method: {}", method.getSignature());
 		
-		DataFlowGraph graph = new DataFlowGraphBuilder(identifier, ir, defUse).createDataFlowGraph();
+		Collection<StringReference> refs = graph.getAllLabelMatchingReferences();
 		
-		Collection<StringReference> substring = graph.getAllLabelMatchingReferences();
-		
-		Set<StringReference> bubble = Sets.newHashSet(substring);
-		
-		if (substring.size() > 0) {
-			Queue<StringReference> refQueue = new UniqueQueue<>(substring);
+		if (refs.size() > 0) {
+			processUntilQueueIsEmpty(refs, definitionCheck);
+			processUntilQueueIsEmpty(refs, usageCheck);
 			
-			while(!refQueue.isEmpty()) {
-				refQueue.remove();
-				
-				
-			}
 			
 		} else {
 			LOG.debug("no string uses found");
 		}	
-		return bubble;
+		return Sets.newHashSet(graph.getAllLabelMatchingReferences());
+		
+	}
+
+
+	private void processUntilQueueIsEmpty(Collection<StringReference> contents, CheckingStrategy strategy) {
+		Queue<StringReference> refQueue = new UniqueQueue<>(contents);
+		
+		while(!refQueue.isEmpty()) {
+
+			strategy.checkReference(refQueue.remove(), refQueue);
+		}
+		
+	}
+
+	interface CheckingStrategy {
+		void checkReference(StringReference ref, Queue<StringReference> refQueue);
+	}
+	
+	CheckingStrategy definitionCheck = new CheckingStrategy() {
+		@Override
+		public void checkReference(StringReference ref, Queue<StringReference> refQueue) {
+			check(ref.getDef(), refQueue);
+		}
+	};
+	
+	CheckingStrategy usageCheck = new CheckingStrategy() {
+		@Override
+		public void checkReference(StringReference ref, Queue<StringReference> refQueue) {
+			for (Use use : ref.getUses()) {
+				if (use.isCompatibleWith(identifier.label())) {
+					System.out.println(use + " is compatible");
+					check(use, refQueue);
+				} else {
+					System.out.println(use + " is not compatible");
+				}
+			}
+		}
+	};
+	
+	
+
+	private void check(DataFlowObject o, Queue<StringReference> refQueue) {
+		LOG.debug("checking {}", o);
+		
+		for (Integer connectedRefId : o.getConnectedRefs()) {
+			StringReference connectedRef = graph.get(connectedRefId);
+			
+			LOG.debug("get connected {}", connectedRefId);
+			
+			if (connectedRef.getLabel() == null) {
+				connectedRef.setLabel(identifier.label());
+				
+				refQueue.add(connectedRef);
+			}
+		}
 		
 	}
 	
-
-
-
-
-
-//	private UseRegister checkCandidates(Map<Integer, List<Integer>> stringCalls) {
-//		
-//		UseRegister register = new UseRegister();
-//		IRAnalyzer analyzer = new IRAnalyzer(ir);
-//		
-//		for (Entry<Integer, List<Integer>> call : stringCalls.entrySet()) {
-//			
-//			Queue<Integer> vs = Queues.newArrayDeque(call.getValue());
-//			
-//			while (!vs.isEmpty()) {
-//				Integer v = vs.remove();
-//				Integer insIndex = call.getKey();
-//				Iterator<SSAInstruction> uses = defUse.getUses(v);
-//				while (uses.hasNext()) {
-//					
-//					SSAInstruction use = uses.next();
-//					if (!(use instanceof SSAPhiInstruction)) {
-//						boolean usedLater = analyzer.isConnected(insIndex, use);
-//						
-//						register.add(v, usedLater);
-//					} else {
-//						Boolean pointerShadow = register.getCandidate(use.getDef());
-//						if (pointerShadow == null) {
-//							vs.add(v);
-//						} else {
-//							register.add(v, pointerShadow);
-//						}
-//					}
-//				}
-//			}
-//			
-//		}
-//		
-//		return register;
-//
-//	}
 	
 }

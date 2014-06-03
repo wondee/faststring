@@ -9,19 +9,18 @@ import org.junit.Test;
 
 import com.google.common.collect.Iterables;
 
-@Ignore
-public class TestMethodAnalyzer extends BaseAnalysisTest {
+public class TestSubstringAnalyzer extends BaseAnalysisTest {
 
 	private static final String TEST_CLASS = "MethodAnalyzerTestClass";
 	
 	private SubstringAnalyzer __testee;
 	
-	@Test
+	@Test 
 	public void testSimpleIfSubstring() {
-		assertList(findCandidates("simpleIfSubstring"), 4);
+		assertList(findCandidates("simpleIfSubstring"), 4, 5, 9, 12, 16, 22, 23);
 	}
 	
-	@Test
+	@Test @Ignore 
 	public void testReturnOfUsed() {
 		assertListEmpty(findCandidates("returnOfUsed"));
 	}
@@ -32,22 +31,22 @@ public class TestMethodAnalyzer extends BaseAnalysisTest {
 		assertListEmpty(findCandidates("phiBefore"));
 	}
 	
-	@Test
+	@Test @Ignore
 	public void testPhiAfter() {
 		assertList(findCandidates("phiAfter"), 4, 7);
 	}
 
-	@Test
+	@Test 
 	public void testPhiLoop() {
-		assertListEmpty(findCandidates("phiLoop"));
+		assertList(findCandidates("phiLoop"), 7, 4, 11, 5, 10);
 	}
 	
-	@Test
+	@Test @Ignore
 	public void testPhiLoop2() {
 		assertListEmpty(findCandidates("phiLoop2"));
 	}
 	
-	@Test
+	@Test @Ignore
 	public void testPhiLoopAndIf() {
 		assertListEmpty(findCandidates("phiLoopAndIf"));
 	}

@@ -19,7 +19,7 @@ public class CallResultDefinition extends Definition {
 	}
 
 	@Override
-	public List<Integer> getNewRefs() {
+	public List<Integer> getConnectedRefs() {
 		if (method.getDeclaringClass().equals(IRUtil.STRING_TYPE)) {
 			return Lists.newArrayList(receiver);
 		} else {
@@ -32,8 +32,6 @@ public class CallResultDefinition extends Definition {
 		return "CallResultDefinition [method=" + method + ", receiver="
 				+ receiver + "]";
 	}
-
-
 
 	
 }

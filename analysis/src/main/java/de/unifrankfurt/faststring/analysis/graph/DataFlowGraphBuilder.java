@@ -52,7 +52,7 @@ public class DataFlowGraphBuilder {
 	private Function<Use, Iterable<Integer>> extractNewRefs = new Function<Use, Iterable<Integer>>() {
 		@Override
 		public Iterable<Integer> apply(Use use) {
-			return use.getNewRefs();
+			return use.getConnectedRefs();
 		}
 	};
 
@@ -97,7 +97,7 @@ public class DataFlowGraphBuilder {
 	private Collection<StringReference> findNewRefs(StringReference stringRef, Set<Integer> contained) {
  		List<Integer> newRefs = Lists.newLinkedList();
 		
-		Iterables.addAll(newRefs, stringRef.getDef().getNewRefs());
+		Iterables.addAll(newRefs, stringRef.getDef().getConnectedRefs());
 		Iterables.addAll(newRefs, concat(transform(stringRef.getUses(), extractNewRefs)));
 		
 		return Sets.newHashSet(transform(filter(newRefs, not(in(contained))), toStringReferences));

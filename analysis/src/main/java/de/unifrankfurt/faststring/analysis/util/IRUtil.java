@@ -22,6 +22,9 @@ public final class IRUtil {
 	public static final MethodReference METHOD_SUBSTRING_DEFAULT_START = MethodReference
 			.findOrCreate(STRING_TYPE, "substring", "(I)Ljava/lang/String;");
 
+	public static final MethodReference METHOD_STRING_VALUE_OF = MethodReference
+			.findOrCreate(STRING_TYPE, "valueOf", "(Ljava/lang/Object;)Ljava/lang/String;");
+	
 	
 	public static final List<Integer> EMPTY_LIST = ImmutableList.of();
 	

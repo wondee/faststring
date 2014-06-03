@@ -3,7 +3,9 @@ package de.unifrankfurt.faststring.analysis.graph;
 import com.ibm.wala.ssa.SSAInstruction;
 import com.ibm.wala.ssa.SSAInstruction.Visitor;
 
-public abstract class DataFlowCreationVisitor<T extends DataFlowCreationObject> extends Visitor {
+import de.unifrankfurt.faststring.analysis.model.DataFlowObject;
+
+public abstract class DataFlowCreationVisitor<T extends DataFlowObject> extends Visitor {
 
 	private T res;
 	

@@ -52,8 +52,6 @@ public abstract class BaseAnalysisTest {
 		for (IClass cl : targetApplication.getApplicationClasses()) {
 				
 			String className = cl.getName().getClassName().toString();
-			
-			LOG.info("test class {} found", className);
 			builder.put(className, cl);
 				
 		}

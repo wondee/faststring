@@ -4,9 +4,7 @@ import java.util.List;
 
 import com.ibm.wala.types.MethodReference;
 
-import de.unifrankfurt.faststring.analysis.graph.DataFlowCreationObject;
-
-public abstract class Definition extends DataFlowCreationObject {
+public abstract class Definition extends DataFlowObject {
 
 	
 	public static Definition createParamDefinition() {

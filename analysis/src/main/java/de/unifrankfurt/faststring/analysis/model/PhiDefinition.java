@@ -16,7 +16,7 @@ public class PhiDefinition extends Definition {
 	}
 
 	@Override
-	public List<Integer> getNewRefs() {
+	public List<Integer> getConnectedRefs() {
 		return refs;
 	}
 	

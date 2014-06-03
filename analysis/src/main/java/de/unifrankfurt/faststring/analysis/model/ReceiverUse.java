@@ -6,6 +6,7 @@ import com.google.common.collect.Lists;
 import com.ibm.wala.types.MethodReference;
 import com.ibm.wala.types.TypeReference;
 
+import de.unifrankfurt.faststring.analysis.label.Label;
 import de.unifrankfurt.faststring.analysis.util.IRUtil;
 
 public class ReceiverUse extends Use {
@@ -34,12 +35,17 @@ public class ReceiverUse extends Use {
 	}
 
 	@Override
-	public List<Integer> getNewRefs() {
+	public List<Integer> getConnectedRefs() {
 		List<Integer> newRefs = Lists.newLinkedList(params);
 		if (def > -1 && method.getReturnType().equals(IRUtil.STRING_TYPE)) {
 			newRefs.add(def);
 		}
 		return newRefs;
+	}
+
+	@Override
+	public boolean isCompatibleWith(Label label) {
+		return label.canBeUsedAsReceiverFor(method);
 	}
 
 }

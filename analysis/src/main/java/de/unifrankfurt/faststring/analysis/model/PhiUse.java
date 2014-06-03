@@ -4,6 +4,8 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
+import de.unifrankfurt.faststring.analysis.label.Label;
+
 public class PhiUse extends Use {
 
 	private int def;
@@ -18,8 +20,13 @@ public class PhiUse extends Use {
 	}
 
 	@Override
-	public List<Integer> getNewRefs() {
+	public List<Integer> getConnectedRefs() {
 		return Lists.newArrayList(def);
+	}
+
+	@Override
+	public boolean isCompatibleWith(Label label) {
+		return true;
 	}
 
 }

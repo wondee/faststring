@@ -116,7 +116,7 @@ public final class TargetApplication {
 		for (IClass cl : classHierarchy) {
 			if (scope.isApplicationLoader(cl.getClassLoader()))  {
 				
-				LOG.debug("application class found: {}", cl.getName());
+				LOG.info("application class found: {}", cl.getName());
 				
 				builder.add(cl);
 				

@@ -4,9 +4,9 @@ import java.util.List;
 
 import com.ibm.wala.types.MethodReference;
 
-import de.unifrankfurt.faststring.analysis.graph.DataFlowCreationObject;
+import de.unifrankfurt.faststring.analysis.label.Label;
 
-public abstract class Use extends DataFlowCreationObject {
+public abstract class Use extends DataFlowObject {
 
 	public static Use createPassedAsParam(MethodReference method, int def, int index) {
 		return new ParameterUse(method, def, index);
@@ -24,6 +24,8 @@ public abstract class Use extends DataFlowCreationObject {
 	public static Use createUsedInPhi(int def) {
 		return new PhiUse(def);
 	}
+
+	public abstract boolean isCompatibleWith(Label label);
 
 
 	
