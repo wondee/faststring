@@ -14,6 +14,4 @@ I'll try to keep the you up to date and dirstribute news in my blog at http://wo
 	- analysis-test 	<- test classes for the use in the unit tests of the analysis project
 ```
 
-To build the benchmark module you need to build the benchmark tool yabt (http://github.com/wondee/yabt) first and have the right version in your maven repo.
-
-Additionally you'll need to build the WALA core and utils package (https://github.com/wala/WALA) on which the analysis component is based 
+To build the benchmark module you need to build the benchmark tool yabt (http://github.com/wondee/yabt) and the WALA core, shrike and utils project (https://github.com/wala/WALA) on which the analysis component is based.  
