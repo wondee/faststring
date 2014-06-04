@@ -8,9 +8,9 @@ I'll try to keep the you up to date and dirstribute news in my blog at http://wo
 
 ```
 - faststring
-	- core 			<- the optimized String types
-	- benchmarks 	<- benchmarks of the core types compared to the original ones
-	- analysis		<- analysis of bytecode with WALA 
+	- core 				<- the optimized String types
+	- benchmarks 		<- benchmarks of the core types compared to the original ones
+	- analysis			<- analysis of bytecode with WALA 
 	- analysis-test 	<- test classes for the use in the unit tests of the analysis project
 ```
 
