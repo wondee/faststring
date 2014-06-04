@@ -9,6 +9,7 @@ import com.ibm.wala.ssa.SSACFG;
 import com.ibm.wala.ssa.SSAInstruction;
 import com.ibm.wala.util.graph.traverse.BFSPathFinder;
 
+@Deprecated
 public class IRAnalyzer {
 
 	private IR ir;

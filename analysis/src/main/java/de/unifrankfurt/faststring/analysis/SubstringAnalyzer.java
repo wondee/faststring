@@ -35,7 +35,7 @@ public class SubstringAnalyzer {
 	private IR ir;
 	private DefUse defUse;
 
-	private StringCallIdentifier identifier = new StringCallIdentifier(Label.SUBSTRING);
+	private Label label = Label.SUBSTRING;
 
 	private DataFlowGraph graph;
 
@@ -47,13 +47,14 @@ public class SubstringAnalyzer {
 		ir = targetApp.findIRForMethod(method);
 		defUse = targetApp.findDefUseForMethod(method);	
 		
-		graph = new DataFlowGraphBuilder(identifier, ir, defUse).createDataFlowGraph();
+		
 	}
 	
 	
 	public Set<StringReference> findCandidates() {
-		LOG.info("analyzing (for {}) Method: {}", identifier.label(), method.getSignature());
+		LOG.info("analyzing (for {}) Method: {}", label, method.getSignature());
 		
+		graph = getGraph();
 		Collection<StringReference> refs = graph.getAllLabelMatchingReferences();
 		
 		if (refs.size() > 0) {
@@ -78,6 +79,14 @@ public class SubstringAnalyzer {
 	}
 
 
+	private DataFlowGraph getGraph() {
+		if (graph == null) {
+			graph = new DataFlowGraphBuilder(label, ir, defUse).createDataFlowGraph();
+		}
+		return graph;
+	}
+
+
 	private void processUntilQueueIsEmpty(Collection<StringReference> contents, CheckingStrategy strategy) {
 		Queue<StringReference> refQueue = new UniqueQueue<>(contents);
 		
@@ -97,7 +106,7 @@ public class SubstringAnalyzer {
 			
 			
 			Definition def = ref.getDef();
-			if (def.isCompatibleWith(identifier.label())) {
+			if (def.isCompatibleWith(label)) {
 				check(def, refQueue);
 				
 			} else {
@@ -113,7 +122,7 @@ public class SubstringAnalyzer {
 			List<Use> uses = ref.getUses();
 			for (int useId = 0; useId < uses.size(); useId++) {
 				Use use = uses.get(useId);
-				if (use.isCompatibleWith(identifier.label())) {
+				if (use.isCompatibleWith(label)) {
 					check(use, refQueue);
 				} else {
 					ref.setConvertToUse(useId);
@@ -131,7 +140,7 @@ public class SubstringAnalyzer {
 			StringReference connectedRef = graph.get(connectedRefId);
 						
 			if (connectedRef.getLabel() == null) {
-				connectedRef.setLabel(identifier.label());
+				connectedRef.setLabel(label);
 				
 				refQueue.add(connectedRef);
 			}

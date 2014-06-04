@@ -65,5 +65,9 @@ public class GraphUtil {
 		
 	}
 
+	public static Set<Integer> extractUsageConversionsRefIds(Set<StringReference> refs) {
+		return extractUsageConversions(refs).keySet();
+	}
+
 
 }

@@ -1,4 +1,4 @@
-package de.unifrankfurt.faststring.analysis.graph;
+package de.unifrankfurt.faststring.analysis;
 
 import static de.unifrankfurt.faststring.analysis.util.TestUtilities.assertList;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
@@ -12,8 +12,9 @@ import com.google.common.collect.Iterables;
 import com.ibm.wala.ssa.DefUse;
 import com.ibm.wala.ssa.IR;
 
-import de.unifrankfurt.faststring.analysis.BaseAnalysisTest;
-import de.unifrankfurt.faststring.analysis.StringCallIdentifier;
+import de.unifrankfurt.faststring.analysis.graph.DataFlowGraph;
+import de.unifrankfurt.faststring.analysis.graph.DataFlowGraphBuilder;
+import de.unifrankfurt.faststring.analysis.graph.GraphUtil;
 import de.unifrankfurt.faststring.analysis.label.Label;
 import de.unifrankfurt.faststring.analysis.model.CallResultDefinition;
 import de.unifrankfurt.faststring.analysis.model.ConstantDefinition;
@@ -114,7 +115,7 @@ public class TestDataFlowGraph extends BaseAnalysisTest {
 		IR ir = getIR(className, methodName);
 		DefUse defUse = new DefUse(ir);
 		
-		return new DataFlowGraphBuilder(new StringCallIdentifier(Label.SUBSTRING), ir, defUse).createDataFlowGraph();
+		return new DataFlowGraphBuilder(Label.SUBSTRING, ir, defUse).createDataFlowGraph();
 	}
 	
 }

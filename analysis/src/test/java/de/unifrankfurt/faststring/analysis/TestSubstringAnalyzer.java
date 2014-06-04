@@ -1,11 +1,9 @@
 package de.unifrankfurt.faststring.analysis;
 
 import static de.unifrankfurt.faststring.analysis.util.TestUtilities.assertList;
-import static de.unifrankfurt.faststring.analysis.util.TestUtilities.assertListEmpty;
 
 import java.util.Set;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import de.unifrankfurt.faststring.analysis.graph.GraphUtil;
@@ -20,46 +18,41 @@ public class TestSubstringAnalyzer extends BaseAnalysisTest {
 	public void testSimpleIfSubstring() {
 		Set<StringReference> candidates = findCandidates("simpleIfSubstring");
 		assertList(GraphUtil.extractIntsFromStringReferences(candidates), 4, 5, 9, 12, 16, 22, 23);
-		assertList(GraphUtil.extractDefConversions(candidates), 4);
+		assertList(GraphUtil.extractDefConversions(candidates), 4, 5);
+		assertList(GraphUtil.extractUsageConversionsRefIds(candidates), 12, 16, 23);
 	}
 
-	@Test @Ignore 
+	@Test  
 	public void testReturnOfUsed() {
 		Set<StringReference> candidates = findCandidates("returnOfUsed");
-		
-		assertListEmpty(GraphUtil.extractIntsFromStringReferences(candidates));
+		assertList(GraphUtil.extractIntsFromStringReferences(candidates), 4, 7);
+		assertList(GraphUtil.extractDefConversions(candidates), 4);
+		assertList(GraphUtil.extractUsageConversionsRefIds(candidates), 4, 7);
 		
 	}
-	
 	
 	@Test
-	public void testPhiBefore() {
-		Set<StringReference> candidates = findCandidates("phiBefore");
-		assertListEmpty(GraphUtil.extractIntsFromStringReferences(candidates));
-	}
-	
-	@Test @Ignore
-	public void testPhiAfter() {
-		Set<StringReference> candidates = findCandidates("phiAfter");
-		assertList(GraphUtil.extractIntsFromStringReferences(candidates), 4, 7);
+	public void testPhiSimple() {
+		Set<StringReference> candidates = findCandidates("phiSimple");
+		assertList(GraphUtil.extractIntsFromStringReferences(candidates), 4, 7, 10);
+		assertList(GraphUtil.extractDefConversions(candidates), 4);
+		assertList(GraphUtil.extractUsageConversionsRefIds(candidates), 7);
 	}
 
 	@Test 
 	public void testPhiLoop() {
 		Set<StringReference> candidates = findCandidates("phiLoop");
-		assertList(GraphUtil.extractIntsFromStringReferences(candidates), 7, 4, 11, 5, 10);
+		assertList(GraphUtil.extractIntsFromStringReferences(candidates), 4, 5, 7, 10, 11);
+		assertList(GraphUtil.extractDefConversions(candidates), 4, 5);
+		assertList(GraphUtil.extractUsageConversionsRefIds(candidates), 11);
 	}
 	
-	@Test @Ignore
-	public void testPhiLoop2() {
-		Set<StringReference> candidates = findCandidates("phiLoop2");
-		assertListEmpty(GraphUtil.extractIntsFromStringReferences(candidates));
-	}
-	
-	@Test @Ignore
+	@Test
 	public void testPhiLoopAndIf() {
 		Set<StringReference> candidates = findCandidates("phiLoopAndIf");
-		assertListEmpty(GraphUtil.extractIntsFromStringReferences(candidates));
+		assertList(GraphUtil.extractIntsFromStringReferences(candidates), 4, 5, 7, 8, 11, 12, 15, 16, 19);
+		assertList(GraphUtil.extractDefConversions(candidates), 4, 5);
+		assertList(GraphUtil.extractUsageConversionsRefIds(candidates), 16);
 	}
 
 	private Set<StringReference> findCandidates(String method) {

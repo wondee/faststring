@@ -28,7 +28,7 @@ public class MethodAnalyzerTestClass {
 	}
 	
 	
-	public String[] phiBefore(boolean is) {
+	public String[] phiSimple(boolean is) {
 		String a = "";
 		String b = a;
 		
@@ -41,19 +41,6 @@ public class MethodAnalyzerTestClass {
 		return new String[]{b};
 	}
 	
-	public String phiAfter(boolean is) {
-		String a = "a";
-		
-		String b = "b";
-		
-		String c = ((is) ? a : b);
-		
-		c.substring(3);
-		
-		return b;
-		
-	}
-	
 	public String phiLoop(boolean is) {
 		String a = "a";
 		
@@ -63,20 +50,6 @@ public class MethodAnalyzerTestClass {
 			String c = ((is) ? a : b);
 			
 			b = c.substring(5);
-		}
-		return b;
-		
-	}
-	
-	public String phiLoop2(boolean is) {
-		String a = "";
-		
-		String b = "b";
-		
-		
-		while(is) {
-			
-			b = a.substring(5);
 		}
 		return b;
 		

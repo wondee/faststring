@@ -27,11 +27,16 @@ public final class TestUtilities {
 	}
 	
 	public static <E extends Comparable<E>> void assertList(Iterable<E> actual, Object...expected) {
-		List<E> list = Lists.newArrayList(actual);
-		Collections.sort(list);
-		Arrays.sort(expected);
+		if (expected.length == 0) {
+			assertListEmpty(actual);
+		} else {
 		
-		assertThat(list, IsIterableContainingInOrder.contains(expected));
+			List<E> list = Lists.newArrayList(actual);
+			Collections.sort(list);
+			Arrays.sort(expected);
+			
+			assertThat(list, IsIterableContainingInOrder.contains(expected));
+		}
 	}
 	
 	public static <E extends Comparable<E>> void assertList(Iterable<E> actual, List<E> expected) {

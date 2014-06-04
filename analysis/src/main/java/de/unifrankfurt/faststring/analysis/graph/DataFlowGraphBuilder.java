@@ -29,7 +29,7 @@ import com.ibm.wala.ssa.DefUse;
 import com.ibm.wala.ssa.IR;
 import com.ibm.wala.ssa.SSAInstruction;
 
-import de.unifrankfurt.faststring.analysis.StringCallIdentifier;
+import de.unifrankfurt.faststring.analysis.label.Label;
 import de.unifrankfurt.faststring.analysis.model.Definition;
 import de.unifrankfurt.faststring.analysis.model.Use;
 import de.unifrankfurt.faststring.analysis.util.UniqueQueue;
@@ -40,7 +40,7 @@ public class DataFlowGraphBuilder {
 	
 	private IR ir;
 	private DefUse defUse;
-	private StringCallIdentifier identifier;
+	private Label label;
 
 	private HashSet<Integer> params;
 
@@ -59,10 +59,10 @@ public class DataFlowGraphBuilder {
 	};
 
 	
-	public DataFlowGraphBuilder(StringCallIdentifier identifier, IR ir, DefUse defUse) {
+	public DataFlowGraphBuilder(Label label, IR ir, DefUse defUse) {
 		this.ir = ir;
 		this.defUse = defUse;
-		this.identifier = identifier;
+		this.label = label;
 		
 		params = Sets.newHashSet(Ints.asList(ir.getParameterValueNumbers()));
 	}
@@ -89,7 +89,7 @@ public class DataFlowGraphBuilder {
 			refs.addAll(findNewRefs(stringRef, refMap.keySet()));
 		}
 
-		DataFlowGraph graph = new DataFlowGraph(identifier.label(), ImmutableMap.copyOf(refMap));
+		DataFlowGraph graph = new DataFlowGraph(label, ImmutableMap.copyOf(refMap));
 		LOG.debug("created dataflow graph for {}: {}", ir.getMethod().getSignature(), graph);
 		
 		return graph;
@@ -149,10 +149,10 @@ public class DataFlowGraphBuilder {
 			
 			SSAInstruction ins = ir.getInstructions()[i];
 			
-			int receiver = identifier.check(ins);
+			int receiver = label.check(ins);
 			
 			if (receiver > -1) {
-				stringReference.add(new StringReference(receiver, identifier.label()));
+				stringReference.add(new StringReference(receiver, label));
 				
 			}
 							
