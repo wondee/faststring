@@ -5,6 +5,7 @@ import java.util.List;
 import com.google.common.collect.Lists;
 import com.ibm.wala.types.MethodReference;
 
+import de.unifrankfurt.faststring.analysis.label.Label;
 import de.unifrankfurt.faststring.analysis.util.IRUtil;
 
 public class CallResultDefinition extends Definition {
@@ -28,10 +29,17 @@ public class CallResultDefinition extends Definition {
 	}
 
 	@Override
+	public boolean isCompatibleWith(Label label) {
+		return label.canBeDefinedAsResultOf(method);
+	}
+	
+	@Override
 	public String toString() {
 		return "CallResultDefinition [method=" + method + ", receiver="
 				+ receiver + "]";
 	}
+
+
 
 	
 }

@@ -1,9 +1,10 @@
 package de.unifrankfurt.faststring.analysis.graph;
 
 import java.util.List;
+import java.util.Set;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import de.unifrankfurt.faststring.analysis.label.Label;
 import de.unifrankfurt.faststring.analysis.model.Definition;
@@ -15,9 +16,12 @@ public class StringReference {
 	private int ref;
 	
 	private Definition def = null;
-	private List<Use> uses = Lists.newLinkedList();
+	private List<Use> uses = null;
 	
-	private Label label;
+	private Label label = null;
+
+	private boolean definitionConversion = false;
+	private Set<Integer> useConversions = Sets.newHashSet();
 
 	public StringReference(int ref) {
 		Preconditions.checkArgument(ref > 0, "valueNumber must be greater than 0");
@@ -36,12 +40,7 @@ public class StringReference {
 		return ref;
 	}
 
-	public void addUse(Use useInfo) {
-		uses.add(useInfo);
-		
-	}
-
-	public void setDefinition(Definition def) {
+	void setDefinition(Definition def) {
 		if (this.def != null) {
 			throw new IllegalStateException("def was tried to set twice");
 		}
@@ -68,6 +67,22 @@ public class StringReference {
 
 	public Integer getRef() {
 		return ref;
+	}
+
+	public void setConvertToDefinition() {
+		definitionConversion = true;
+	}
+
+	public boolean isDefinitionConversion() {
+		return definitionConversion;
+	}
+	
+	public void setConvertToUse(Integer useId) {
+		useConversions.add(useId);
+	}
+
+	public Set<Integer> getUseConversions() {
+		return useConversions;
 	}
 	
 	@Override
@@ -98,6 +113,14 @@ public class StringReference {
 		if (ref != other.ref)
 			return false;
 		return true;
+	}
+
+
+	void setUses(List<Use> uses) {
+		if (this.uses != null) {
+			throw new IllegalStateException("uses was tried to set twice");
+		}
+		this.uses = uses;
 	}
 
 

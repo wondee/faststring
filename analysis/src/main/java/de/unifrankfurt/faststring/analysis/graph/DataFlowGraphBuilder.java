@@ -17,6 +17,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Function;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -107,10 +109,14 @@ public class DataFlowGraphBuilder {
 		List<SSAInstruction> uses = Lists.newArrayList(defUse.getUses(ref.valueNumber()));
 		UseFactory useFactory = new UseFactory(ref.valueNumber());
 		
+		Builder<Use> builder = new ImmutableList.Builder<Use>();
+		
 		for (SSAInstruction ins : uses) {
 			
-			ref.addUse(useFactory.create(ins));
+			builder.add(useFactory.create(ins));
+			
 		}
+		ref.setUses(builder.build());
 	}
 
 	private void checkDefinition(StringReference ref) {

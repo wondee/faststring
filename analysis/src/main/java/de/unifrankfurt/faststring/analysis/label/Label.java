@@ -34,8 +34,14 @@ public enum Label {
 		
 		private Set<MethodReference> compatibleMethods() {
 			Set<MethodReference> set = Sets.newHashSet(methods());
+			// TODO maybe wrong only if it is substituted with a toString() call
 			set.add(METHOD_STRING_VALUE_OF);
 			return set;
+		}
+
+		@Override
+		public boolean canBeDefinedAsResultOf(MethodReference method) {
+			return methods().contains(method);
 		}
 	};
 	
@@ -45,4 +51,6 @@ public enum Label {
 	public abstract boolean canBeUsedAsParamFor(MethodReference method, int index);
 
 	public abstract boolean canBeUsedAsReceiverFor(MethodReference method);
+
+	public abstract boolean canBeDefinedAsResultOf(MethodReference method);
 }
