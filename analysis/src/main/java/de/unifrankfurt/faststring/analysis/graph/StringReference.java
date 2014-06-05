@@ -6,7 +6,7 @@ import java.util.Set;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 
-import de.unifrankfurt.faststring.analysis.label.Label;
+import de.unifrankfurt.faststring.analysis.label.StringTypeLabel;
 import de.unifrankfurt.faststring.analysis.model.Definition;
 import de.unifrankfurt.faststring.analysis.model.Use;
 
@@ -18,7 +18,7 @@ public class StringReference {
 	private Definition def = null;
 	private List<Use> uses = null;
 	
-	private Label label = null;
+	private StringTypeLabel label = null;
 
 	private boolean definitionConversion = false;
 	private Set<Integer> useConversions = Sets.newHashSet();
@@ -30,7 +30,7 @@ public class StringReference {
 	}
 
 
-	public StringReference(int receiver, Label label) {
+	public StringReference(int receiver, StringTypeLabel label) {
 		this(receiver);
 		this.label = label;
 	}
@@ -52,12 +52,12 @@ public class StringReference {
 		return def;
 	}
 	
-	public void setLabel(Label label) {
+	public void setLabel(StringTypeLabel label) {
 		this.label = label;
 		
 	}
 
-	public Label getLabel() {
+	public StringTypeLabel getLabel() {
 		return label;
 	}
 

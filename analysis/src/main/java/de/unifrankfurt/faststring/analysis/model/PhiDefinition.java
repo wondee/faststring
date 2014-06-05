@@ -2,7 +2,7 @@ package de.unifrankfurt.faststring.analysis.model;
 
 import java.util.List;
 
-import de.unifrankfurt.faststring.analysis.label.Label;
+import de.unifrankfurt.faststring.analysis.label.StringTypeLabel;
 
 public class PhiDefinition extends Definition {
 
@@ -23,7 +23,7 @@ public class PhiDefinition extends Definition {
 	}
 	
 	@Override
-	public boolean isCompatibleWith(Label label) {
+	public boolean isCompatibleWith(StringTypeLabel label) {
 		// TODO need to check if the uses are all labeled with a compatible label
 		return true;
 	}

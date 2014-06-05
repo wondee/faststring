@@ -8,21 +8,21 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.ibm.wala.ssa.IR;
 import com.ibm.wala.ssa.SSAAbstractInvokeInstruction;
 import com.ibm.wala.ssa.SSAInstruction;
 import com.ibm.wala.types.MethodReference;
 
-public enum Label {
+import de.unifrankfurt.faststring.analysis.graph.StringReference;
+
+public enum BuiltInTypes implements StringTypeLabel {
 
 	
 	
-	SUBSTRING {
-		@Override
-		public List<MethodReference> methods() {
-			return Arrays.asList(METHOD_SUBSTRING, METHOD_SUBSTRING_DEFAULT_START);
-		}
-
+	SUBSTRING(METHOD_SUBSTRING, METHOD_SUBSTRING_DEFAULT_START) {
+		
 		@Override
 		public boolean canBeUsedAsParamFor(MethodReference method, int index) {
 			// TODO check if its possible for stringbuilder
@@ -47,20 +47,20 @@ public enum Label {
 		}
 	};
 	
+	private List<MethodReference> methods;
+
+	private BuiltInTypes(MethodReference...ms) {
+		methods = Arrays.asList(ms);
+	}
 	
-	public abstract List<MethodReference> methods();
-
-	public abstract boolean canBeUsedAsParamFor(MethodReference method, int index);
-
-	public abstract boolean canBeUsedAsReceiverFor(MethodReference method);
-
-	public abstract boolean canBeDefinedAsResultOf(MethodReference method);
-	
-	/**
-	 * checks if the given instruction represents a call to a stored method
-	 * @param ins the {@link SSAInstruction} to check
-	 * @return the value number of the call receiver if the method is contained in the {@link #methods} list, -1 otherwise
+	/* (non-Javadoc)
+	 * @see de.unifrankfurt.faststring.analysis.label.StringTypeLabel#methods()
 	 */
+	@Override
+	public List<MethodReference> methods() {
+		return methods;
+	}
+	@Override
 	public int check(SSAInstruction ins) {
 		
 		if (ins != null) {
@@ -75,5 +75,23 @@ public enum Label {
 		
 		}
 		return -1;
+	}
+	
+	public List<StringReference> findStringUses(IR ir) {
+		List<StringReference> stringReference = Lists.newLinkedList();
+		
+		for (int i = 0; i < ir.getInstructions().length; i++) {
+			
+			SSAInstruction ins = ir.getInstructions()[i];
+			
+			int receiver = check(ins);
+			
+			if (receiver > -1) {
+				stringReference.add(new StringReference(receiver, this));
+				
+			}
+							
+		}
+		return stringReference;
 	}
 }

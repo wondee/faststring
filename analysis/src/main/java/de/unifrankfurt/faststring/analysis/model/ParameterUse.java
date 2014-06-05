@@ -5,7 +5,7 @@ import java.util.List;
 import com.google.common.collect.Lists;
 import com.ibm.wala.types.MethodReference;
 
-import de.unifrankfurt.faststring.analysis.label.Label;
+import de.unifrankfurt.faststring.analysis.label.StringTypeLabel;
 import de.unifrankfurt.faststring.analysis.util.IRUtil;
 
 public class ParameterUse extends Use {
@@ -36,7 +36,7 @@ public class ParameterUse extends Use {
 	}
 
 	@Override
-	public boolean isCompatibleWith(Label label) {
+	public boolean isCompatibleWith(StringTypeLabel label) {
 		return label.canBeUsedAsParamFor(method, index);
 	}
 

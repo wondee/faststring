@@ -15,7 +15,7 @@ import com.ibm.wala.ssa.IR;
 import de.unifrankfurt.faststring.analysis.graph.DataFlowGraph;
 import de.unifrankfurt.faststring.analysis.graph.DataFlowGraphBuilder;
 import de.unifrankfurt.faststring.analysis.graph.GraphUtil;
-import de.unifrankfurt.faststring.analysis.label.Label;
+import de.unifrankfurt.faststring.analysis.label.BuiltInTypes;
 import de.unifrankfurt.faststring.analysis.model.CallResultDefinition;
 import de.unifrankfurt.faststring.analysis.model.ConstantDefinition;
 import de.unifrankfurt.faststring.analysis.model.PhiDefinition;
@@ -115,7 +115,7 @@ public class TestDataFlowGraph extends BaseAnalysisTest {
 		IR ir = getIR(className, methodName);
 		DefUse defUse = new DefUse(ir);
 		
-		return new DataFlowGraphBuilder(Label.SUBSTRING, ir, defUse).createDataFlowGraph();
+		return new DataFlowGraphBuilder(BuiltInTypes.SUBSTRING).createDataFlowGraph(defUse, ir);
 	}
 	
 }

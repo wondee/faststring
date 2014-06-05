@@ -6,7 +6,7 @@ import com.google.common.collect.Lists;
 import com.ibm.wala.types.MethodReference;
 import com.ibm.wala.types.TypeReference;
 
-import de.unifrankfurt.faststring.analysis.label.Label;
+import de.unifrankfurt.faststring.analysis.label.StringTypeLabel;
 import de.unifrankfurt.faststring.analysis.util.IRUtil;
 
 public class ReceiverUse extends Use {
@@ -44,7 +44,7 @@ public class ReceiverUse extends Use {
 	}
 
 	@Override
-	public boolean isCompatibleWith(Label label) {
+	public boolean isCompatibleWith(StringTypeLabel label) {
 		return label.canBeUsedAsReceiverFor(method);
 	}
 

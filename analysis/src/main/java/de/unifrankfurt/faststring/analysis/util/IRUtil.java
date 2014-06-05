@@ -1,9 +1,14 @@
 package de.unifrankfurt.faststring.analysis.util;
 
 import java.util.List;
+import java.util.Set;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import com.google.common.primitives.Ints;
+import com.ibm.wala.shrikeBT.Util;
+import com.ibm.wala.ssa.IR;
 import com.ibm.wala.ssa.SSAInstruction;
 import com.ibm.wala.ssa.SSAInvokeInstruction;
 import com.ibm.wala.types.ClassLoaderReference;
@@ -15,6 +20,11 @@ public final class IRUtil {
 	public static final TypeReference STRING_TYPE = TypeReference.findOrCreate(
 			ClassLoaderReference.Application, "Ljava/lang/String");
 	
+	
+	public static void main(String[] args) {
+		System.out.println(Util.makeType(String.class));
+		
+	}
 	
 	public static final MethodReference METHOD_SUBSTRING = MethodReference
 			.findOrCreate(STRING_TYPE, "substring", "(II)Ljava/lang/String;");
@@ -33,14 +43,22 @@ public final class IRUtil {
 		// empty
 	}
 
+	/**
+	 * creates a {@link List} out of all uses found in the given {@link SSAInstruction} starting with the use of index 
+	 * {@code startsWith}.
+	 * 
+	 * @param ins the {@code SSAInstruction} to look for uses
+	 * @param startWith the index of the use to start with adding to the list
+	 * @return a list containing the found uses
+	 */
 	public static List<Integer> getUsesList(SSAInstruction ins, int startWith) {
 		int size = ins.getNumberOfUses();
+		
 		List<Integer> list = Lists.newArrayListWithExpectedSize(size);
 		
 		for (int i = startWith; i < size; i++) {
 			list.add(ins.getUse(i));
 		}
-		
 		return list;
 		
 	}
@@ -57,6 +75,10 @@ public final class IRUtil {
 			}
 		}
 		throw new IllegalStateException("value number not found in uses list");
+	}
+	
+	public static Set<Integer> getParamsFromIR(IR ir) {
+		return Sets.newHashSet(Ints.asList(ir.getParameterValueNumbers()));
 	}
 	
 }

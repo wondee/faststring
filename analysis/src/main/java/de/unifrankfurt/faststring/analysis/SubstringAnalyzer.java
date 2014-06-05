@@ -17,7 +17,8 @@ import de.unifrankfurt.faststring.analysis.graph.DataFlowGraph;
 import de.unifrankfurt.faststring.analysis.graph.DataFlowGraphBuilder;
 import de.unifrankfurt.faststring.analysis.graph.GraphUtil;
 import de.unifrankfurt.faststring.analysis.graph.StringReference;
-import de.unifrankfurt.faststring.analysis.label.Label;
+import de.unifrankfurt.faststring.analysis.label.BuiltInTypes;
+import de.unifrankfurt.faststring.analysis.label.StringTypeLabel;
 import de.unifrankfurt.faststring.analysis.model.DataFlowObject;
 import de.unifrankfurt.faststring.analysis.model.Definition;
 import de.unifrankfurt.faststring.analysis.model.Use;
@@ -35,7 +36,7 @@ public class SubstringAnalyzer {
 	private IR ir;
 	private DefUse defUse;
 
-	private Label label = Label.SUBSTRING;
+	private StringTypeLabel label = BuiltInTypes.SUBSTRING;
 
 	private DataFlowGraph graph;
 
@@ -46,7 +47,6 @@ public class SubstringAnalyzer {
 		
 		ir = targetApp.findIRForMethod(method);
 		defUse = targetApp.findDefUseForMethod(method);	
-		
 		
 	}
 	
@@ -81,7 +81,7 @@ public class SubstringAnalyzer {
 
 	private DataFlowGraph getGraph() {
 		if (graph == null) {
-			graph = new DataFlowGraphBuilder(label, ir, defUse).createDataFlowGraph();
+			graph = new DataFlowGraphBuilder(label).createDataFlowGraph(defUse, ir);
 		}
 		return graph;
 	}
@@ -147,6 +147,5 @@ public class SubstringAnalyzer {
 		}
 		
 	}
-	
 	
 }

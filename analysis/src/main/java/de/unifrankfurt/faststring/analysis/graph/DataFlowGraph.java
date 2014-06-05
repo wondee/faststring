@@ -6,13 +6,13 @@ import java.util.Map;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Maps;
 
-import de.unifrankfurt.faststring.analysis.label.Label;
+import de.unifrankfurt.faststring.analysis.label.StringTypeLabel;
 import de.unifrankfurt.faststring.analysis.util.StringUtil;
 
 public class DataFlowGraph {
 	
 	private final Map<Integer, StringReference> nodes;
-	private final Label label;
+	private final StringTypeLabel label;
 	private final Predicate<StringReference> matchedLabel = new Predicate<StringReference>() {
 		@Override
 		public boolean apply(StringReference ref) {
@@ -20,7 +20,7 @@ public class DataFlowGraph {
 		}
 	};
 	
-	public DataFlowGraph(Label label, Map<Integer, StringReference> nodeMap) {
+	public DataFlowGraph(StringTypeLabel label, Map<Integer, StringReference> nodeMap) {
 		this.nodes = nodeMap;
 		this.label = label;
 	}
