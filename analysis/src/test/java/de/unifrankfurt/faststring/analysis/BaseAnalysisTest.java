@@ -102,6 +102,10 @@ public abstract class BaseAnalysisTest {
 		return ir;
 	}
 	
+	protected static IMethod getMethod(String className, String methodName) {
+		return getIR(className, methodName).getMethod();
+	}
+	
 	public static TargetApplication getTargetApplication() {
 		return targetApplication;
 	}
