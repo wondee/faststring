@@ -2,8 +2,10 @@ package de.unifrankfurt.faststring.analysis;
 
 import java.io.File;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 
 import com.ibm.wala.shrikeBT.ConstantInstruction;
+import com.ibm.wala.shrikeBT.Disassembler;
 import com.ibm.wala.shrikeBT.GetInstruction;
 import com.ibm.wala.shrikeBT.Instruction;
 import com.ibm.wala.shrikeBT.MethodData;
@@ -28,7 +30,7 @@ public class ShrikeTest {
 		
 		instrumenter.addInputJar(new File("../analysis-test/target/test.jar"));
 		
-		ClassInstrumenter ci;
+		
 		
 		final GetInstruction getOut = Util.makeGet(System.class, "out");
 		final Instruction callPrintln = Util.makeInvoke(PrintStream.class, "println", new Class[] { String.class });
@@ -37,6 +39,10 @@ public class ShrikeTest {
 		
 		instrumenter.setOutputJar(new File("../analysis-test/target/helloWorld.jar"));
 		
+		PrintWriter writer = new PrintWriter(System.out);
+		instrumenter.setPassUnmodifiedClasses(true);
+		
+		ClassInstrumenter ci;
 		while ((ci = instrumenter.nextClass()) != null) {
 			
 			for (int i = 0; i < ci.getReader().getMethodCount(); i++) {
@@ -46,6 +52,9 @@ public class ShrikeTest {
 				
 				
 				if (ci.getMethodCode(i) != null) {
+					System.out.println("old");
+					new Disassembler(methodData).disassembleTo(writer);
+					writer.flush();
 					MethodEditor editor = new MethodEditor(methodData);
 					editor.beginPass();
 					editor.insertAtStart(new MethodEditor.Patch() {
@@ -57,18 +66,18 @@ public class ShrikeTest {
 							w.emit(callPrintln);
 						}
 					});
+					new Verifier(methodData).verify();
+
 					editor.applyPatches();
 					editor.endPass();
-					new Verifier(methodData).verify();
 					
+					System.out.println("new");
+					new Disassembler(methodData).disassembleTo(writer);
+					writer.flush();
 //					ci.replaceMethod(i, methodData);
-					if (ci.isChanged()) {
-						
-						
-						instrumenter.outputModifiedClass(ci);
-					} else {
-						System.out.println("no changes");
-					}
+					
+					instrumenter.outputModifiedClass(ci, ci.emitClass());
+					
 				} else {
 					System.out.println("old code for " + i + " is null");
 				}
@@ -76,6 +85,7 @@ public class ShrikeTest {
 			
 		}
 		
+		instrumenter.close();
 	}
 	
 	public void test() {
