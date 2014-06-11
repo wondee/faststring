@@ -83,4 +83,11 @@ public class MethodAnalyzerTestClass {
 		b.substring(3, 6);
 	}
 	
+	public StringBuilder usedAsCtorParam(String a) {
+		
+		String b = a.substring(4);
+		
+		return new StringBuilder(b);
+		
+	}
 }

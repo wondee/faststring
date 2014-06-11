@@ -1,6 +1,7 @@
 package de.unifrankfurt.faststring.analysis.label;
 
 import java.util.List;
+import java.util.Set;
 
 import com.ibm.wala.ssa.IR;
 import com.ibm.wala.ssa.SSAInstruction;
@@ -10,7 +11,7 @@ import de.unifrankfurt.faststring.analysis.graph.StringReference;
 
 public interface StringTypeLabel {
 
-	List<MethodReference> methods();
+	Set<MethodReference> methods();
 
 	boolean canBeUsedAsParamFor(MethodReference method,	int index);
 

@@ -22,11 +22,14 @@ public class ParameterUse extends Use {
 
 	@Override
 	public String toString() {
-		return "ParamUse [method=" + method + ", def=" + def + ", index=" + index + "]";
+		return "ParameterUse [method=" + method + ", def=" + def + ", index=" + index + "]";
 	}
 
 	@Override
 	public List<Integer> getConnectedRefs() {
+		// TODO check more precise in which cases the return value chould be labeled
+		// in the actual error String.valueOf(labeledItem) does not return a labeled item but a normal String
+		
 		if (method.getReturnType().equals(IRUtil.STRING_TYPE)) {
 			return Lists.newArrayList(def);			
 		} else {

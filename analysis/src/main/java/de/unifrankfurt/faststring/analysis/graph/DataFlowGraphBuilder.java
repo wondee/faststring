@@ -61,10 +61,14 @@ public class DataFlowGraphBuilder {
 	}
 	
 	public DataFlowGraph createDataFlowGraph(DefUse defUse, IR ir) {
-		return createDataFlowGraph(defUse, IRUtil.getParamsFromIR(ir), ir.getSymbolTable(), label.findStringUses(ir));
+		return createDataFlowGraph(defUse, ir , label.findStringUses(ir));
 	}
 	
-	public DataFlowGraph createDataFlowGraph(DefUse defUse, Set<Integer> params, SymbolTable symbolTable, List<StringReference> stringRefs) {
+	public DataFlowGraph createDataFlowGraph(DefUse defUse, IR ir, List<StringReference> stringRefs) {
+		
+		Set<Integer> params = IRUtil.getParamsFromIR(ir);
+		SymbolTable symbolTable = ir.getSymbolTable();
+		Map<SSAInstruction, Integer> instructionToIndexMap = IRUtil.createInstructionToIndexMap(ir);
 		
 		Queue<StringReference> refs = new UniqueQueue<StringReference>(stringRefs);
 		
@@ -78,8 +82,8 @@ public class DataFlowGraphBuilder {
 				refMap.put(ref, stringRef);
 			}
 
-			checkDefinition(defUse, params, symbolTable, stringRef);
-			checkUses(defUse, stringRef);
+			checkDefinition(defUse, instructionToIndexMap, params, symbolTable, stringRef);
+			checkUses(defUse, instructionToIndexMap, stringRef);
 			
 			refs.addAll(findNewRefs(stringRef, refMap.keySet()));
 		}
@@ -100,9 +104,9 @@ public class DataFlowGraphBuilder {
 		return Sets.newHashSet(transform(filter(newRefs, not(in(contained))), toStringReferences));
 	}
 
-	private void checkUses(DefUse defUse, StringReference ref) {
+	private void checkUses(DefUse defUse, Map<SSAInstruction, Integer> instructionToIndexMap, StringReference ref) {
 		List<SSAInstruction> uses = Lists.newArrayList(defUse.getUses(ref.valueNumber()));
-		UseFactory useFactory = new UseFactory(ref.valueNumber());
+		UseFactory useFactory = new UseFactory(instructionToIndexMap, ref.valueNumber());
 		
 		Builder<Use> builder = new ImmutableList.Builder<Use>();
 		
@@ -114,13 +118,15 @@ public class DataFlowGraphBuilder {
 		ref.setUses(builder.build());
 	}
 
-	private void checkDefinition(DefUse defUse, Set<Integer> params, SymbolTable symbolTable, StringReference ref) {
+	private void checkDefinition(DefUse defUse, Map<SSAInstruction, Integer> instructionToIndexMap, 
+			Set<Integer> params, SymbolTable symbolTable, StringReference ref) {
+		
 		Definition def = null;
 		int v = ref.valueNumber();
 		SSAInstruction defInstruction = defUse.getDef(v);
 		
 		if (defInstruction != null) {	
-			def = new DefinitionFactory().create(defInstruction);
+			def = new DefinitionFactory(instructionToIndexMap).create(defInstruction);
 			
 		} else 	if (params.contains(v)) {
 			def = Definition.createParamDefinition();
@@ -135,7 +141,6 @@ public class DataFlowGraphBuilder {
 		}
 		
 	}
-	
 	
 	
 }

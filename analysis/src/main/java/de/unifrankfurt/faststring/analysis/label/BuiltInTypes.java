@@ -4,7 +4,6 @@ import static de.unifrankfurt.faststring.analysis.util.IRUtil.METHOD_STRING_VALU
 import static de.unifrankfurt.faststring.analysis.util.IRUtil.METHOD_SUBSTRING;
 import static de.unifrankfurt.faststring.analysis.util.IRUtil.METHOD_SUBSTRING_DEFAULT_START;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -19,14 +18,17 @@ import de.unifrankfurt.faststring.analysis.graph.StringReference;
 
 public enum BuiltInTypes implements StringTypeLabel {
 
-	
+	// TODO IMPORTANT incompatible labels ordering priority where are the barrieres set
 	
 	SUBSTRING(METHOD_SUBSTRING, METHOD_SUBSTRING_DEFAULT_START) {
 		
 		@Override
 		public boolean canBeUsedAsParamFor(MethodReference method, int index) {
 			// TODO check if its possible for stringbuilder
-			return false;
+			Set<MethodReference> set = Sets.newHashSet(methods());
+			set.add(METHOD_STRING_VALUE_OF);
+			
+			return set.contains(method);
 		}
 
 		@Override
@@ -35,10 +37,7 @@ public enum BuiltInTypes implements StringTypeLabel {
 		}
 		
 		private Set<MethodReference> compatibleMethods() {
-			Set<MethodReference> set = Sets.newHashSet(methods());
-			// TODO maybe wrong only if it is substituted with a toString() call
-			set.add(METHOD_STRING_VALUE_OF);
-			return set;
+			return methods();
 		}
 
 		@Override
@@ -47,17 +46,17 @@ public enum BuiltInTypes implements StringTypeLabel {
 		}
 	};
 	
-	private List<MethodReference> methods;
+	private Set<MethodReference> methods;
 
 	private BuiltInTypes(MethodReference...ms) {
-		methods = Arrays.asList(ms);
+		methods = Sets.newHashSet(ms);
 	}
 	
 	/* (non-Javadoc)
 	 * @see de.unifrankfurt.faststring.analysis.label.StringTypeLabel#methods()
 	 */
 	@Override
-	public List<MethodReference> methods() {
+	public Set<MethodReference> methods() {
 		return methods;
 	}
 	@Override

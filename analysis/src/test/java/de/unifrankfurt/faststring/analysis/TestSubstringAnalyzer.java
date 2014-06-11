@@ -17,9 +17,9 @@ public class TestSubstringAnalyzer extends BaseAnalysisTest {
 	@Test 
 	public void testSimpleIfSubstring() {
 		Set<StringReference> candidates = findCandidates("simpleIfSubstring");
-		assertList(GraphUtil.extractIntsFromStringReferences(candidates), 4, 5, 9, 12, 16, 22, 23);
+		assertList(GraphUtil.extractIntsFromStringReferences(candidates), 4, 5, 9, 16, 22, 23);
 		assertList(GraphUtil.extractDefConversions(candidates), 4, 5);
-		assertList(GraphUtil.extractUsageConversionsRefIds(candidates), 12, 16, 23);
+		assertList(GraphUtil.extractUsageConversionsRefIds(candidates), 16, 23);
 	}
 
 	@Test  
@@ -55,6 +55,14 @@ public class TestSubstringAnalyzer extends BaseAnalysisTest {
 		assertList(GraphUtil.extractUsageConversionsRefIds(candidates), 16);
 	}
 
+	@Test
+	public void testUsedAsCtorParam() {
+		Set<StringReference> candidates = findCandidates("usedAsCtorParam");
+		assertList(GraphUtil.extractIntsFromStringReferences(candidates), 2, 6);
+		assertList(GraphUtil.extractDefConversions(candidates), 2);
+		assertList(GraphUtil.extractUsageConversionsRefIds(candidates), 6);
+	}
+	
 	private Set<StringReference> findCandidates(String method) {
 		return new SubstringAnalyzer(getTargetApplication(), getIR(TEST_CLASS, method).getMethod()).findCandidates();
 	}

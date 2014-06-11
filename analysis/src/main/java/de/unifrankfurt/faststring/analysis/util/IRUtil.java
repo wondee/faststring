@@ -1,10 +1,12 @@
 package de.unifrankfurt.faststring.analysis.util;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.primitives.Ints;
 import com.ibm.wala.shrikeBT.Util;
@@ -68,8 +70,12 @@ public final class IRUtil {
 	}
 
 	public static int findUseIndex(int v, SSAInvokeInstruction invoke) {
+		return findUseIndex(v, invoke, 1);
+	}
+	
+	public static int findUseIndex(int v, SSAInvokeInstruction invoke, int startWith) {
 		// start with 1 because 0 is the receiver
-		for (int i = 1; i < invoke.getNumberOfUses(); i++) {
+		for (int i = startWith; i < invoke.getNumberOfUses(); i++) {
 			if (invoke.getUse(i) == v) {
 				return i;
 			}
@@ -79,6 +85,24 @@ public final class IRUtil {
 	
 	public static Set<Integer> getParamsFromIR(IR ir) {
 		return Sets.newHashSet(Ints.asList(ir.getParameterValueNumbers()));
+	}
+
+	public static Map<SSAInstruction, Integer> createInstructionToIndexMap(IR ir) {
+		Map<SSAInstruction, Integer> map = Maps.newHashMap();
+		
+		for (int i = 0; i < ir.getInstructions().length; i++) {
+			SSAInstruction instruction = ir.getInstructions()[i];
+			
+			if (instruction != null) {
+				Integer old = map.put(instruction, i);
+				if (old != null) {
+					throw new IllegalStateException("instruction was set before: actual index = " + i + 
+							"; old index = " + old + "; instruction = " + instruction);
+				}
+			}
+		}
+		
+		return map;
 	}
 	
 }

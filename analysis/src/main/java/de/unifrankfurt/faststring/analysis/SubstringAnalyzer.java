@@ -136,10 +136,12 @@ public class SubstringAnalyzer {
 	
 
 	private void check(DataFlowObject o, Queue<StringReference> refQueue) {		
+		System.out.println("inspecting " + o);
 		for (Integer connectedRefId : o.getConnectedRefs()) {
 			StringReference connectedRef = graph.get(connectedRefId);
-						
+			// TODO maybe somewhere else...
 			if (connectedRef.getLabel() == null) {
+				System.out.println("setting label to " + connectedRef);
 				connectedRef.setLabel(label);
 				
 				refQueue.add(connectedRef);
