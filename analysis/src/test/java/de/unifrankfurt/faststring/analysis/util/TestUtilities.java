@@ -19,7 +19,8 @@ public final class TestUtilities {
 
 	private static final String TEST_RES = "../analysis-test/src/main/resources/";
 	
-	private static final String TEST_SCOPE_FILE = TEST_RES + "testScope.txt";
+	private static final String TEST_CLASSES_SCOPE_FILE = TEST_RES + "testClassesScope.txt";
+	private static final String TEST_JAR_SCOPE_FILE = TEST_RES + "testJarScope.txt";
 	private static final String TEST_EXCLUSION_FILE = TEST_RES + "testExclusion.txt";	
 	
 	private TestUtilities() {
@@ -51,7 +52,15 @@ public final class TestUtilities {
 	
 	public static TargetApplication loadTestClasses() {
 		try {
-			return new TargetApplication(TEST_SCOPE_FILE,TEST_EXCLUSION_FILE);
+			return new TargetApplication(TEST_CLASSES_SCOPE_FILE,TEST_EXCLUSION_FILE);
+		} catch (ClassHierarchyException | IOException e ) {
+			throw new TestInitializingException("Failed to load testclasses", e);
+		}
+	}
+	
+	public static TargetApplication loadTestJar() {
+		try {
+			return new TargetApplication(TEST_JAR_SCOPE_FILE,TEST_EXCLUSION_FILE);
 		} catch (ClassHierarchyException | IOException e ) {
 			throw new TestInitializingException("Failed to load testclasses", e);
 		}

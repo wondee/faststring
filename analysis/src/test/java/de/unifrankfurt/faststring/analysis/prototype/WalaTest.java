@@ -1,4 +1,4 @@
-package de.unifrankfurt.faststring.analysis;
+package de.unifrankfurt.faststring.analysis.prototype;
 
 import java.io.IOException;
 
@@ -7,6 +7,8 @@ import com.ibm.wala.classLoader.IMethod;
 import com.ibm.wala.util.CancelException;
 import com.ibm.wala.util.WalaException;
 
+import de.unifrankfurt.faststring.analysis.SubstringAnalyzer;
+import de.unifrankfurt.faststring.analysis.TargetApplication;
 import de.unifrankfurt.faststring.analysis.util.TestUtilities;
 
 public class WalaTest {

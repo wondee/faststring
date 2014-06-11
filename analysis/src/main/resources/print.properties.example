@@ -1,1 +1,3 @@
+# copy this file to enable printing of irs based on the test classes in the analysis-test project
+
 dot=PATH_TO_YOUR_DOT_EXECUTABLE

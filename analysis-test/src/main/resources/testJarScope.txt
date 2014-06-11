@@ -1,0 +1,2 @@
+Primordial,Java,stdlib,none
+Application,Java,jarFile,../analysis-test/target/test.jar

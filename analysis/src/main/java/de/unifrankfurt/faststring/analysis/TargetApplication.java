@@ -30,7 +30,9 @@ import com.ibm.wala.ssa.IR;
 import com.ibm.wala.util.config.AnalysisScopeReader;
 
 public final class TargetApplication {
-
+	// TODO make creation independent of input files (maybe manual)
+	
+	
 	private static final Logger LOG = LoggerFactory.getLogger(TargetApplication.class);
 	
 	private ClassHierarchy classHierarchy;
