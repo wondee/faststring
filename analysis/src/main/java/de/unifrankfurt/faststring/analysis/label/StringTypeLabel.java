@@ -3,10 +3,10 @@ package de.unifrankfurt.faststring.analysis.label;
 import java.util.List;
 import java.util.Set;
 
-import com.ibm.wala.ssa.IR;
 import com.ibm.wala.ssa.SSAInstruction;
 import com.ibm.wala.types.MethodReference;
 
+import de.unifrankfurt.faststring.analysis.IRMethod;
 import de.unifrankfurt.faststring.analysis.graph.StringReference;
 
 public interface StringTypeLabel {
@@ -26,6 +26,6 @@ public interface StringTypeLabel {
 	 */
 	int check(SSAInstruction ins);
 
-	List<StringReference> findStringUses(IR ir);
+	List<StringReference> findStringUses(IRMethod ir);
 
 }

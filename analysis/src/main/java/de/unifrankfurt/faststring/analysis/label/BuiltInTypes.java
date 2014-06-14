@@ -9,11 +9,11 @@ import java.util.Set;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.ibm.wala.ssa.IR;
 import com.ibm.wala.ssa.SSAAbstractInvokeInstruction;
 import com.ibm.wala.ssa.SSAInstruction;
 import com.ibm.wala.types.MethodReference;
 
+import de.unifrankfurt.faststring.analysis.IRMethod;
 import de.unifrankfurt.faststring.analysis.graph.StringReference;
 
 public enum BuiltInTypes implements StringTypeLabel {
@@ -76,7 +76,7 @@ public enum BuiltInTypes implements StringTypeLabel {
 		return -1;
 	}
 	
-	public List<StringReference> findStringUses(IR ir) {
+	public List<StringReference> findStringUses(IRMethod ir) {
 		List<StringReference> stringReference = Lists.newLinkedList();
 		
 		for (int i = 0; i < ir.getInstructions().length; i++) {

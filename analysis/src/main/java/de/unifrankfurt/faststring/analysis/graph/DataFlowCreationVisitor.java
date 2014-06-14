@@ -1,19 +1,22 @@
 package de.unifrankfurt.faststring.analysis.graph;
 
-import java.util.Map;
-
 import com.ibm.wala.ssa.SSAInstruction;
 import com.ibm.wala.ssa.SSAInstruction.Visitor;
 
+import de.unifrankfurt.faststring.analysis.IRMethod;
 import de.unifrankfurt.faststring.analysis.model.DataFlowObject;
 
 public abstract class DataFlowCreationVisitor<T extends DataFlowObject> extends Visitor {
 
 	private T res;
-	private Map<SSAInstruction, Integer> instructionToIndexMap;
-	
-	public DataFlowCreationVisitor(Map<SSAInstruction, Integer> instructionToIndexMap) {
-		this.instructionToIndexMap = instructionToIndexMap;
+
+	private int valueNumber;
+
+	private IRMethod ir;
+
+	public DataFlowCreationVisitor(IRMethod ir, int valueNumber) {
+		this.ir = ir;
+		this.valueNumber = valueNumber;
 	}
 
 	protected void setResult(T result) {
@@ -33,10 +36,12 @@ public abstract class DataFlowCreationVisitor<T extends DataFlowObject> extends 
 			
 			T result = res;
 			
-			Integer index = instructionToIndexMap.get(instruction);
+			Integer index = ir.getIndexFor(instruction);
 			
+			// null if it is not a bytecode instruction
 			if (index != null) {
-				result.setIndex(index);
+				result.setByteCodeIndex(index);
+				result.setLocalVariableIndex(ir.getLocalVariableIndex(index, valueNumber));
 			}
 			
 			res = null;
@@ -44,5 +49,7 @@ public abstract class DataFlowCreationVisitor<T extends DataFlowObject> extends 
 		}
 	}
 	
-	
+	protected int getValueNumber() {
+		return valueNumber;
+	}
 }

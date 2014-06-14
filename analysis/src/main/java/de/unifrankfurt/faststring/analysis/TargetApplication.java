@@ -190,13 +190,16 @@ public final class TargetApplication {
 
 	public IR findIRForMethod(IMethod m) {		
 		return cache.getSSACache().findOrCreateIR(m, Everywhere.EVERYWHERE, options.getSSAOptions());
-		
 	}
 
 	public DefUse findDefUseForMethod(IMethod method) {
 		return cache.getSSACache().findOrCreateDU(method, Everywhere.EVERYWHERE, options.getSSAOptions()) ;
 	}
 
+	public IRMethod findIRMethodForMethod(IMethod m) {
+		return new IRMethod(findIRForMethod(m), findDefUseForMethod(m));
+	}
+	
 	public ClassHierarchy getClassHierachy() {
 		return classHierarchy;
 	}

@@ -10,8 +10,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Sets;
 import com.ibm.wala.classLoader.IMethod;
-import com.ibm.wala.ssa.DefUse;
-import com.ibm.wala.ssa.IR;
 
 import de.unifrankfurt.faststring.analysis.graph.DataFlowGraph;
 import de.unifrankfurt.faststring.analysis.graph.DataFlowGraphBuilder;
@@ -28,13 +26,8 @@ import de.unifrankfurt.faststring.analysis.util.UniqueQueue;
 public class SubstringAnalyzer {
 
 	private static final Logger LOG = LoggerFactory.getLogger(SubstringAnalyzer.class);
-	
-	private TargetApplication targetApp;
-	
-	private IMethod method;
-
-	private IR ir;
-	private DefUse defUse;
+		
+	private IRMethod ir;
 
 	private StringTypeLabel label = BuiltInTypes.SUBSTRING;
 
@@ -42,17 +35,13 @@ public class SubstringAnalyzer {
 
 	
 	public SubstringAnalyzer(TargetApplication targetApplication, IMethod m) {
-		method = m;
-		targetApp = targetApplication;
-		
-		ir = targetApp.findIRForMethod(method);
-		defUse = targetApp.findDefUseForMethod(method);	
+		ir = targetApplication.findIRMethodForMethod(m);
 		
 	}
 	
 	
 	public Set<StringReference> findCandidates() {
-		LOG.info("analyzing (for {}) Method: {}", label, method.getSignature());
+		LOG.info("analyzing (for {}) Method: {}", label, ir.getMethodSignature());
 		
 		graph = getGraph();
 		Collection<StringReference> refs = graph.getAllLabelMatchingReferences();
@@ -81,7 +70,7 @@ public class SubstringAnalyzer {
 
 	private DataFlowGraph getGraph() {
 		if (graph == null) {
-			graph = new DataFlowGraphBuilder(label).createDataFlowGraph(defUse, ir);
+			graph = new DataFlowGraphBuilder(label, ir).createDataFlowGraph();
 		}
 		return graph;
 	}
@@ -136,12 +125,12 @@ public class SubstringAnalyzer {
 	
 
 	private void check(DataFlowObject o, Queue<StringReference> refQueue) {		
-		System.out.println("inspecting " + o);
+		LOG.debug("inspecting {}", o);
 		for (Integer connectedRefId : o.getConnectedRefs()) {
 			StringReference connectedRef = graph.get(connectedRefId);
 			// TODO maybe somewhere else...
 			if (connectedRef.getLabel() == null) {
-				System.out.println("setting label to " + connectedRef);
+				LOG.debug("setting label to {}", connectedRef);
 				connectedRef.setLabel(label);
 				
 				refQueue.add(connectedRef);

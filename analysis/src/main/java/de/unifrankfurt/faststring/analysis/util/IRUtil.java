@@ -1,21 +1,26 @@
 package de.unifrankfurt.faststring.analysis.util;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import com.google.common.primitives.Ints;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
+import com.ibm.wala.classLoader.IMethod;
+import com.ibm.wala.classLoader.ShrikeCTMethod;
 import com.ibm.wala.shrikeBT.Util;
+import com.ibm.wala.shrikeCT.InvalidClassFileException;
 import com.ibm.wala.ssa.IR;
 import com.ibm.wala.ssa.SSAInstruction;
 import com.ibm.wala.ssa.SSAInvokeInstruction;
 import com.ibm.wala.types.ClassLoaderReference;
 import com.ibm.wala.types.MethodReference;
 import com.ibm.wala.types.TypeReference;
+import com.ibm.wala.util.collections.Pair;
 
 public final class IRUtil {
 
@@ -82,10 +87,6 @@ public final class IRUtil {
 		}
 		throw new IllegalStateException("value number not found in uses list");
 	}
-	
-	public static Set<Integer> getParamsFromIR(IR ir) {
-		return Sets.newHashSet(Ints.asList(ir.getParameterValueNumbers()));
-	}
 
 	public static Map<SSAInstruction, Integer> createInstructionToIndexMap(IR ir) {
 		Map<SSAInstruction, Integer> map = Maps.newHashMap();
@@ -105,4 +106,40 @@ public final class IRUtil {
 		return map;
 	}
 	
+	public static Map<Pair<String, Integer>, Collection<Integer>> createLocalNamesMap(IMethod m) {
+		try {
+			if (m instanceof ShrikeCTMethod) {
+				
+				ShrikeCTMethod bm = (ShrikeCTMethod) m;
+				
+				int maxLocals = bm.getMaxLocals();
+				
+				
+				Multimap<Pair<String, Integer>, Integer> varIndexMap = HashMultimap.create();
+				
+//				System.out.println("max locals: " + maxLocals);
+				for (int bcIndex = 0; bcIndex < bm.getInstructions().length; bcIndex++) {
+					for (int localIndex = 0; localIndex < maxLocals; localIndex++) {
+						String name = bm.getLocalVariableName(bcIndex, localIndex);
+//					System.out.printf("%d %d %sn", bcIndex, localIndex, name);
+						
+						Pair<String, Integer> pair = Pair.make(name, bcIndex);
+						varIndexMap.put(pair, localIndex);
+						
+					}
+				}
+				
+				
+				
+				Map<Pair<String, Integer>, Collection<Integer>> map = Multimaps.asMap(varIndexMap);
+//				System.out.println(StringUtil.toStringMap(map));
+				
+				return map;
+			} else {
+				throw new IllegalArgumentException("methods needs to be a ShrikeCTMethod, but was: " + m.getClass().getName());
+			}
+		} catch (InvalidClassFileException e) {
+			throw new IllegalArgumentException("Error while getting instructions", e);
+		}
+	}
 }

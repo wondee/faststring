@@ -23,15 +23,12 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.ibm.wala.ssa.DefUse;
-import com.ibm.wala.ssa.IR;
 import com.ibm.wala.ssa.SSAInstruction;
-import com.ibm.wala.ssa.SymbolTable;
 
+import de.unifrankfurt.faststring.analysis.IRMethod;
 import de.unifrankfurt.faststring.analysis.label.StringTypeLabel;
 import de.unifrankfurt.faststring.analysis.model.Definition;
 import de.unifrankfurt.faststring.analysis.model.Use;
-import de.unifrankfurt.faststring.analysis.util.IRUtil;
 import de.unifrankfurt.faststring.analysis.util.UniqueQueue;
 
 public class DataFlowGraphBuilder {
@@ -39,7 +36,9 @@ public class DataFlowGraphBuilder {
 	private static final Logger LOG = LoggerFactory.getLogger(DataFlowGraphBuilder.class);
 	
 	private StringTypeLabel label;
+	private IRMethod ir;
 
+	
 	private Function<Integer, StringReference> toStringReferences = new Function<Integer, StringReference>() {
 		@Override
 		public StringReference apply(Integer ref) {
@@ -55,20 +54,16 @@ public class DataFlowGraphBuilder {
 	};
 
 	
-	public DataFlowGraphBuilder(StringTypeLabel label) {
+	public DataFlowGraphBuilder(StringTypeLabel label, IRMethod ir) {
+		this.ir = ir;
 		this.label = label;
-		
+	}
+
+	public DataFlowGraph createDataFlowGraph() {
+		return createDataFlowGraph(label.findStringUses(ir));
 	}
 	
-	public DataFlowGraph createDataFlowGraph(DefUse defUse, IR ir) {
-		return createDataFlowGraph(defUse, ir , label.findStringUses(ir));
-	}
-	
-	public DataFlowGraph createDataFlowGraph(DefUse defUse, IR ir, List<StringReference> stringRefs) {
-		
-		Set<Integer> params = IRUtil.getParamsFromIR(ir);
-		SymbolTable symbolTable = ir.getSymbolTable();
-		Map<SSAInstruction, Integer> instructionToIndexMap = IRUtil.createInstructionToIndexMap(ir);
+	public DataFlowGraph createDataFlowGraph(List<StringReference> stringRefs) {
 		
 		Queue<StringReference> refs = new UniqueQueue<StringReference>(stringRefs);
 		
@@ -82,8 +77,8 @@ public class DataFlowGraphBuilder {
 				refMap.put(ref, stringRef);
 			}
 
-			checkDefinition(defUse, instructionToIndexMap, params, symbolTable, stringRef);
-			checkUses(defUse, instructionToIndexMap, stringRef);
+			checkDefinition(stringRef);
+			checkUses(stringRef);
 			
 			refs.addAll(findNewRefs(stringRef, refMap.keySet()));
 		}
@@ -104,9 +99,9 @@ public class DataFlowGraphBuilder {
 		return Sets.newHashSet(transform(filter(newRefs, not(in(contained))), toStringReferences));
 	}
 
-	private void checkUses(DefUse defUse, Map<SSAInstruction, Integer> instructionToIndexMap, StringReference ref) {
-		List<SSAInstruction> uses = Lists.newArrayList(defUse.getUses(ref.valueNumber()));
-		UseFactory useFactory = new UseFactory(instructionToIndexMap, ref.valueNumber());
+	private void checkUses(StringReference ref) {
+		List<SSAInstruction> uses = Lists.newArrayList(ir.getUses(ref.valueNumber()));
+		UseFactory useFactory = new UseFactory(ir, ref.valueNumber());
 		
 		Builder<Use> builder = new ImmutableList.Builder<Use>();
 		
@@ -118,19 +113,18 @@ public class DataFlowGraphBuilder {
 		ref.setUses(builder.build());
 	}
 
-	private void checkDefinition(DefUse defUse, Map<SSAInstruction, Integer> instructionToIndexMap, 
-			Set<Integer> params, SymbolTable symbolTable, StringReference ref) {
+	private void checkDefinition(StringReference ref) {
 		
 		Definition def = null;
 		int v = ref.valueNumber();
-		SSAInstruction defInstruction = defUse.getDef(v);
+		SSAInstruction defInstruction = ir.getDef(v);
 		
 		if (defInstruction != null) {	
-			def = new DefinitionFactory(instructionToIndexMap).create(defInstruction);
+			def = new DefinitionFactory(ir, ref.valueNumber()).create(defInstruction);
 			
-		} else 	if (params.contains(v)) {
+		} else 	if (ir.getParams().contains(v)) {
 			def = Definition.createParamDefinition();
-		} else if (symbolTable.isConstant(v)) {
+		} else if (ir.isConstant(v)) {
 			def = Definition.createConstantDefinition();
 		}
 		

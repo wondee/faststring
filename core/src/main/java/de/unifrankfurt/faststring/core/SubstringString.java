@@ -52,4 +52,8 @@ public final class SubstringString implements CharSequence {
 		return substring(start, end);
 	}
 
+	public static SubstringString valueOf(String string) {
+		return new SubstringString(string);
+	}
+
 }

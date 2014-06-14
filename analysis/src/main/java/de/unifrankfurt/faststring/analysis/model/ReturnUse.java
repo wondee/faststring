@@ -7,7 +7,7 @@ public class ReturnUse extends Use {
 
 	@Override
 	public String toString() {
-		return "ReturnUse";
+		return "ReturnUse [byteCodeIndex=" + getByteCodeIndex() + ", varIndex= " + getLocalVariableIndex()+ "]";
 	}
 
 	@Override

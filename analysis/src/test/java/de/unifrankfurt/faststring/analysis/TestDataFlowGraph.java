@@ -112,10 +112,11 @@ public class TestDataFlowGraph extends BaseAnalysisTest {
 	
 	
 	private DataFlowGraph createGraph(String className, String methodName) {
+		
 		IR ir = getIR(className, methodName);
 		DefUse defUse = new DefUse(ir);
 		
-		return new DataFlowGraphBuilder(BuiltInTypes.SUBSTRING).createDataFlowGraph(defUse, ir);
+		return new DataFlowGraphBuilder(BuiltInTypes.SUBSTRING, new IRMethod(ir, defUse)).createDataFlowGraph();
 	}
 	
 }

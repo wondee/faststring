@@ -9,7 +9,8 @@ public class TestComplete extends BaseAnalysisTest{
 	public void testParserTest() {
 		
 		
-		SubstringAnalyzer analyzer = new SubstringAnalyzer(getTargetApplication(), getMethod("ParserTest", "parse"));
+		SubstringAnalyzer analyzer = new SubstringAnalyzer(getTargetApplication(), getMethod("ByteCodeTestClass", "stringFromCallResult"));
+		
 		
 		analyzer.findCandidates();
 	}

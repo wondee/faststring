@@ -31,7 +31,8 @@ public class ReceiverUse extends Use {
 
 	@Override
 	public String toString() {
-		return "ReceiverUse [params=" + params + ", def=" + def + ", method=" + method + "]";
+		return "ReceiverUse [params=" + params + ", def=" + def + ", method=" + method + 
+				", byteCodeIndex=" + getByteCodeIndex() + ", varIndex= " + getLocalVariableIndex()+ "]";
 	}
 
 	@Override

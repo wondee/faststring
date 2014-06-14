@@ -68,6 +68,8 @@ public class JarManager {
 			
 			for (int i = 0; i < ci.getReader().getMethodCount(); i++) {
 				
+				
+				
 				MethodData methodData = ci.visitMethod(i);				
 				
 				String signature = ci.getReader().getName().replace('/', '.') + "." + methodData.getName() + methodData.getSignature();

@@ -36,7 +36,7 @@ public class CallResultDefinition extends Definition {
 	@Override
 	public String toString() {
 		return "CallResultDefinition [method=" + method + ", receiver="
-				+ receiver + "]";
+				+ receiver + ", byteCodeIndex=" + getByteCodeIndex() + ", varIndex= " + getLocalVariableIndex()+ "]";
 	}
 
 

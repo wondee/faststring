@@ -22,7 +22,8 @@ public class ParameterUse extends Use {
 
 	@Override
 	public String toString() {
-		return "ParameterUse [method=" + method + ", def=" + def + ", index=" + index + "]";
+		return "ParameterUse [method=" + method + ", def=" + def + ", index=" + index + 
+				", byteCodeIndex=" + getByteCodeIndex() + ", varIndex= " + getLocalVariableIndex()+ "]";
 	}
 
 	@Override
