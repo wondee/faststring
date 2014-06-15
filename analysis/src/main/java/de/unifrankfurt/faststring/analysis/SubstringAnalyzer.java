@@ -85,11 +85,11 @@ public class SubstringAnalyzer {
 		
 	}
 
-	interface CheckingStrategy {
+	private interface CheckingStrategy {
 		void checkReference(StringReference ref, Queue<StringReference> refQueue);
 	}
 	
-	CheckingStrategy definitionCheck = new CheckingStrategy() {
+	private CheckingStrategy definitionCheck = new CheckingStrategy() {
 		@Override
 		public void checkReference(StringReference ref, Queue<StringReference> refQueue) {
 			
@@ -105,7 +105,7 @@ public class SubstringAnalyzer {
 		}
 	};
 	
-	CheckingStrategy usageCheck = new CheckingStrategy() {
+	private CheckingStrategy usageCheck = new CheckingStrategy() {
 		@Override
 		public void checkReference(StringReference ref, Queue<StringReference> refQueue) {
 			List<Use> uses = ref.getUses();
