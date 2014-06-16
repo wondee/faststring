@@ -72,7 +72,7 @@ public final class TargetApplication {
 	}
 	
 	
-	@SuppressWarnings("unused")
+	@SuppressWarnings({"unused","deprecation"})
 	private void initCallGraph()  {
 		CFAStrategy strategy = CFAStrategy.ZERO_ONE_CONTAINER;
 		

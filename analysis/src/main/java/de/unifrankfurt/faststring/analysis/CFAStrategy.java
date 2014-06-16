@@ -8,6 +8,7 @@ import com.ibm.wala.ipa.callgraph.AnalysisScope;
 import com.ibm.wala.ipa.callgraph.propagation.SSAPropagationCallGraphBuilder;
 import com.ibm.wala.ipa.cha.IClassHierarchy;
 
+@Deprecated
 public enum CFAStrategy {
 	ZERO {
 		@Override
