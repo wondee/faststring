@@ -6,7 +6,6 @@ import com.google.common.collect.Lists;
 import com.ibm.wala.types.MethodReference;
 
 import de.unifrankfurt.faststring.analysis.label.TypeLabel;
-import de.unifrankfurt.faststring.analysis.util.IRUtil;
 
 public class ParameterUse extends Use {
 
@@ -31,7 +30,7 @@ public class ParameterUse extends Use {
 		// TODO check more precise in which cases the return value chould be labeled
 		// in the actual error String.valueOf(labeledItem) does not return a labeled item but a normal String
 		
-		if (method.getReturnType().equals(IRUtil.STRING_TYPE)) {
+		if (label.canReturnedValueBeLabeled(method)) {
 			return Lists.newArrayList(def);			
 		} else {
 			return Lists.newArrayList();

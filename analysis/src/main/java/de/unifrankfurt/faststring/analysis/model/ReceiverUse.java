@@ -4,10 +4,9 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 import com.ibm.wala.types.MethodReference;
-import com.ibm.wala.types.TypeReference;
 
+import de.unifrankfurt.faststring.analysis.label.ReceiverInfo;
 import de.unifrankfurt.faststring.analysis.label.TypeLabel;
-import de.unifrankfurt.faststring.analysis.util.IRUtil;
 
 public class ReceiverUse extends Use {
 
@@ -15,18 +14,10 @@ public class ReceiverUse extends Use {
 	private MethodReference method;
 	private int def;
 
-	public ReceiverUse(final MethodReference method, int def, List<Integer> unfilteredParams) {
+	public ReceiverUse(final MethodReference method, int def, List<Integer> params) {
 		this.method = method;
 		this.def = def;
-		this.params = Lists.newLinkedList();
-		
-		for (int i = 0; i < unfilteredParams.size(); i++) {
-			
-			TypeReference parameterType = method.getParameterType(i);
-			if (IRUtil.STRING_TYPE.equals(parameterType)) {
-				this.params.add(unfilteredParams.get(i));
-			}
-		}
+		this.params = params;
 	}
 
 	@Override
@@ -37,10 +28,18 @@ public class ReceiverUse extends Use {
 
 	@Override
 	public List<Integer> getConnectedRefs(TypeLabel label) {
-		List<Integer> newRefs = Lists.newLinkedList(params);
-		if (def > -1 && method.getReturnType().equals(IRUtil.STRING_TYPE)) {
+		ReceiverInfo receiverInfo = label.getReceiverUseInfo(method);
+		
+		List<Integer> newRefs = Lists.newLinkedList();
+		
+		if (def != -1 && receiverInfo.isDefLabelable()) {
 			newRefs.add(def);
 		}
+		
+		for (Integer index : receiverInfo.getLabelableParams()) {
+			newRefs.add(params.get(index));
+		}
+		
 		return newRefs;
 	}
 

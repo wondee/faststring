@@ -51,14 +51,13 @@ public class TestDataFlowGraph extends BaseAnalysisTest {
 		assertTrue(graph.contains(4));
 		assertTrue(graph.contains(5));
 		assertTrue(graph.contains(9));
-		assertTrue(graph.contains(12));
 		assertTrue(graph.contains(16));
 		assertTrue(graph.contains(22));
 		assertTrue(graph.contains(20));
 		assertTrue(graph.contains(23));
 		
 		
-		assertEquals(8, graph.size());
+		assertEquals(7, graph.size());
 		
 		assertThat(graph.get(4).getDef(), instanceOf(ConstantDefinition.class));
 		assertThat(graph.get(9).getDef(), instanceOf(CallResultDefinition.class));

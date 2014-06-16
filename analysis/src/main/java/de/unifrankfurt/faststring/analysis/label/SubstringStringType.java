@@ -10,11 +10,15 @@ import java.util.Set;
 import com.google.common.collect.Sets;
 import com.ibm.wala.types.MethodReference;
 
+import de.unifrankfurt.faststring.analysis.util.IRUtil;
+
 public class SubstringStringType extends BaseTypeLabel {
 
 	public static final TypeLabel INSTANCE = new SubstringStringType();
 	
-	private Collection<MethodReference> methods = Sets.newHashSet(METHOD_SUBSTRING, METHOD_SUBSTRING_DEFAULT_START);
+	private static final ReceiverInfo RECEIVER_INFO = new ReceiverInfo(true, IRUtil.EMPTY_LIST);
+	
+	private static final Collection<MethodReference> methods = Sets.newHashSet(METHOD_SUBSTRING, METHOD_SUBSTRING_DEFAULT_START);
 	
 	@Override
 	public Collection<MethodReference> methods() {
@@ -42,6 +46,20 @@ public class SubstringStringType extends BaseTypeLabel {
 	@Override
 	public boolean canBeDefinedAsResultOf(MethodReference method) {
 		return methods().contains(method);
+	}
+
+	@Override
+	public ReceiverInfo getReceiverUseInfo(MethodReference method) {
+		if (canBeUsedAsReceiverFor(method)) {
+			return RECEIVER_INFO;
+		} else {
+			return ReceiverInfo.NOT_USABLE_AS_RECEIVER;
+		}
+	}
+
+	@Override
+	public boolean canReturnedValueBeLabeled(MethodReference method) {
+		return methods.contains(method);
 	}
 
 }

@@ -21,7 +21,9 @@ public class CallResultDefinition extends Definition {
 
 	@Override
 	public List<Integer> getConnectedRefs(TypeLabel label) {
-		if (method.getDeclaringClass().equals(IRUtil.STRING_TYPE)) {
+		if (label.canBeDefinedAsResultOf(method)) {
+		
+//		if (method.getDeclaringClass().equals(IRUtil.STRING_TYPE)) {
 			return Lists.newArrayList(receiver);
 		} else {
 			return IRUtil.EMPTY_LIST;

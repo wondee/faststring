@@ -28,4 +28,8 @@ public interface TypeLabel {
 
 	List<Reference> findTypeUses(IRMethod ir);
 
+	ReceiverInfo getReceiverUseInfo(MethodReference method);
+
+	boolean canReturnedValueBeLabeled(MethodReference method);
+
 }
