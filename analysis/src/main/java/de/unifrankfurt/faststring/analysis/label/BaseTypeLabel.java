@@ -1,5 +1,6 @@
 package de.unifrankfurt.faststring.analysis.label;
 
+import java.util.Collection;
 import java.util.List;
 
 import com.google.common.collect.Lists;
@@ -12,6 +13,11 @@ import de.unifrankfurt.faststring.analysis.graph.Reference;
 
 public abstract class BaseTypeLabel implements TypeLabel {
 
+	/**
+	 * @return all methods that should be replaced by an signature equal equivalent
+	 */
+	protected abstract Collection<MethodReference> methods();
+	
 	@Override
 	public int check(SSAInstruction ins) {
 		
