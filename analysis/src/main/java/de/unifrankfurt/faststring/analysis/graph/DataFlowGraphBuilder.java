@@ -39,7 +39,7 @@ public class DataFlowGraphBuilder {
 	private final IRMethod ir;
 
 	
-	private Function<Integer, Reference> toStringReferences = new Function<Integer, Reference>() {
+	private Function<Integer, Reference> toReferences = new Function<Integer, Reference>() {
 		@Override
 		public Reference apply(Integer ref) {
 			return new Reference(ref);
@@ -96,7 +96,7 @@ public class DataFlowGraphBuilder {
 		Iterables.addAll(newRefs, stringRef.getDef().getConnectedRefs(label));
 		Iterables.addAll(newRefs, concat(transform(stringRef.getUses(), extractNewRefs)));
 		
-		return Sets.newHashSet(transform(filter(newRefs, not(in(contained))), toStringReferences));
+		return Sets.newHashSet(transform(filter(newRefs, not(in(contained))), toReferences));
 	}
 
 	private void checkUses(Reference ref) {
