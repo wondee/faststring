@@ -26,7 +26,7 @@ import com.google.common.collect.Sets;
 import com.ibm.wala.ssa.SSAInstruction;
 
 import de.unifrankfurt.faststring.analysis.IRMethod;
-import de.unifrankfurt.faststring.analysis.label.StringTypeLabel;
+import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 import de.unifrankfurt.faststring.analysis.model.Definition;
 import de.unifrankfurt.faststring.analysis.model.Use;
 import de.unifrankfurt.faststring.analysis.util.UniqueQueue;
@@ -35,42 +35,42 @@ public class DataFlowGraphBuilder {
 
 	private static final Logger LOG = LoggerFactory.getLogger(DataFlowGraphBuilder.class);
 	
-	private StringTypeLabel label;
-	private IRMethod ir;
+	private final TypeLabel label;
+	private final IRMethod ir;
 
 	
-	private Function<Integer, StringReference> toStringReferences = new Function<Integer, StringReference>() {
+	private Function<Integer, Reference> toStringReferences = new Function<Integer, Reference>() {
 		@Override
-		public StringReference apply(Integer ref) {
-			return new StringReference(ref);
+		public Reference apply(Integer ref) {
+			return new Reference(ref);
 		}
 	};
 
 	private Function<Use, Iterable<Integer>> extractNewRefs = new Function<Use, Iterable<Integer>>() {
 		@Override
 		public Iterable<Integer> apply(Use use) {
-			return use.getConnectedRefs();
+			return use.getConnectedRefs(label);
 		}
 	};
 
 	
-	public DataFlowGraphBuilder(StringTypeLabel label, IRMethod ir) {
+	public DataFlowGraphBuilder(TypeLabel label, IRMethod ir) {
 		this.ir = ir;
 		this.label = label;
 	}
 
 	public DataFlowGraph createDataFlowGraph() {
-		return createDataFlowGraph(label.findStringUses(ir));
+		return createDataFlowGraph(label.findTypeUses(ir));
 	}
 	
-	public DataFlowGraph createDataFlowGraph(List<StringReference> stringRefs) {
+	public DataFlowGraph createDataFlowGraph(List<Reference> stringRefs) {
 		
-		Queue<StringReference> refs = new UniqueQueue<StringReference>(stringRefs);
+		Queue<Reference> refs = new UniqueQueue<Reference>(stringRefs);
 		
-		Map<Integer, StringReference> refMap = Maps.newHashMap();
+		Map<Integer, Reference> refMap = Maps.newHashMap();
 		
 		while(!refs.isEmpty()) {
-			StringReference stringRef = refs.remove();
+			Reference stringRef = refs.remove();
 			int ref = stringRef.valueNumber();
 			
 			if (!refMap.containsKey(ref)) {
@@ -90,16 +90,16 @@ public class DataFlowGraphBuilder {
 	}
 	
 
-	private Collection<StringReference> findNewRefs(StringReference stringRef, Set<Integer> contained) {
+	private Collection<Reference> findNewRefs(Reference stringRef, Set<Integer> contained) {
  		List<Integer> newRefs = Lists.newLinkedList();
 		
-		Iterables.addAll(newRefs, stringRef.getDef().getConnectedRefs());
+		Iterables.addAll(newRefs, stringRef.getDef().getConnectedRefs(label));
 		Iterables.addAll(newRefs, concat(transform(stringRef.getUses(), extractNewRefs)));
 		
 		return Sets.newHashSet(transform(filter(newRefs, not(in(contained))), toStringReferences));
 	}
 
-	private void checkUses(StringReference ref) {
+	private void checkUses(Reference ref) {
 		List<SSAInstruction> uses = Lists.newArrayList(ir.getUses(ref.valueNumber()));
 		UseFactory useFactory = new UseFactory(ir, ref.valueNumber());
 		
@@ -113,7 +113,7 @@ public class DataFlowGraphBuilder {
 		ref.setUses(builder.build());
 	}
 
-	private void checkDefinition(StringReference ref) {
+	private void checkDefinition(Reference ref) {
 		
 		Definition def = null;
 		int v = ref.valueNumber();
@@ -122,7 +122,7 @@ public class DataFlowGraphBuilder {
 		if (defInstruction != null) {	
 			def = new DefinitionFactory(ir, ref.valueNumber()).create(defInstruction);
 			
-		} else 	if (ir.getParams().contains(v)) {
+		} else if (ir.getParams().contains(v)) {
 			def = Definition.createParamDefinition();
 		} else if (ir.isConstant(v)) {
 			def = Definition.createConstantDefinition();

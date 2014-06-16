@@ -14,9 +14,9 @@ import com.ibm.wala.classLoader.IMethod;
 import de.unifrankfurt.faststring.analysis.graph.DataFlowGraph;
 import de.unifrankfurt.faststring.analysis.graph.DataFlowGraphBuilder;
 import de.unifrankfurt.faststring.analysis.graph.GraphUtil;
-import de.unifrankfurt.faststring.analysis.graph.StringReference;
+import de.unifrankfurt.faststring.analysis.graph.Reference;
 import de.unifrankfurt.faststring.analysis.label.BuiltInTypes;
-import de.unifrankfurt.faststring.analysis.label.StringTypeLabel;
+import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 import de.unifrankfurt.faststring.analysis.model.DataFlowObject;
 import de.unifrankfurt.faststring.analysis.model.Definition;
 import de.unifrankfurt.faststring.analysis.model.Use;
@@ -29,7 +29,7 @@ public class SubstringAnalyzer {
 		
 	private IRMethod ir;
 
-	private StringTypeLabel label = BuiltInTypes.SUBSTRING;
+	private TypeLabel label = BuiltInTypes.SUBSTRING;
 
 	private DataFlowGraph graph;
 
@@ -40,11 +40,11 @@ public class SubstringAnalyzer {
 	}
 	
 	
-	public Set<StringReference> findCandidates() {
+	public Set<Reference> findCandidates() {
 		LOG.info("analyzing (for {}) Method: {}", label, ir.getMethodSignature());
 		
 		graph = getGraph();
-		Collection<StringReference> refs = graph.getAllLabelMatchingReferences();
+		Collection<Reference> refs = graph.getAllLabelMatchingReferences();
 		
 		if (refs.size() > 0) {
 			processUntilQueueIsEmpty(refs, definitionCheck);
@@ -55,7 +55,7 @@ public class SubstringAnalyzer {
 			LOG.debug("no string uses found");
 		}
 		
-		Collection<StringReference> finalRefs = graph.getAllLabelMatchingReferences();
+		Collection<Reference> finalRefs = graph.getAllLabelMatchingReferences();
 		
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("found possible references: {}", GraphUtil.extractIntsFromStringReferences(finalRefs));
@@ -76,8 +76,8 @@ public class SubstringAnalyzer {
 	}
 
 
-	private void processUntilQueueIsEmpty(Collection<StringReference> contents, CheckingStrategy strategy) {
-		Queue<StringReference> refQueue = new UniqueQueue<>(contents);
+	private void processUntilQueueIsEmpty(Collection<Reference> contents, CheckingStrategy strategy) {
+		Queue<Reference> refQueue = new UniqueQueue<>(contents);
 		
 		while(!refQueue.isEmpty()) {
 			strategy.checkReference(refQueue.remove(), refQueue);
@@ -86,12 +86,12 @@ public class SubstringAnalyzer {
 	}
 
 	private interface CheckingStrategy {
-		void checkReference(StringReference ref, Queue<StringReference> refQueue);
+		void checkReference(Reference ref, Queue<Reference> refQueue);
 	}
 	
 	private CheckingStrategy definitionCheck = new CheckingStrategy() {
 		@Override
-		public void checkReference(StringReference ref, Queue<StringReference> refQueue) {
+		public void checkReference(Reference ref, Queue<Reference> refQueue) {
 			
 			
 			Definition def = ref.getDef();
@@ -107,7 +107,7 @@ public class SubstringAnalyzer {
 	
 	private CheckingStrategy usageCheck = new CheckingStrategy() {
 		@Override
-		public void checkReference(StringReference ref, Queue<StringReference> refQueue) {
+		public void checkReference(Reference ref, Queue<Reference> refQueue) {
 			List<Use> uses = ref.getUses();
 			for (int useId = 0; useId < uses.size(); useId++) {
 				Use use = uses.get(useId);
@@ -124,10 +124,10 @@ public class SubstringAnalyzer {
 	
 	
 
-	private void check(DataFlowObject o, Queue<StringReference> refQueue) {		
+	private void check(DataFlowObject o, Queue<Reference> refQueue) {		
 		LOG.debug("inspecting {}", o);
-		for (Integer connectedRefId : o.getConnectedRefs()) {
-			StringReference connectedRef = graph.get(connectedRefId);
+		for (Integer connectedRefId : o.getConnectedRefs(label)) {
+			Reference connectedRef = graph.get(connectedRefId);
 			// TODO maybe somewhere else...
 			if (connectedRef.getLabel() == null) {
 				LOG.debug("setting label to {}", connectedRef);

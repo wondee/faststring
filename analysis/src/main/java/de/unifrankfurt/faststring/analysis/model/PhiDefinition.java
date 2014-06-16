@@ -2,7 +2,7 @@ package de.unifrankfurt.faststring.analysis.model;
 
 import java.util.List;
 
-import de.unifrankfurt.faststring.analysis.label.StringTypeLabel;
+import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 
 public class PhiDefinition extends Definition {
 
@@ -18,12 +18,12 @@ public class PhiDefinition extends Definition {
 	}
 
 	@Override
-	public List<Integer> getConnectedRefs() {
+	public List<Integer> getConnectedRefs(TypeLabel label) {
 		return refs;
 	}
 	
 	@Override
-	public boolean isCompatibleWith(StringTypeLabel label) {
+	public boolean isCompatibleWith(TypeLabel label) {
 		// TODO need to check if the uses are all labeled with a compatible label
 		return true;
 	}

@@ -4,11 +4,11 @@ import com.ibm.wala.shrikeBT.LoadInstruction;
 import com.ibm.wala.shrikeBT.MethodEditor.Output;
 import com.ibm.wala.shrikeBT.MethodEditor.Patch;
 
-import de.unifrankfurt.faststring.analysis.graph.StringReference;
+import de.unifrankfurt.faststring.analysis.graph.Reference;
 
 public class PatchFactory {
 
-	public static Patch createDefinitionPatch(StringReference ref) {
+	public static Patch createDefinitionPatch(Reference ref) {
 		
 		return new Patch() {
 

@@ -5,7 +5,7 @@ import java.util.List;
 import com.google.common.collect.Lists;
 import com.ibm.wala.types.MethodReference;
 
-import de.unifrankfurt.faststring.analysis.label.StringTypeLabel;
+import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 import de.unifrankfurt.faststring.analysis.util.IRUtil;
 
 public class ParameterUse extends Use {
@@ -27,7 +27,7 @@ public class ParameterUse extends Use {
 	}
 
 	@Override
-	public List<Integer> getConnectedRefs() {
+	public List<Integer> getConnectedRefs(TypeLabel label) {
 		// TODO check more precise in which cases the return value chould be labeled
 		// in the actual error String.valueOf(labeledItem) does not return a labeled item but a normal String
 		
@@ -40,7 +40,7 @@ public class ParameterUse extends Use {
 	}
 
 	@Override
-	public boolean isCompatibleWith(StringTypeLabel label) {
+	public boolean isCompatibleWith(TypeLabel label) {
 		return label.canBeUsedAsParamFor(method, index);
 	}
 

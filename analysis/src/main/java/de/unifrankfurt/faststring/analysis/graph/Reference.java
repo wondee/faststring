@@ -6,31 +6,31 @@ import java.util.Set;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 
-import de.unifrankfurt.faststring.analysis.label.StringTypeLabel;
+import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 import de.unifrankfurt.faststring.analysis.model.Definition;
 import de.unifrankfurt.faststring.analysis.model.Use;
 
 
-public class StringReference {
+public class Reference {
 
 	private int ref;
 	
 	private Definition def = null;
 	private List<Use> uses = null;
 	
-	private StringTypeLabel label = null;
+	private TypeLabel label = null;
 
 	private boolean definitionConversion = false;
 	private Set<Integer> useConversions = Sets.newHashSet();
 
-	public StringReference(int ref) {
+	public Reference(int ref) {
 		Preconditions.checkArgument(ref > 0, "valueNumber must be greater than 0");
 		this.ref = ref;
 		
 	}
 
 
-	public StringReference(int receiver, StringTypeLabel label) {
+	public Reference(int receiver, TypeLabel label) {
 		this(receiver);
 		this.label = label;
 	}
@@ -52,12 +52,12 @@ public class StringReference {
 		return def;
 	}
 	
-	public void setLabel(StringTypeLabel label) {
+	public void setLabel(TypeLabel label) {
 		this.label = label;
 		
 	}
 
-	public StringTypeLabel getLabel() {
+	public TypeLabel getLabel() {
 		return label;
 	}
 
@@ -109,7 +109,7 @@ public class StringReference {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		StringReference other = (StringReference) obj;
+		Reference other = (Reference) obj;
 		if (ref != other.ref)
 			return false;
 		return true;

@@ -9,7 +9,7 @@ import com.ibm.wala.classLoader.IMethod;
 
 import de.unifrankfurt.faststring.analysis.SubstringAnalyzer;
 import de.unifrankfurt.faststring.analysis.TargetApplication;
-import de.unifrankfurt.faststring.analysis.graph.StringReference;
+import de.unifrankfurt.faststring.analysis.graph.Reference;
 import de.unifrankfurt.faststring.analysis.util.StringUtil;
 import de.unifrankfurt.faststring.analysis.util.TestUtilities;
 import de.unifrankfurt.faststring.transform.JarManager;
@@ -27,7 +27,7 @@ public class ShrikeTest {
 		
 		TargetApplication targetApplication = TestUtilities.loadTestJar();
 		
-		Map<String, Set<StringReference>> analysisResult = Maps.newHashMap();
+		Map<String, Set<Reference>> analysisResult = Maps.newHashMap();
 		
 		for (IClass clazz : targetApplication.getApplicationClasses()) {
 
@@ -35,7 +35,7 @@ public class ShrikeTest {
 			for (IMethod m : clazz.getDeclaredMethods()) {
 				SubstringAnalyzer analyzer = new SubstringAnalyzer(targetApplication, m);
 				
-				Set<StringReference> candidates = analyzer.findCandidates();
+				Set<Reference> candidates = analyzer.findCandidates();
 				
 				if (!candidates.isEmpty()) {
 					analysisResult.put(m.getSignature(), candidates);

@@ -5,7 +5,7 @@ import java.util.List;
 import com.google.common.collect.Lists;
 import com.ibm.wala.types.MethodReference;
 
-import de.unifrankfurt.faststring.analysis.label.StringTypeLabel;
+import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 import de.unifrankfurt.faststring.analysis.util.IRUtil;
 
 public class CallResultDefinition extends Definition {
@@ -20,7 +20,7 @@ public class CallResultDefinition extends Definition {
 	}
 
 	@Override
-	public List<Integer> getConnectedRefs() {
+	public List<Integer> getConnectedRefs(TypeLabel label) {
 		if (method.getDeclaringClass().equals(IRUtil.STRING_TYPE)) {
 			return Lists.newArrayList(receiver);
 		} else {
@@ -29,7 +29,7 @@ public class CallResultDefinition extends Definition {
 	}
 
 	@Override
-	public boolean isCompatibleWith(StringTypeLabel label) {
+	public boolean isCompatibleWith(TypeLabel label) {
 		return label.canBeDefinedAsResultOf(method);
 	}
 	

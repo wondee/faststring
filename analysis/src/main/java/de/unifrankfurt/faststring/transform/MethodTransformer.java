@@ -7,13 +7,13 @@ import com.ibm.wala.shrikeBT.MethodEditor;
 import com.ibm.wala.shrikeBT.analysis.Analyzer.FailureException;
 import com.ibm.wala.shrikeBT.analysis.Verifier;
 
-import de.unifrankfurt.faststring.analysis.graph.StringReference;
+import de.unifrankfurt.faststring.analysis.graph.Reference;
 import de.unifrankfurt.faststring.analysis.model.Definition;
 
 public class MethodTransformer {
 
 	
-	public void transformMethod(MethodData methodData, Set<StringReference> refs) {
+	public void transformMethod(MethodData methodData, Set<Reference> refs) {
 		System.out.println("editing: " + methodData.getName());
 		
 		
@@ -21,7 +21,7 @@ public class MethodTransformer {
 		MethodEditor editor = new MethodEditor(methodData);
 		editor.beginPass();
 		
-		for (StringReference ref : refs) {
+		for (Reference ref : refs) {
 			
 			Definition def = ref.getDef();
 			

@@ -1,17 +1,17 @@
 package de.unifrankfurt.faststring.analysis.label;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 import com.ibm.wala.ssa.SSAInstruction;
 import com.ibm.wala.types.MethodReference;
 
 import de.unifrankfurt.faststring.analysis.IRMethod;
-import de.unifrankfurt.faststring.analysis.graph.StringReference;
+import de.unifrankfurt.faststring.analysis.graph.Reference;
 
-public interface StringTypeLabel {
+public interface TypeLabel {
 
-	Set<MethodReference> methods();
+	Collection<MethodReference> methods();
 
 	boolean canBeUsedAsParamFor(MethodReference method,	int index);
 
@@ -26,6 +26,6 @@ public interface StringTypeLabel {
 	 */
 	int check(SSAInstruction ins);
 
-	List<StringReference> findStringUses(IRMethod ir);
+	List<Reference> findTypeUses(IRMethod ir);
 
 }

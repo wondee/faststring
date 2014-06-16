@@ -1,6 +1,6 @@
 package de.unifrankfurt.faststring.analysis.model;
 
-import de.unifrankfurt.faststring.analysis.label.StringTypeLabel;
+import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 
 
 public class MethodParameterDefinition extends Definition {
@@ -11,7 +11,7 @@ public class MethodParameterDefinition extends Definition {
 	}
 
 	@Override
-	public boolean isCompatibleWith(StringTypeLabel label) {
+	public boolean isCompatibleWith(TypeLabel label) {
 		return false;
 	}
 

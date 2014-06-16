@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
-import de.unifrankfurt.faststring.analysis.label.StringTypeLabel;
+import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 
 public class PhiUse extends Use {
 
@@ -20,12 +20,12 @@ public class PhiUse extends Use {
 	}
 
 	@Override
-	public List<Integer> getConnectedRefs() {
+	public List<Integer> getConnectedRefs(TypeLabel label) {
 		return Lists.newArrayList(def);
 	}
 
 	@Override
-	public boolean isCompatibleWith(StringTypeLabel label) {
+	public boolean isCompatibleWith(TypeLabel label) {
 		return true;
 	}
 

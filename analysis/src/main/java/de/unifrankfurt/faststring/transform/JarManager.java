@@ -16,17 +16,17 @@ import com.ibm.wala.shrikeBT.shrikeCT.ClassInstrumenter;
 import com.ibm.wala.shrikeBT.shrikeCT.OfflineInstrumenter;
 import com.ibm.wala.shrikeCT.InvalidClassFileException;
 
-import de.unifrankfurt.faststring.analysis.graph.StringReference;
+import de.unifrankfurt.faststring.analysis.graph.Reference;
 
 public class JarManager {
 
 	private static final Logger LOG = LoggerFactory.getLogger(JarManager.class);
 	
 	private String baseName;
-	private Map<String, Set<StringReference>> analysisResult;
+	private Map<String, Set<Reference>> analysisResult;
 
 
-	public JarManager(String folderName, String jarBaseName, Map<String, Set<StringReference>> analysisResults) {
+	public JarManager(String folderName, String jarBaseName, Map<String, Set<Reference>> analysisResults) {
 
 		baseName = folderName + jarBaseName;
 		analysisResult = analysisResults;
@@ -74,7 +74,7 @@ public class JarManager {
 				
 				String signature = ci.getReader().getName().replace('/', '.') + "." + methodData.getName() + methodData.getSignature();
 				
-				Set<StringReference> refs = analysisResult.get(signature);
+				Set<Reference> refs = analysisResult.get(signature);
 				if (refs != null) {
 					System.out.println("--- old code");
 					new Disassembler(methodData).disassembleTo(writer);

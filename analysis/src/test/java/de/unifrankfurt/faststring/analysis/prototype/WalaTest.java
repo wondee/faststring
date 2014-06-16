@@ -1,10 +1,8 @@
 package de.unifrankfurt.faststring.analysis.prototype;
 
 import java.io.IOException;
-import java.util.Map;
 
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.ibm.wala.classLoader.IBytecodeMethod;

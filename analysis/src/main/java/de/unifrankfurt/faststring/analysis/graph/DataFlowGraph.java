@@ -6,21 +6,21 @@ import java.util.Map;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Maps;
 
-import de.unifrankfurt.faststring.analysis.label.StringTypeLabel;
+import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 import de.unifrankfurt.faststring.analysis.util.StringUtil;
 
 public class DataFlowGraph {
 	
-	private final Map<Integer, StringReference> nodes;
-	private final StringTypeLabel label;
-	private final Predicate<StringReference> matchedLabel = new Predicate<StringReference>() {
+	private final Map<Integer, Reference> nodes;
+	private final TypeLabel label;
+	private final Predicate<Reference> matchedLabel = new Predicate<Reference>() {
 		@Override
-		public boolean apply(StringReference ref) {
+		public boolean apply(Reference ref) {
 			return label == ref.getLabel();
 		}
 	};
 	
-	public DataFlowGraph(StringTypeLabel label, Map<Integer, StringReference> nodeMap) {
+	public DataFlowGraph(TypeLabel label, Map<Integer, Reference> nodeMap) {
 		this.nodes = nodeMap;
 		this.label = label;
 	}
@@ -29,7 +29,7 @@ public class DataFlowGraph {
 		return nodes.containsKey(key);
 	}
 
-	public StringReference get(int ref) {
+	public Reference get(int ref) {
 		return nodes.get(ref);
 	}
 
@@ -38,7 +38,7 @@ public class DataFlowGraph {
 	}
 	
 
-	public Collection<StringReference> getAllLabelMatchingReferences() {
+	public Collection<Reference> getAllLabelMatchingReferences() {
 		return Maps.filterValues(nodes, matchedLabel).values();
 	}
 

@@ -17,41 +17,41 @@ import de.unifrankfurt.faststring.analysis.model.Use;
 
 public class GraphUtil {
 
-	public static final Function<StringReference, Integer> stringReferenceToInt = new Function<StringReference, Integer>() {
+	public static final Function<Reference, Integer> stringReferenceToInt = new Function<Reference, Integer>() {
 		@Override
-		public Integer apply(StringReference input) {
+		public Integer apply(Reference input) {
 			return input.getRef();
 		}
 	};
 	
-	private static final Predicate<StringReference> isDefinitionConversation = new Predicate<StringReference>() {
+	private static final Predicate<Reference> isDefinitionConversation = new Predicate<Reference>() {
 		@Override
-		public boolean apply(StringReference input) {
+		public boolean apply(Reference input) {
 			return input.isDefinitionConversion();
 		}
 	};
 
-	private static Predicate<StringReference> isUsesConversation =new Predicate<StringReference>() {
+	private static Predicate<Reference> isUsesConversation =new Predicate<Reference>() {
 		@Override
-		public boolean apply(StringReference input) {
+		public boolean apply(Reference input) {
 			return !input.getUseConversions().isEmpty();
 		}
 	};
 	
-	public static Iterable<Integer> extractIntsFromStringReferences(Iterable<StringReference> refs) {
+	public static Iterable<Integer> extractIntsFromStringReferences(Iterable<Reference> refs) {
 		return Iterables.transform(refs, stringReferenceToInt);
 	}
 
-	public static Iterable<Integer> extractDefConversions(Collection<StringReference> candidates) {
+	public static Iterable<Integer> extractDefConversions(Collection<Reference> candidates) {
 		return extractIntsFromStringReferences(Collections2.filter(candidates, isDefinitionConversation));
 	}
 
-	public static Map<Integer, Set<Use>> extractUsageConversions(Collection<StringReference> finalRefs) {
+	public static Map<Integer, Set<Use>> extractUsageConversions(Collection<Reference> finalRefs) {
 		
-		Collection<StringReference> refsWithUseConversation = Collections2.filter(finalRefs, isUsesConversation);
+		Collection<Reference> refsWithUseConversation = Collections2.filter(finalRefs, isUsesConversation);
 		Builder<Integer, Set<Use>> builder = new ImmutableMap.Builder<Integer, Set<Use>>();
 		
-		for (StringReference ref : refsWithUseConversation) {
+		for (Reference ref : refsWithUseConversation) {
 			Set<Use> useConversations = Sets.newHashSet();
 			
 			for (int useId : ref.getUseConversions()) {
@@ -65,7 +65,7 @@ public class GraphUtil {
 		
 	}
 
-	public static Set<Integer> extractUsageConversionsRefIds(Set<StringReference> refs) {
+	public static Set<Integer> extractUsageConversionsRefIds(Set<Reference> refs) {
 		return extractUsageConversions(refs).keySet();
 	}
 
