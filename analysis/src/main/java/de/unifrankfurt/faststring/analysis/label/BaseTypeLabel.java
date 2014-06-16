@@ -14,7 +14,7 @@ import de.unifrankfurt.faststring.analysis.graph.Reference;
 public abstract class BaseTypeLabel implements TypeLabel {
 
 	/**
-	 * @return all methods that should be replaced by an signature equal equivalent
+	 * @return all methods that should be replaced by a signature equal equivalent
 	 */
 	protected abstract Collection<MethodReference> methods();
 	

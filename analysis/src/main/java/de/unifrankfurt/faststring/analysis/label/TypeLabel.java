@@ -12,6 +12,8 @@ import de.unifrankfurt.faststring.analysis.graph.Reference;
 /**
  * defines a label for a type containing optimizable methods. This interface is implemented by
  * concrete optimizable type definition to be used by the analysis.
+ * <p>
+ * The {@link BaseTypeLabel} class provides some preimplemented methods
  * 
  * @see DataFlowGraphBuilder
  * @see BuiltInTypes
