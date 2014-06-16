@@ -1,6 +1,6 @@
 # faststring
 
-This project is build in the context of my master thesis. The goal is to create a system which is able to optimize the  performance of String operations in a compiled Java application or library. 
+This project is build in the context of my master thesis. The goal is to create a system which is able to optimize a given bytecode by choosing different implementation types. This is done in this thesis with String types, but the system should be able to transform a program for given rules by changing a given type A with any other B. 
 
 I'll try to keep the you up to date and dirstribute news in my blog at http://wondee.info (which is down at the moment)
 
