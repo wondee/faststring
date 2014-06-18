@@ -92,5 +92,23 @@ public class IRMethod {
 		return ir.getSymbolTable().isConstant(v);
 	}
 
+	public Object getConstantValue(int v) {
+		return ir.getSymbolTable().getConstantValue(v);
+	}
+
+	public int getParamIndexFor(int v) {
+		int[] params = ir.getSymbolTable().getParameterValueNumbers();
+		
+		for (int i = 0; i < params.length; i++) {
+			int p = params[i];
+			
+			if (p == v) {
+				return i;
+			}
+		}
+		
+		return -1;
+	}
+
 	
 }

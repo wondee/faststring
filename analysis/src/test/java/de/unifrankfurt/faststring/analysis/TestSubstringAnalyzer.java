@@ -18,7 +18,7 @@ public class TestSubstringAnalyzer extends BaseAnalysisTest {
 	public void testSimpleIfSubstring() {
 		Set<Reference> candidates = findCandidates("simpleIfSubstring");
 		assertList(GraphUtil.extractIntsFromStringReferences(candidates), 4, 5, 9, 16, 22, 23);
-		assertList(GraphUtil.extractDefConversions(candidates), 4, 5);
+		assertList(GraphUtil.extractDefConversionsAsInt(candidates), 4, 5);
 		assertList(GraphUtil.extractUsageConversionsRefIds(candidates), 16, 23);
 	}
 
@@ -26,7 +26,7 @@ public class TestSubstringAnalyzer extends BaseAnalysisTest {
 	public void testReturnOfUsed() {
 		Set<Reference> candidates = findCandidates("returnOfUsed");
 		assertList(GraphUtil.extractIntsFromStringReferences(candidates), 4, 7);
-		assertList(GraphUtil.extractDefConversions(candidates), 4);
+		assertList(GraphUtil.extractDefConversionsAsInt(candidates), 4);
 		assertList(GraphUtil.extractUsageConversionsRefIds(candidates), 4, 7);
 		
 	}
@@ -35,7 +35,7 @@ public class TestSubstringAnalyzer extends BaseAnalysisTest {
 	public void testPhiSimple() {
 		Set<Reference> candidates = findCandidates("phiSimple");
 		assertList(GraphUtil.extractIntsFromStringReferences(candidates), 4, 7, 10);
-		assertList(GraphUtil.extractDefConversions(candidates), 4);
+		assertList(GraphUtil.extractDefConversionsAsInt(candidates), 4);
 		assertList(GraphUtil.extractUsageConversionsRefIds(candidates), 7);
 	}
 
@@ -43,7 +43,7 @@ public class TestSubstringAnalyzer extends BaseAnalysisTest {
 	public void testPhiLoop() {
 		Set<Reference> candidates = findCandidates("phiLoop");
 		assertList(GraphUtil.extractIntsFromStringReferences(candidates), 4, 5, 7, 10, 11);
-		assertList(GraphUtil.extractDefConversions(candidates), 4, 5);
+		assertList(GraphUtil.extractDefConversionsAsInt(candidates), 4, 5);
 		assertList(GraphUtil.extractUsageConversionsRefIds(candidates), 11);
 	}
 	
@@ -51,7 +51,7 @@ public class TestSubstringAnalyzer extends BaseAnalysisTest {
 	public void testPhiLoopAndIf() {
 		Set<Reference> candidates = findCandidates("phiLoopAndIf");
 		assertList(GraphUtil.extractIntsFromStringReferences(candidates), 4, 5, 7, 8, 11, 12, 15, 16, 19);
-		assertList(GraphUtil.extractDefConversions(candidates), 4, 5);
+		assertList(GraphUtil.extractDefConversionsAsInt(candidates), 4, 5);
 		assertList(GraphUtil.extractUsageConversionsRefIds(candidates), 16);
 	}
 
@@ -59,9 +59,18 @@ public class TestSubstringAnalyzer extends BaseAnalysisTest {
 	public void testUsedAsCtorParam() {
 		Set<Reference> candidates = findCandidates("usedAsCtorParam");
 		assertList(GraphUtil.extractIntsFromStringReferences(candidates), 2, 6);
-		assertList(GraphUtil.extractDefConversions(candidates), 2);
+		assertList(GraphUtil.extractDefConversionsAsInt(candidates), 2);
 		assertList(GraphUtil.extractUsageConversionsRefIds(candidates), 6);
 	}
+	
+	@Test
+	public void testParamDef() {
+		Set<Reference> candidates = findCandidates("paramDef");
+		assertList(GraphUtil.extractIntsFromStringReferences(candidates), 2, 6, 10);
+		assertList(GraphUtil.extractDefConversionsAsInt(candidates), 2);
+		assertList(GraphUtil.extractUsageConversionsRefIds(candidates));
+	}
+	
 	
 	private Set<Reference> findCandidates(String method) {
 		return new SubstringAnalyzer(getTargetApplication(), getIR(TEST_CLASS, method).getMethod()).findCandidates();

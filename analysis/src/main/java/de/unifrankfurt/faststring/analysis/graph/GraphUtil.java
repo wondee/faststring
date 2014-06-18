@@ -10,8 +10,10 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import de.unifrankfurt.faststring.analysis.model.Definition;
 import de.unifrankfurt.faststring.analysis.model.Use;
 
 
@@ -42,7 +44,20 @@ public class GraphUtil {
 		return Iterables.transform(refs, stringReferenceToInt);
 	}
 
-	public static Iterable<Integer> extractDefConversions(Collection<Reference> candidates) {
+	public static Map<Integer, Definition> extractDefConversions(Collection<Reference> candidates) {
+		
+		Iterable<Reference> refs = Collections2.filter(candidates, isDefinitionConversation);
+		
+		Map<Integer, Definition> defMap = Maps.newHashMap();
+		
+		for (Reference ref : refs) {
+			defMap.put(ref.valueNumber(), ref.getDef());
+		}
+		
+		return defMap;
+	}
+	
+	public static Iterable<Integer> extractDefConversionsAsInt(Collection<Reference> candidates) {
 		return extractIntsFromStringReferences(Collections2.filter(candidates, isDefinitionConversation));
 	}
 

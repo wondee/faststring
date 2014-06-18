@@ -59,7 +59,7 @@ public class SubstringAnalyzer {
 		
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("found possible references: {}", GraphUtil.extractIntsFromStringReferences(finalRefs));
-			LOG.debug("definition conversion needed for: {}", GraphUtil.extractDefConversions(finalRefs));
+			LOG.debug("definition conversion needed for: {}", StringUtil.toStringMap(GraphUtil.extractDefConversions(finalRefs)));
 			LOG.debug("usage conversion needed for: {}", StringUtil.toStringMap(GraphUtil.extractUsageConversions(finalRefs)));
 		}
 		

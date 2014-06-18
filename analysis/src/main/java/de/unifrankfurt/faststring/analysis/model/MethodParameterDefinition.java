@@ -5,9 +5,15 @@ import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 
 public class MethodParameterDefinition extends Definition {
 
+	private int index;
+
+	public MethodParameterDefinition(int i) {
+		this.index = i;
+	}
+
 	@Override
 	public String toString() {
-		return "MethodParameterDefinition";
+		return "MethodParameterDefinition [index=" + index + "]";
 	}
 
 	@Override

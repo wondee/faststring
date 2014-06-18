@@ -123,9 +123,10 @@ public class DataFlowGraphBuilder {
 			def = new DefinitionFactory(ir, ref.valueNumber()).create(defInstruction);
 			
 		} else if (ir.getParams().contains(v)) {
-			def = Definition.createParamDefinition();
+			
+			def = Definition.createParamDefinition(ir.getParamIndexFor(v));
 		} else if (ir.isConstant(v)) {
-			def = Definition.createConstantDefinition();
+			def = Definition.createConstantDefinition(ir.getConstantValue(v));
 		}
 		
 		if (def == null) {
