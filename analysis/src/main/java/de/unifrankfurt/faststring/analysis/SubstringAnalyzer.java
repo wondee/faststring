@@ -41,7 +41,7 @@ public class SubstringAnalyzer {
 	
 	
 	public Set<Reference> findCandidates() {
-		LOG.info("analyzing (for {}) Method: {}", label, ir.getMethodSignature());
+		LOG.info("analyzing (for {}) Method: {}", label.getClass(), ir.getMethodSignature());
 		
 		graph = getGraph();
 		Collection<Reference> refs = graph.getAllLabelMatchingReferences();
@@ -125,12 +125,12 @@ public class SubstringAnalyzer {
 	
 
 	private void check(DataFlowObject o, Queue<Reference> refQueue) {		
-		LOG.debug("inspecting {}", o);
+		LOG.trace("inspecting {}", o);
 		for (Integer connectedRefId : o.getConnectedRefs(label)) {
 			Reference connectedRef = graph.get(connectedRefId);
 			// TODO maybe somewhere else...
 			if (connectedRef.getLabel() == null) {
-				LOG.debug("setting label to {}", connectedRef);
+				LOG.trace("setting label to {}", connectedRef);
 				connectedRef.setLabel(label);
 				
 				refQueue.add(connectedRef);

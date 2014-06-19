@@ -61,5 +61,5 @@ public class SubstringStringType extends BaseTypeLabel {
 	public boolean canReturnedValueBeLabeled(MethodReference method) {
 		return methods.contains(method);
 	}
-
+	
 }

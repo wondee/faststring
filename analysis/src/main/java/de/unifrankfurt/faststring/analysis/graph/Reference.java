@@ -87,7 +87,7 @@ public class Reference {
 	
 	@Override
 	public String toString() {
-		return "StringReference [ref=" + ref + ", def=" + def
+		return "Reference [ref=" + ref + ", def=" + def
 				+ ", uses=" + uses + "]";
 	}
 

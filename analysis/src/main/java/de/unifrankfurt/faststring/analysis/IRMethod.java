@@ -5,6 +5,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.collect.Sets;
 import com.google.common.primitives.Ints;
 import com.ibm.wala.ssa.DefUse;
@@ -16,6 +19,8 @@ import de.unifrankfurt.faststring.analysis.util.IRUtil;
 
 public class IRMethod {
 
+	private static final Logger LOG = LoggerFactory.getLogger(IRMethod.class);
+	
 	private IR ir;
 	private DefUse defUse;
 
@@ -66,11 +71,11 @@ public class IRMethod {
 				if (c != null) {
 					set.addAll(c);
 				} else {
-					System.out.printf("nothing found for %s\n", pair.toString());
+					LOG.warn("no index found for pair {}", pair.toString());
 				}
 			}
 		} else {
-			System.out.printf("nothing found for %d %d\n", bcIndex, valueNumber);
+			LOG.warn("no local name found for bcIndex={}; v={}", bcIndex, valueNumber);
 		}
 			
 		return set;
