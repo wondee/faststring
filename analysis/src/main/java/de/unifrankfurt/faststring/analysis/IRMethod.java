@@ -67,10 +67,6 @@ public class IRMethod {
 		
 	}
 
-	public String[] getLocalNames(int index, int vn) {
-		return ir.getLocalNames(index, vn);
-	}
-	
 	public Set<Integer> getParams() {
 		return Sets.newHashSet(Ints.asList(ir.getParameterValueNumbers()));
 	}
