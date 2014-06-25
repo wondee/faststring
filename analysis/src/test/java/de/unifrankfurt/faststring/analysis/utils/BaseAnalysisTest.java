@@ -1,4 +1,4 @@
-package de.unifrankfurt.faststring.analysis;
+package de.unifrankfurt.faststring.analysis.utils;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -17,7 +17,8 @@ import com.ibm.wala.ipa.cha.ClassHierarchyException;
 import com.ibm.wala.ssa.DefUse;
 import com.ibm.wala.ssa.IR;
 
-import de.unifrankfurt.faststring.analysis.utils.TestUtilities;
+import de.unifrankfurt.faststring.analysis.IRMethod;
+import de.unifrankfurt.faststring.analysis.TargetApplication;
 
 /**
  * base test class for all analysis test cases. Takes care creating the {@link ClassHierarchy} and

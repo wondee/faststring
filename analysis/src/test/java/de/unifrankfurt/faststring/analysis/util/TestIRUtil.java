@@ -6,7 +6,7 @@ import java.util.Collection;
 
 import org.junit.Test;
 
-import de.unifrankfurt.faststring.analysis.BaseAnalysisTest;
+import de.unifrankfurt.faststring.analysis.utils.BaseAnalysisTest;
 
 public class TestIRUtil extends BaseAnalysisTest {
 

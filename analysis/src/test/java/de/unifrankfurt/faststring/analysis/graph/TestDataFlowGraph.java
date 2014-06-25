@@ -12,7 +12,6 @@ import com.google.common.collect.Iterables;
 import com.ibm.wala.ssa.DefUse;
 import com.ibm.wala.ssa.IR;
 
-import de.unifrankfurt.faststring.analysis.BaseAnalysisTest;
 import de.unifrankfurt.faststring.analysis.IRMethod;
 import de.unifrankfurt.faststring.analysis.graph.DataFlowGraph;
 import de.unifrankfurt.faststring.analysis.graph.DataFlowGraphBuilder;
@@ -21,6 +20,7 @@ import de.unifrankfurt.faststring.analysis.model.CallResultDefinition;
 import de.unifrankfurt.faststring.analysis.model.ConstantDefinition;
 import de.unifrankfurt.faststring.analysis.model.PhiDefinition;
 import de.unifrankfurt.faststring.analysis.util.GraphUtil;
+import de.unifrankfurt.faststring.analysis.utils.BaseAnalysisTest;
 
 public class TestDataFlowGraph extends BaseAnalysisTest {
 

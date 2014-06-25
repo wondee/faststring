@@ -2,6 +2,8 @@ package de.unifrankfurt.faststring.analysis;
 
 import org.junit.Test;
 
+import de.unifrankfurt.faststring.analysis.utils.BaseAnalysisTest;
+
 public class TestComplete extends BaseAnalysisTest{
 
 	

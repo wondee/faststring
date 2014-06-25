@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import de.unifrankfurt.faststring.analysis.graph.Reference;
 import de.unifrankfurt.faststring.analysis.util.GraphUtil;
+import de.unifrankfurt.faststring.analysis.utils.BaseAnalysisTest;
 
 public class TestSubstringAnalyzer extends BaseAnalysisTest {
 

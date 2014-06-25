@@ -4,8 +4,8 @@ import static de.unifrankfurt.faststring.analysis.utils.TestUtilities.assertList
 
 import org.junit.Test;
 
-import de.unifrankfurt.faststring.analysis.BaseAnalysisTest;
 import de.unifrankfurt.faststring.analysis.util.GraphUtil;
+import de.unifrankfurt.faststring.analysis.utils.BaseAnalysisTest;
 
 public class TestBaseTypeLabel extends BaseAnalysisTest {
 
