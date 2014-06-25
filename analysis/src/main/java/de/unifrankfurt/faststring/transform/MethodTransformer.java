@@ -16,7 +16,6 @@ public class MethodTransformer {
 		System.out.println("editing: " + methodData.getName());
 		
 		
-		
 		MethodEditor editor = new MethodEditor(methodData);
 		editor.beginPass();
 		

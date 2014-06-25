@@ -7,8 +7,9 @@ import com.ibm.wala.classLoader.IClass;
 import com.ibm.wala.classLoader.IMethod;
 
 import de.unifrankfurt.faststring.analysis.AnalysisResult;
-import de.unifrankfurt.faststring.analysis.SubstringAnalyzer;
+import de.unifrankfurt.faststring.analysis.MethodAnalyzer;
 import de.unifrankfurt.faststring.analysis.TargetApplication;
+import de.unifrankfurt.faststring.analysis.label.BuiltInTypes;
 import de.unifrankfurt.faststring.analysis.util.StringUtil;
 import de.unifrankfurt.faststring.analysis.utils.TestUtilities;
 import de.unifrankfurt.faststring.transform.JarManager;
@@ -32,9 +33,9 @@ public class ShrikeTest {
 
 			System.out.println("-- Class: " + clazz.getName());
 			for (IMethod m : clazz.getDeclaredMethods()) {
-				SubstringAnalyzer analyzer = new SubstringAnalyzer(targetApplication, m);
+				MethodAnalyzer analyzer = new MethodAnalyzer(targetApplication.findIRMethodForMethod(m), BuiltInTypes.SUBSTRING_ANALYZER);
 				
-				AnalysisResult candidates = analyzer.findCandidates();
+				AnalysisResult candidates = analyzer.analyze();
 				
 				if (!candidates.isEmpty()) {
 					analysisResult.put(m.getSignature(), candidates);

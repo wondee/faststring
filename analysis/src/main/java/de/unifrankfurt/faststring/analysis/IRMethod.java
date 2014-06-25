@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Sets;
 import com.google.common.primitives.Ints;
 import com.ibm.wala.classLoader.IBytecodeMethod;
+import com.ibm.wala.classLoader.ShrikeCTMethod;
 import com.ibm.wala.shrikeCT.InvalidClassFileException;
 import com.ibm.wala.ssa.DefUse;
 import com.ibm.wala.ssa.IR;
@@ -104,6 +105,10 @@ public class IRMethod {
 		} catch (InvalidClassFileException e) {
 			throw new IllegalStateException("could not read class file", e);
 		}
+	}
+
+	public int getMaxLocals() {
+		return ((ShrikeCTMethod)ir.getMethod()).getMaxLocals();
 	}
 
 	
