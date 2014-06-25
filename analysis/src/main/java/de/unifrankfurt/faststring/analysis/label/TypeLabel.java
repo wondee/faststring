@@ -1,6 +1,6 @@
 package de.unifrankfurt.faststring.analysis.label;
 
-import java.util.List;
+import java.util.Collection;
 
 import com.ibm.wala.ssa.SSAInstruction;
 import com.ibm.wala.types.MethodReference;
@@ -61,9 +61,9 @@ public interface TypeLabel {
 	 * finds all uses of this label matching methods that are found in the given {@link IRMethod}
 	 * 
 	 * @param ir the {@link IRMethod} of the method that is checked
-	 * @return a list of {@link Reference}s that are used in the given method 
+	 * @return a collection containing {@link Reference}s that are used in the given method 
 	 */
-	List<Reference> findTypeUses(IRMethod ir);
+	Collection<Reference> findTypeUses(IRMethod ir);
 
 	/**
 	 * creates a {@link ReceiverInfo} object that holds information about the labeled references used as 

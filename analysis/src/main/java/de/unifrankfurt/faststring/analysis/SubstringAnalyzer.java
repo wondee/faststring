@@ -3,25 +3,25 @@ package de.unifrankfurt.faststring.analysis;
 import java.util.Collection;
 import java.util.List;
 import java.util.Queue;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Sets;
 import com.ibm.wala.classLoader.IMethod;
 
 import de.unifrankfurt.faststring.analysis.graph.DataFlowGraph;
 import de.unifrankfurt.faststring.analysis.graph.DataFlowGraphBuilder;
-import de.unifrankfurt.faststring.analysis.graph.GraphUtil;
 import de.unifrankfurt.faststring.analysis.graph.Reference;
 import de.unifrankfurt.faststring.analysis.label.BuiltInTypes;
 import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 import de.unifrankfurt.faststring.analysis.model.DataFlowObject;
 import de.unifrankfurt.faststring.analysis.model.Definition;
 import de.unifrankfurt.faststring.analysis.model.Use;
+import de.unifrankfurt.faststring.analysis.util.GraphUtil;
+import de.unifrankfurt.faststring.analysis.util.QueueUtil;
+import de.unifrankfurt.faststring.analysis.util.QueueUtil.BaseProcessingStrategy;
+import de.unifrankfurt.faststring.analysis.util.QueueUtil.ProcessingStrategy;
 import de.unifrankfurt.faststring.analysis.util.StringUtil;
-import de.unifrankfurt.faststring.analysis.util.UniqueQueue;
 
 public class SubstringAnalyzer {
 
@@ -40,16 +40,15 @@ public class SubstringAnalyzer {
 	}
 	
 	
-	public Set<Reference> findCandidates() {
+	public AnalysisResult findCandidates() {
 		LOG.info("analyzing (for {}) Method: {}", label.getClass(), ir.getMethodSignature());
 		
 		graph = getGraph();
 		Collection<Reference> refs = graph.getAllLabelMatchingReferences();
 		
 		if (refs.size() > 0) {
-			processUntilQueueIsEmpty(refs, definitionCheck);
-			processUntilQueueIsEmpty(graph.getAllLabelMatchingReferences(), usageCheck);
-			
+			QueueUtil.processUntilQueueIsEmpty(refs, definitionCheck);
+			QueueUtil.processUntilQueueIsEmpty(graph.getAllLabelMatchingReferences(), usageCheck);
 			
 		} else {
 			LOG.debug("no string uses found");
@@ -63,7 +62,7 @@ public class SubstringAnalyzer {
 			LOG.debug("usage conversion needed for: {}", StringUtil.toStringMap(GraphUtil.extractUsageConversions(finalRefs)));
 		}
 		
-		return Sets.newHashSet(finalRefs);
+		return new AnalysisResult(finalRefs);
 		
 	}
 
@@ -74,24 +73,10 @@ public class SubstringAnalyzer {
 		}
 		return graph;
 	}
-
-
-	private void processUntilQueueIsEmpty(Collection<Reference> contents, CheckingStrategy strategy) {
-		Queue<Reference> refQueue = new UniqueQueue<>(contents);
-		
-		while(!refQueue.isEmpty()) {
-			strategy.checkReference(refQueue.remove(), refQueue);
-		}
-		
-	}
-
-	private interface CheckingStrategy {
-		void checkReference(Reference ref, Queue<Reference> refQueue);
-	}
 	
-	private CheckingStrategy definitionCheck = new CheckingStrategy() {
+	private ProcessingStrategy<Reference> definitionCheck = new BaseProcessingStrategy<Reference>() {
 		@Override
-		public void checkReference(Reference ref, Queue<Reference> refQueue) {
+		public void process(Reference ref, Queue<Reference> refQueue) {
 			
 			
 			Definition def = ref.getDef();
@@ -105,9 +90,9 @@ public class SubstringAnalyzer {
 		}
 	};
 	
-	private CheckingStrategy usageCheck = new CheckingStrategy() {
+	private ProcessingStrategy<Reference> usageCheck = new BaseProcessingStrategy<Reference>() {
 		@Override
-		public void checkReference(Reference ref, Queue<Reference> refQueue) {
+		public void process(Reference ref, Queue<Reference> refQueue) {
 			List<Use> uses = ref.getUses();
 			for (int useId = 0; useId < uses.size(); useId++) {
 				Use use = uses.get(useId);

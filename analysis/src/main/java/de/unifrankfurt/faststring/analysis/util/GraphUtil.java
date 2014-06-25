@@ -1,4 +1,4 @@
-package de.unifrankfurt.faststring.analysis.graph;
+package de.unifrankfurt.faststring.analysis.util;
 
 import java.util.Collection;
 import java.util.Map;
@@ -13,6 +13,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import de.unifrankfurt.faststring.analysis.graph.Reference;
 import de.unifrankfurt.faststring.analysis.model.Definition;
 import de.unifrankfurt.faststring.analysis.model.Use;
 
@@ -80,7 +81,7 @@ public class GraphUtil {
 		
 	}
 
-	public static Set<Integer> extractUsageConversionsRefIds(Set<Reference> refs) {
+	public static Collection<Integer> extractUsageConversionsRefIds(Collection<Reference> refs) {
 		return extractUsageConversions(refs).keySet();
 	}
 

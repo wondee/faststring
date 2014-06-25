@@ -15,19 +15,18 @@ import com.ibm.wala.shrikeCT.InvalidClassFileException;
 import com.ibm.wala.ssa.DefUse;
 import com.ibm.wala.ssa.IR;
 import com.ibm.wala.ssa.SSAInstruction;
-import com.ibm.wala.util.collections.Pair;
 
 import de.unifrankfurt.faststring.analysis.util.IRUtil;
 
 public class IRMethod {
 
+	@SuppressWarnings("unused")
 	private static final Logger LOG = LoggerFactory.getLogger(IRMethod.class);
 	
 	private IR ir;
 	private DefUse defUse;
 
 	private Map<SSAInstruction, Integer> instructionToIndexMap;
-	private Map<Pair<String, Integer>, Collection<Integer>> localNamesMap;
 	
 	
 	public IRMethod(IR ir, DefUse defUse) {
@@ -55,32 +54,17 @@ public class IRMethod {
 		return defUse.getUses(v);
 	}	
 	
-	public Collection<Integer> getLocalVariableIndex(int bcIndex, int valueNumber) {
+	public Collection<Integer> getLocalVariableIndices(int bcIndex, int valueNumber) {
 		
-		String[] localNames = ir.getLocalNames(bcIndex, valueNumber);
+		Set<Integer> pointers = IRUtil.findAllPointersFor(defUse, valueNumber);
+		Set<Integer> locals = Sets.newHashSet();
 		
-		if (localNamesMap == null) {
-			localNamesMap = IRUtil.createLocalNamesMap(ir.getMethod());
+		for (Integer p : pointers) {
+			locals.addAll(IRHelper.findLocalVariableIndex(ir, bcIndex, p));
 		}
 		
-		Set<Integer> set = Sets.newHashSet();
+		return locals;
 		
-		if (localNames != null) {
-		
-			for (String name : localNames) {
-				Pair<String, Integer> pair = Pair.make(name, bcIndex);
-				Collection<Integer> c = localNamesMap.get(pair);
-				if (c != null) {
-					set.addAll(c);
-				} else {
-					LOG.warn("no index found for pair {}", pair.toString());
-				}
-			}
-		} else {
-			LOG.warn("no local name found for bcIndex={}; v={}", bcIndex, valueNumber);
-		}
-			
-		return set;
 	}
 
 	public String[] getLocalNames(int index, int vn) {

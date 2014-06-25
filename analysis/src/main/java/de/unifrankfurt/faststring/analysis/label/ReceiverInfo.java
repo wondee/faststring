@@ -4,15 +4,13 @@ import java.util.List;
 
 import com.google.common.collect.ImmutableList;
 
-import de.unifrankfurt.faststring.analysis.util.IRUtil;
-
 public class ReceiverInfo {
 
 	private boolean defLabelable;
 	
 	private List<Integer> labelableParams;
 
-	public static ReceiverInfo NOT_USABLE_AS_RECEIVER = new ReceiverInfo(false, IRUtil.EMPTY_LIST);
+	public static ReceiverInfo NOT_USABLE_AS_RECEIVER = new ReceiverInfo(false, ImmutableList.<Integer>of());
 	
 	public ReceiverInfo(boolean defLabelable, Iterable<Integer> labelableParams) {
 		super();

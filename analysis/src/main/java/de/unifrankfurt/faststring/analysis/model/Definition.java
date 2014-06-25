@@ -19,7 +19,7 @@ public abstract class Definition extends DataFlowObject {
 		return new CallResultDefinition(method, receiver);
 	}
 	
-	public static Definition createPhiDefinitionInfo(List<Integer> refs) {
+	public static Definition createPhiDefinition(List<Integer> refs) {
 		return new PhiDefinition(refs);
 	}
 

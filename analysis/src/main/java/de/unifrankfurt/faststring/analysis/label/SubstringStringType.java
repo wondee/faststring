@@ -7,16 +7,15 @@ import static de.unifrankfurt.faststring.analysis.util.IRUtil.METHOD_SUBSTRING_D
 import java.util.Collection;
 import java.util.Set;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import com.ibm.wala.types.MethodReference;
-
-import de.unifrankfurt.faststring.analysis.util.IRUtil;
 
 public class SubstringStringType extends BaseTypeLabel {
 
 	public static final TypeLabel INSTANCE = new SubstringStringType();
 	
-	private static final ReceiverInfo RECEIVER_INFO = new ReceiverInfo(true, IRUtil.EMPTY_LIST);
+	private static final ReceiverInfo RECEIVER_INFO = new ReceiverInfo(true, ImmutableList.<Integer>of());
 	
 	private static final Collection<MethodReference> methods = Sets.newHashSet(METHOD_SUBSTRING, METHOD_SUBSTRING_DEFAULT_START);
 	

@@ -41,7 +41,7 @@ public abstract class DataFlowCreationVisitor<T extends DataFlowObject> extends 
 			// null if it is not a bytecode instruction
 			if (index != null) {
 				result.setByteCodeIndex(ir.getByteCodeIndexFor(index));
-				result.setLocalVariableIndex(ir.getLocalVariableIndex(index, valueNumber));
+				result.setLocalVariableIndices(ir.getLocalVariableIndices(index, valueNumber));
 			}
 			
 			res = null;

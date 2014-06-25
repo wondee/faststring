@@ -90,4 +90,16 @@ public class MethodAnalyzerTestClass {
 		return new StringBuilder(b);
 		
 	}
+	
+	public String effectedVars(boolean is, String a, int i) {
+		String b = "";
+		
+		while (is) {
+			b = a.substring(4);
+		}
+		
+		String c = b.intern(); 
+		i = c.length();
+		return c;
+	}
 }

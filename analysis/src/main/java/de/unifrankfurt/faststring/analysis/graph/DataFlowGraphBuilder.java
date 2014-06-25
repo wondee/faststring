@@ -63,7 +63,7 @@ public class DataFlowGraphBuilder {
 		return createDataFlowGraph(label.findTypeUses(ir));
 	}
 	
-	public DataFlowGraph createDataFlowGraph(List<Reference> stringRefs) {
+	public DataFlowGraph createDataFlowGraph(Collection<Reference> stringRefs) {
 		
 		Queue<Reference> refs = new UniqueQueue<Reference>(stringRefs);
 		

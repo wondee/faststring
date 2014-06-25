@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 
 import de.unifrankfurt.faststring.analysis.label.TypeLabel;
@@ -120,7 +121,7 @@ public class Reference {
 		if (this.uses != null) {
 			throw new IllegalStateException("uses was tried to set twice");
 		}
-		this.uses = uses;
+		this.uses = ImmutableList.copyOf(uses);
 	}
 
 

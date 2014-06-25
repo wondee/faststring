@@ -1,4 +1,4 @@
-package de.unifrankfurt.faststring.analysis.util;
+package de.unifrankfurt.faststring.analysis.utils;
 
 import static org.junit.Assert.assertThat;
 

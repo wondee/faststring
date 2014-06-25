@@ -1,4 +1,4 @@
-package de.unifrankfurt.faststring.analysis.util;
+package de.unifrankfurt.faststring.analysis.utils;
 
 import java.io.IOException;
 
@@ -7,6 +7,7 @@ import com.ibm.wala.classLoader.IMethod;
 import com.ibm.wala.util.WalaException;
 
 import de.unifrankfurt.faststring.analysis.TargetApplication;
+import de.unifrankfurt.faststring.analysis.util.PDFUtil;
 
 public class PrintTestIRs {
 

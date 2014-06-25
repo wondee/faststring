@@ -20,11 +20,6 @@ public class TestConnectAlgorithm extends BaseAnalysisTest {
 	
 	private final static String TEST_CLASS = "ConnectTestClass";
 	
-	@Test
-	public void test() {
-		System.out.println(getIR(TEST_CLASS, "simple"));
-	}
-	
 	
 	
 	@Test

@@ -23,7 +23,7 @@ public class DefinitionFactory extends  DataFlowCreationVisitor<Definition> {
 	
 	@Override
 	public void visitPhi(SSAPhiInstruction instruction) {
-		Definition result = Definition.createPhiDefinitionInfo(IRUtil.getUsesList(instruction));
+		Definition result = Definition.createPhiDefinition(IRUtil.getUses(instruction));
 		setResult(result);
 	
 	}

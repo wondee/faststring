@@ -3,35 +3,27 @@ package de.unifrankfurt.faststring.analysis.util;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Multimaps;
-import com.ibm.wala.classLoader.IMethod;
-import com.ibm.wala.classLoader.ShrikeCTMethod;
-import com.ibm.wala.shrikeBT.Util;
-import com.ibm.wala.shrikeCT.InvalidClassFileException;
+import com.google.common.collect.Sets;
+import com.ibm.wala.ssa.DefUse;
 import com.ibm.wala.ssa.IR;
 import com.ibm.wala.ssa.SSAInstruction;
 import com.ibm.wala.ssa.SSAInvokeInstruction;
+import com.ibm.wala.ssa.SSAPhiInstruction;
 import com.ibm.wala.types.ClassLoaderReference;
 import com.ibm.wala.types.MethodReference;
 import com.ibm.wala.types.TypeReference;
-import com.ibm.wala.util.collections.Pair;
+
+import de.unifrankfurt.faststring.analysis.util.QueueUtil.ProcessingStrategy;
 
 public final class IRUtil {
 
 	public static final TypeReference STRING_TYPE = TypeReference.findOrCreate(
 			ClassLoaderReference.Application, "Ljava/lang/String");
-	
-	
-	public static void main(String[] args) {
-		System.out.println(Util.makeType(String.class));
-		
-	}
 	
 	public static final MethodReference METHOD_SUBSTRING = MethodReference
 			.findOrCreate(STRING_TYPE, "substring", "(II)Ljava/lang/String;");
@@ -41,9 +33,6 @@ public final class IRUtil {
 
 	public static final MethodReference METHOD_STRING_VALUE_OF = MethodReference
 			.findOrCreate(STRING_TYPE, "valueOf", "(Ljava/lang/Object;)Ljava/lang/String;");
-	
-	
-	public static final List<Integer> EMPTY_LIST = ImmutableList.of();
 	
 	
 	private IRUtil() {
@@ -70,7 +59,7 @@ public final class IRUtil {
 		
 	}
 
-	public static List<Integer> getUsesList(SSAInstruction ins) {
+	public static List<Integer> getUses(SSAInstruction ins) {
 		return getUsesList(ins, 0);
 	}
 
@@ -106,40 +95,48 @@ public final class IRUtil {
 		return map;
 	}
 	
-	public static Map<Pair<String, Integer>, Collection<Integer>> createLocalNamesMap(IMethod m) {
-		try {
-			if (m instanceof ShrikeCTMethod) {
-				
-				ShrikeCTMethod bm = (ShrikeCTMethod) m;
-				
-				int maxLocals = bm.getMaxLocals();
-				
-				
-				Multimap<Pair<String, Integer>, Integer> varIndexMap = HashMultimap.create();
-				
-//				System.out.println("max locals: " + maxLocals);
-				for (int bcIndex = 0; bcIndex < bm.getInstructions().length; bcIndex++) {
-					for (int localIndex = 0; localIndex < maxLocals; localIndex++) {
-						String name = bm.getLocalVariableName(bcIndex, localIndex);
-//					System.out.printf("%d %d %sn", bcIndex, localIndex, name);
-						
-						Pair<String, Integer> pair = Pair.make(name, bcIndex);
-						varIndexMap.put(pair, localIndex);
-						
-					}
-				}
-				
-				
-				
-				Map<Pair<String, Integer>, Collection<Integer>> map = Multimaps.asMap(varIndexMap);
-//				System.out.println(StringUtil.toStringMap(map));
-				
-				return map;
-			} else {
-				throw new IllegalArgumentException("methods needs to be a ShrikeCTMethod, but was: " + m.getClass().getName());
-			}
-		} catch (InvalidClassFileException e) {
-			throw new IllegalArgumentException("Error while getting instructions", e);
+	public static Set<Integer> findAllPointersFor(DefUse defUse, int valueNumber) {
+		
+		PhiPointerProcessingStrategy strategy = new PhiPointerProcessingStrategy(defUse, valueNumber);
+		QueueUtil.processUntilQueueIsEmpty(strategy);
+		return strategy.getPointers();
+	}
+	
+	private static final class PhiPointerProcessingStrategy implements ProcessingStrategy<Integer> {
+
+		private Set<Integer> pointers = Sets.newHashSet();
+		private DefUse defUse;
+		private int valueNumber;
+		
+		public PhiPointerProcessingStrategy(DefUse defUse, int valueNumber) {
+			this.defUse = defUse;
+			this.valueNumber = valueNumber;
 		}
+
+		@Override
+		public Queue<Integer> initQueue(Collection<Integer> initialElems) {
+			return new UniqueQueue<Integer>(Lists.newArrayList(valueNumber));
+		}
+		
+		@Override
+		public void process(Integer i, Queue<Integer> queue) {
+			if (!pointers.contains(i)) {
+				pointers.add(i);
+				SSAInstruction def = defUse.getDef(i);
+				
+				if (def instanceof SSAPhiInstruction) {
+					List<Integer> uses = getUses(def);
+					
+					queue.addAll(uses);
+				}
+			}
+			
+		}
+		
+		public Set<Integer> getPointers() {
+			return pointers;
+		}
+
+
 	}
 }

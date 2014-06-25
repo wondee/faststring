@@ -14,13 +14,16 @@ import com.ibm.wala.classLoader.IClass;
 import com.ibm.wala.classLoader.IMethod;
 import com.ibm.wala.ipa.cha.ClassHierarchy;
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
+import com.ibm.wala.ssa.DefUse;
 import com.ibm.wala.ssa.IR;
 
-import de.unifrankfurt.faststring.analysis.util.TestUtilities;
+import de.unifrankfurt.faststring.analysis.utils.TestUtilities;
 
 /**
  * base test class for all analysis test cases. Takes care creating the {@link ClassHierarchy} and
- * provides methods for easily retrieving {@link IR}s and {@link IClass}es
+ * provides methods for easily retrieving {@link IR}s and {@link IClass}es.
+ * 
+ * This class is for test proposes only! 
  * 
  * @author markus
  *
@@ -102,8 +105,16 @@ public abstract class BaseAnalysisTest {
 		return ir;
 	}
 	
+	protected static DefUse getDefUse(String className, String methodName) {
+		return new DefUse(getIR(className, methodName));
+	}
+	
 	protected static IMethod getMethod(String className, String methodName) {
 		return getIR(className, methodName).getMethod();
+	}
+	
+	protected static IRMethod getIRMethod(String className, String methodName) {
+		return targetApplication.findIRMethodForMethod(getMethod(className, methodName));
 	}
 	
 	public static TargetApplication getTargetApplication() {

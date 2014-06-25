@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Map;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,20 +15,20 @@ import com.ibm.wala.shrikeBT.shrikeCT.ClassInstrumenter;
 import com.ibm.wala.shrikeBT.shrikeCT.OfflineInstrumenter;
 import com.ibm.wala.shrikeCT.InvalidClassFileException;
 
-import de.unifrankfurt.faststring.analysis.graph.Reference;
+import de.unifrankfurt.faststring.analysis.AnalysisResult;
 
 public class JarManager {
 
 	private static final Logger LOG = LoggerFactory.getLogger(JarManager.class);
 	
 	private String baseName;
-	private Map<String, Set<Reference>> analysisResult;
+	private Map<String, AnalysisResult> analysisResult;
 
 
-	public JarManager(String folderName, String jarBaseName, Map<String, Set<Reference>> analysisResults) {
+	public JarManager(String folderName, String jarBaseName, Map<String, AnalysisResult> analysisResult) {
 
 		baseName = folderName + jarBaseName;
-		analysisResult = analysisResults;
+		this.analysisResult = analysisResult;
 		
 	}
 	
@@ -74,7 +73,7 @@ public class JarManager {
 				
 				String signature = ci.getReader().getName().replace('/', '.') + "." + methodData.getName() + methodData.getSignature();
 				
-				Set<Reference> refs = analysisResult.get(signature);
+				AnalysisResult refs = analysisResult.get(signature);
 				if (refs != null) {
 					System.out.println("--- old code");
 					new Disassembler(methodData).disassembleTo(writer);

@@ -1,9 +1,9 @@
 package de.unifrankfurt.faststring.analysis.label;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.Set;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.ibm.wala.ssa.SSAAbstractInvokeInstruction;
 import com.ibm.wala.ssa.SSAInstruction;
 import com.ibm.wala.types.MethodReference;
@@ -35,8 +35,8 @@ public abstract class BaseTypeLabel implements TypeLabel {
 		return -1;
 	}
 	
-	public List<Reference> findTypeUses(IRMethod ir) {
-		List<Reference> references = Lists.newLinkedList();
+	public Collection<Reference> findTypeUses(IRMethod ir) {
+		Set<Reference> references = Sets.newHashSet();
 		
 		for (int i = 0; i < ir.getInstructions().length; i++) {
 			
