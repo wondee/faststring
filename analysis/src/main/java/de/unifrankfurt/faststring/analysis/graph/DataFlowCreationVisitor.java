@@ -1,6 +1,7 @@
 package de.unifrankfurt.faststring.analysis.graph;
 
 import com.ibm.wala.ssa.SSAInstruction;
+import com.ibm.wala.ssa.SSAPhiInstruction;
 import com.ibm.wala.ssa.SSAInstruction.Visitor;
 
 import de.unifrankfurt.faststring.analysis.IRMethod;
@@ -42,6 +43,10 @@ public abstract class DataFlowCreationVisitor<T extends DataFlowObject> extends 
 			if (index != null) {
 				result.setByteCodeIndex(ir.getByteCodeIndexFor(index));
 				result.setLocalVariableIndices(ir.getLocalVariableIndices(index, valueNumber));
+			} else {
+				if (!(instruction instanceof SSAPhiInstruction)) {
+					throw new IllegalStateException("no index found for: " + instruction);
+				}
 			}
 			
 			res = null;

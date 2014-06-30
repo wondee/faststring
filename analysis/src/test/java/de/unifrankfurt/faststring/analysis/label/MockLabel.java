@@ -5,7 +5,7 @@ import java.util.Collection;
 import com.google.common.collect.ImmutableList;
 import com.ibm.wala.types.MethodReference;
 
-import de.unifrankfurt.faststring.analysis.util.IRUtil;
+import de.unifrankfurt.faststring.core.SubstringString;
 
 public class MockLabel extends BaseTypeLabel {
 
@@ -36,7 +36,22 @@ public class MockLabel extends BaseTypeLabel {
 
 	@Override
 	protected Collection<MethodReference> methods() {
-		return ImmutableList.of(IRUtil.METHOD_SUBSTRING, IRUtil.METHOD_SUBSTRING_DEFAULT_START);
+		return ImmutableList.of(SubstringStringType.METHOD_SUBSTRING, SubstringStringType.METHOD_SUBSTRING_DEFAULT_START);
+	}
+
+	@Override
+	public Class<?> getOptimizedType() {
+		return SubstringString.class;
+	}
+
+	@Override
+	public Class<?> getOriginalType() {
+		return String.class;
+	}
+
+	@Override
+	public String getCreationMethodName() {
+		return "valueOf";
 	}
 
 }

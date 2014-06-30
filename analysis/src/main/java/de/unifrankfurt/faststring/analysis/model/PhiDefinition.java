@@ -21,11 +21,11 @@ public class PhiDefinition extends Definition {
 	public List<Integer> getConnectedRefs(TypeLabel label) {
 		return refs;
 	}
-	
+
 	@Override
 	public boolean isCompatibleWith(TypeLabel label) {
 		// TODO need to check if the uses are all labeled with a compatible label
-		return true;
+		return false;
 	}
-	
+
 }

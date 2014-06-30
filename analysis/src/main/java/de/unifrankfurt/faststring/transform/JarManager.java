@@ -20,7 +20,7 @@ import de.unifrankfurt.faststring.analysis.AnalysisResult;
 public class JarManager {
 
 	private static final Logger LOG = LoggerFactory.getLogger(JarManager.class);
-	
+
 	private String baseName;
 	private Map<String, AnalysisResult> analysisResult;
 
@@ -29,9 +29,9 @@ public class JarManager {
 
 		baseName = folderName + jarBaseName;
 		this.analysisResult = analysisResult;
-		
+
 	}
-	
+
 	public void process() {
 		try {
 			OfflineInstrumenter instrumenter = new OfflineInstrumenter();
@@ -49,54 +49,54 @@ public class JarManager {
 			e.printStackTrace();
 		}
 	}
-	
-	
+
+
 	private void iterateClasses(OfflineInstrumenter instrumenter)
 			throws IOException, InvalidClassFileException, FailureException {
 //		final GetInstruction getOut = Util.makeGet(System.class, "out");
 //		final Instruction callPrintln = Util.makeInvoke(PrintStream.class, "println", new Class[] { String.class });
-		
+
 		instrumenter.beginTraversal();
 		PrintWriter writer = new PrintWriter(System.out);
 		instrumenter.setPassUnmodifiedClasses(true);
-		
+
 		MethodTransformer transformer = new MethodTransformer();
-		
+
 		ClassInstrumenter ci;
 		while ((ci = instrumenter.nextClass()) != null) {
-			
+
 			for (int i = 0; i < ci.getReader().getMethodCount(); i++) {
-				
-				
-				
-				MethodData methodData = ci.visitMethod(i);				
-				
+
+
+
+				MethodData methodData = ci.visitMethod(i);
+
 				String signature = ci.getReader().getName().replace('/', '.') + "." + methodData.getName() + methodData.getSignature();
-				
-				AnalysisResult refs = analysisResult.get(signature);
-				if (refs != null) {
+
+				AnalysisResult result = analysisResult.get(signature);
+				if (result != null) {
 					System.out.println("--- old code");
 					new Disassembler(methodData).disassembleTo(writer);
 					writer.flush();
-	
-					transformer.transformMethod(methodData, refs);
-					
+
+					transformer.transformMethod(methodData, new TransformationInfo(result));
+
 					System.out.println("--- new code");
 					new Disassembler(methodData).disassembleTo(writer);
 					writer.flush();
-					
-					
+
+
 					instrumenter.outputModifiedClass(ci, ci.emitClass());
 				} else {
 					LOG.debug("no analysis results found for {}", signature);
 				}
-				
+
 			}
-			
+
 		}
-		
+
 		instrumenter.close();
 	}
-	
-	
+
+
 }

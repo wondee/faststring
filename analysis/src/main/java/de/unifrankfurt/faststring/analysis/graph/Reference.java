@@ -15,10 +15,10 @@ import de.unifrankfurt.faststring.analysis.model.Use;
 public class Reference {
 
 	private int ref;
-	
+
 	private Definition def = null;
 	private List<Use> uses = null;
-	
+
 	private TypeLabel label = null;
 
 	private boolean definitionConversion = false;
@@ -27,7 +27,7 @@ public class Reference {
 	public Reference(int ref) {
 		Preconditions.checkArgument(ref > 0, "valueNumber must be greater than 0");
 		this.ref = ref;
-		
+
 	}
 
 
@@ -45,17 +45,17 @@ public class Reference {
 		if (this.def != null) {
 			throw new IllegalStateException("def was tried to set twice");
 		}
-		
+
 		this.def = def;
 	}
 
 	public Definition getDef() {
 		return def;
 	}
-	
+
 	public void setLabel(TypeLabel label) {
 		this.label = label;
-		
+
 	}
 
 	public TypeLabel getLabel() {
@@ -77,7 +77,7 @@ public class Reference {
 	public boolean isDefinitionConversion() {
 		return definitionConversion;
 	}
-	
+
 	public void setConvertToUse(Integer useId) {
 		useConversions.add(useId);
 	}
@@ -85,7 +85,7 @@ public class Reference {
 	public Set<Integer> getUseConversions() {
 		return useConversions;
 	}
-	
+
 	@Override
 	public String toString() {
 		return "Reference [ref=" + ref + ", def=" + def
@@ -122,6 +122,19 @@ public class Reference {
 			throw new IllegalStateException("uses was tried to set twice");
 		}
 		this.uses = ImmutableList.copyOf(uses);
+	}
+
+
+	public void setConvertToUse(Use o) {
+		int i = uses.indexOf(o);
+
+		if (i > -1) {
+			setConvertToUse(i);
+		} else {
+			throw new IllegalStateException("no index found for " + o + " in list " + uses);
+		}
+
+
 	}
 
 

@@ -1,4 +1,4 @@
-package de.unifrankfurt.faststring.analysis.prototype;
+package de.unifrankfurt.faststring.prototype;
 
 import java.util.Map;
 
@@ -19,24 +19,24 @@ public class ShrikeTest {
 	/*
 	 * Verifier 									// for typechecking
 	 * ClassInstrumenter.createEmptyMethodData		// for creating new methods
-	 * 
-	 * 
+	 *
+	 *
 	 */
-	
+
 	public static void main(String[] args) throws Exception {
-		
+
 		TargetApplication targetApplication = TestUtilities.loadTestJar();
-		
+
 		Map<String, AnalysisResult> analysisResult = Maps.newHashMap();
-		
+
 		for (IClass clazz : targetApplication.getApplicationClasses()) {
 
 			System.out.println("-- Class: " + clazz.getName());
 			for (IMethod m : clazz.getDeclaredMethods()) {
 				MethodAnalyzer analyzer = new MethodAnalyzer(targetApplication.findIRMethodForMethod(m), BuiltInTypes.SUBSTRING_ANALYZER);
-				
+
 				AnalysisResult candidates = analyzer.analyze();
-				
+
 				if (!candidates.isEmpty()) {
 					analysisResult.put(m.getSignature(), candidates);
 				}
@@ -44,13 +44,13 @@ public class ShrikeTest {
 			}
 
 		}
-		
+
 		System.out.println("the analysis results are:");
 		System.out.println(StringUtil.toStringMap(analysisResult));
-		
+
 		new JarManager("../analysis-test/target/", "test", analysisResult).process();
-		
+
 	}
-	
-	
+
+
 }

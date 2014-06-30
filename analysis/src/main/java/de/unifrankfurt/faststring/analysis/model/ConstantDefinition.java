@@ -3,11 +3,11 @@ package de.unifrankfurt.faststring.analysis.model;
 import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 
 
-public class ConstantDefinition<T> extends Definition {
+public class ConstantDefinition extends Definition {
 
-	private T value;
+	private Object value;
 
-	public ConstantDefinition(T value) {
+	public ConstantDefinition(Object value) {
 		this.value = value;
 	}
 
@@ -22,6 +22,8 @@ public class ConstantDefinition<T> extends Definition {
 	}
 
 
-
+	public Object getValue() {
+		return value;
+	}
 
 }

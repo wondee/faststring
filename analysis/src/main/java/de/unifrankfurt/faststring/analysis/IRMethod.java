@@ -23,23 +23,23 @@ public class IRMethod {
 
 	@SuppressWarnings("unused")
 	private static final Logger LOG = LoggerFactory.getLogger(IRMethod.class);
-	
+
 	private IR ir;
 	private DefUse defUse;
 
 	private Map<SSAInstruction, Integer> instructionToIndexMap;
-	
-	
+
+
 	public IRMethod(IR ir, DefUse defUse) {
 		this.ir = ir;
 		this.defUse = defUse;
 	}
-	
+
 	public Integer getIndexFor(SSAInstruction instruction) {
 		if (instructionToIndexMap == null) {
 			instructionToIndexMap = IRUtil.createInstructionToIndexMap(ir);
 		}
-		
+
 		return instructionToIndexMap.get(instruction);
 	}
 
@@ -50,22 +50,23 @@ public class IRMethod {
 	public SSAInstruction getDef(int v) {
 		return defUse.getDef(v);
 	}
-	
+
 	public Iterator<SSAInstruction> getUses(int v) {
 		return defUse.getUses(v);
-	}	
-	
+	}
+
 	public Collection<Integer> getLocalVariableIndices(int bcIndex, int valueNumber) {
-		
-		Set<Integer> pointers = IRUtil.findAllPointersFor(defUse, valueNumber);
+
+		Set<Integer> pointers = IRUtil.findAllDefPointersFor(defUse, valueNumber);
+
 		Set<Integer> locals = Sets.newHashSet();
-		
+
 		for (Integer p : pointers) {
 			locals.addAll(IRHelper.findLocalVariableIndex(ir, bcIndex, p));
 		}
-		
+
 		return locals;
-		
+
 	}
 
 	public Set<Integer> getParams() {
@@ -86,15 +87,15 @@ public class IRMethod {
 
 	public int getParamIndexFor(int v) {
 		int[] params = ir.getSymbolTable().getParameterValueNumbers();
-		
+
 		for (int i = 0; i < params.length; i++) {
 			int p = params[i];
-			
+
 			if (p == v) {
 				return i;
 			}
 		}
-		
+
 		return -1;
 	}
 
@@ -111,5 +112,9 @@ public class IRMethod {
 		return ((ShrikeCTMethod)ir.getMethod()).getMaxLocals();
 	}
 
-	
+	public Set<Integer> findAllUsesPhiPointer(Integer ref) {
+		return IRUtil.findAllUsesPointersFor(defUse, ref);
+
+	}
+
 }
