@@ -70,7 +70,7 @@ public class TestTransformationInfo extends BaseAnalysisTest  {
 	}
 	
 	private TransformationInfo getTransformationInfo(String methodName) {
-		AnalysisResult result = new MethodAnalyzer(getIRMethod(TEST_CLASS, methodName), BuiltInTypes.SUBSTRING_ANALYZER).analyze();
+		AnalysisResult result = new MethodAnalyzer(getIRMethod(TEST_CLASS, methodName), BuiltInTypes.SUBSTRING).analyze();
 		return new TransformationInfo(result);
 	}
 

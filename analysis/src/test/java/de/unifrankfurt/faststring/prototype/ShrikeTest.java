@@ -33,7 +33,7 @@ public class ShrikeTest {
 
 			System.out.println("-- Class: " + clazz.getName());
 			for (IMethod m : clazz.getDeclaredMethods()) {
-				MethodAnalyzer analyzer = new MethodAnalyzer(targetApplication.findIRMethodForMethod(m), BuiltInTypes.SUBSTRING_ANALYZER);
+				MethodAnalyzer analyzer = new MethodAnalyzer(targetApplication.findIRMethodForMethod(m), BuiltInTypes.SUBSTRING);
 
 				AnalysisResult candidates = analyzer.analyze();
 

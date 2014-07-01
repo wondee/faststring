@@ -16,7 +16,7 @@ import com.ibm.wala.ssa.SSAInstruction;
 import com.ibm.wala.ssa.SSAInvokeInstruction;
 import com.ibm.wala.ssa.SSAPhiInstruction;
 
-import de.unifrankfurt.faststring.analysis.util.QueueUtil.ProcessingStrategy;
+import de.unifrankfurt.faststring.analysis.util.QueueUtil.BaseQueueProcessingStrategy;
 
 public final class IRUtil {
 
@@ -94,7 +94,7 @@ public final class IRUtil {
 		return strategy.getPointers();
 	}
 
-	private static abstract class PhiPointerProcessingStrategy implements ProcessingStrategy<Integer> {
+	private static abstract class PhiPointerProcessingStrategy extends BaseQueueProcessingStrategy<Integer> {
 
 		private Set<Integer> pointers = Sets.newHashSet();
 		DefUse defUse;
@@ -170,4 +170,5 @@ public final class IRUtil {
 		}
 
 	}
+
 }

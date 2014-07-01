@@ -47,7 +47,7 @@ public class UseFactory extends DataFlowCreationVisitor<Use> implements IVisitor
 
 	@Override
 	public void visitPhi(SSAPhiInstruction instruction) {
-		setResult(Use.createUsedInPhi(instruction.getDef()));
+		setResult(Use.createUsedInPhi(instruction.getDef(), IRUtil.getUses(instruction)));
 	}
 
 	@Override

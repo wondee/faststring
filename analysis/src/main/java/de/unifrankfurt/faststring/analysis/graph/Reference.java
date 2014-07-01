@@ -1,5 +1,6 @@
 package de.unifrankfurt.faststring.analysis.graph;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -21,8 +22,11 @@ public class Reference {
 
 	private TypeLabel label = null;
 
-	private boolean definitionConversion = false;
-	private Set<Integer> useConversions = Sets.newHashSet();
+	private boolean definitionConversionToOpt = false;
+	private boolean definitionConversionFromOpt = false;
+	
+	private Set<Integer> useConversionsToOpt = Sets.newHashSet();
+	private Set<Integer> useConversionsFromOpt = Sets.newHashSet();
 
 	public Reference(int ref) {
 		Preconditions.checkArgument(ref > 0, "valueNumber must be greater than 0");
@@ -70,22 +74,54 @@ public class Reference {
 		return ref;
 	}
 
-	public void setConvertToDefinition() {
-		definitionConversion = true;
+	public void setDefinitionConvertToOpt() {
+		definitionConversionToOpt = true;
 	}
 
-	public boolean isDefinitionConversion() {
-		return definitionConversion;
+	public boolean isDefinitionConversionToOpt() {
+		return definitionConversionToOpt;
+	}
+	
+	public void setDefinitionConvertFromOpt() {
+		definitionConversionFromOpt = true;
 	}
 
-	public void setConvertToUse(Integer useId) {
-		useConversions.add(useId);
+	public boolean isDefinitionConversionFromOpt() {
+		return definitionConversionFromOpt;
 	}
 
-	public Set<Integer> getUseConversions() {
-		return useConversions;
+	public void setConvertUseFromOpt(Use use) {
+		setConvertToUse(use, true);
 	}
 
+	public Set<Integer> getUseConversionsFromOpt() {
+		return useConversionsFromOpt;
+	}
+
+	public Set<Integer> getUseConversionsToOpt() {
+		return useConversionsToOpt;
+	}
+	
+	public void setConvertUseToOpt(Use use) {
+		setConvertToUse(use, false);
+	}
+	
+	public void setConvertToUse(Use o, boolean from) {
+		int i = uses.indexOf(o);
+
+		if (i > -1) {
+			if (from) {
+				useConversionsFromOpt.add(i);
+			} else {
+				useConversionsToOpt.add(i);
+			}
+		} else {
+			throw new IllegalStateException("no index found for " + o + " in list " + uses);
+		}
+
+
+	}
+	
 	@Override
 	public String toString() {
 		return "Reference [ref=" + ref + ", def=" + def
@@ -125,20 +161,12 @@ public class Reference {
 	}
 
 
-	public void setConvertToUse(Use o) {
-		int i = uses.indexOf(o);
-
-		if (i > -1) {
-			setConvertToUse(i);
-		} else {
-			throw new IllegalStateException("no index found for " + o + " in list " + uses);
-		}
 
 
+
+	void setUsesMutable(LinkedList<Use> uses) {
+		this.uses = uses;
 	}
-
-
-
 
 
 }

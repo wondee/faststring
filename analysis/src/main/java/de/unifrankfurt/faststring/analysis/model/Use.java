@@ -1,5 +1,6 @@
 package de.unifrankfurt.faststring.analysis.model;
 
+import java.util.Collection;
 import java.util.List;
 
 import com.ibm.wala.types.MethodReference;
@@ -19,8 +20,8 @@ public abstract class Use extends DataFlowObject {
 		return new ReceiverUse(method, def, params);
 	}
 
-	public static Use createUsedInPhi(int def) {
-		return new PhiUse(def);
+	public static Use createUsedInPhi(int def, Collection<Integer> uses) {
+		return new PhiUse(def, uses);
 	}
 
 	

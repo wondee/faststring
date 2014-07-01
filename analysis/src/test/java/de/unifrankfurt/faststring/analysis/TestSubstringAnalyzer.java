@@ -6,6 +6,8 @@ import java.util.Collection;
 
 import org.junit.Test;
 
+import de.unifrankfurt.faststring.analysis.graph.DataFlowGraph;
+import de.unifrankfurt.faststring.analysis.graph.DataFlowGraphBuilder;
 import de.unifrankfurt.faststring.analysis.graph.Reference;
 import de.unifrankfurt.faststring.analysis.label.BuiltInTypes;
 import de.unifrankfurt.faststring.analysis.util.GraphUtil;
@@ -97,7 +99,11 @@ public class TestSubstringAnalyzer extends BaseAnalysisTest {
 	}
 
 	private Collection<Reference> getAnalysisResult(String method) {
-		return BuiltInTypes.SUBSTRING_ANALYZER.analyzeLabel(getIRMethod(TEST_CLASS, method));
+		
+		DataFlowGraph graph = new DataFlowGraphBuilder(BuiltInTypes.SUBSTRING, getIRMethod(TEST_CLASS, method)).createDataFlowGraph();
+		LabelAnalyzer.analyzeLabel(graph);
+		
+		return graph.getAllLabelMatchingReferences();
 	}
 
 }

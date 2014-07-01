@@ -48,6 +48,14 @@ public class DataFlowGraph {
 		return StringUtil.toStringWithLineBreak(nodes.values());
 	}
 
+	public TypeLabel getLabel() {
+		return label;
+	}
+
+	public Collection<Reference> getReferences() {
+		return nodes.values();
+	}
+
 
 
 }

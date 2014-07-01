@@ -10,10 +10,8 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
 
 import de.unifrankfurt.faststring.analysis.AnalysisResult;
 import de.unifrankfurt.faststring.analysis.graph.Reference;
@@ -23,7 +21,6 @@ import de.unifrankfurt.faststring.analysis.model.DataFlowObject;
 import de.unifrankfurt.faststring.analysis.model.Definition;
 import de.unifrankfurt.faststring.analysis.model.Use;
 import de.unifrankfurt.faststring.analysis.util.GraphUtil;
-import de.unifrankfurt.faststring.analysis.util.StringUtil;
 
 public class TransformationInfo {
 
@@ -47,8 +44,8 @@ public class TransformationInfo {
 		defConversations = ImmutableSet.copyOf(GraphUtil.extractDefConversions(result.getRefs()).values());
 
 
-		Collection<Set<Use>> values = GraphUtil.extractUsageConversions(result.getRefs()).values();
-		Set<Use> useConversations = Sets.newHashSet(Iterables.concat(values));
+//		Collection<Set<Use>> values = GraphUtil.extractUsageConversions(result.getRefs()).values();
+//		Set<Use> useConversations = Sets.newHashSet(Iterables.concat(values));
 
 		for (Reference ref : result.getRefs()) {
 			Definition def = ref.getDef();
