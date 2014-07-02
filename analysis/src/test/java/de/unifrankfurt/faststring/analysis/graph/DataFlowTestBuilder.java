@@ -1,71 +1,76 @@
 package de.unifrankfurt.faststring.analysis.graph;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import de.unifrankfurt.faststring.analysis.label.BuiltInTypes;
 import de.unifrankfurt.faststring.analysis.label.SubstringStringType;
-import de.unifrankfurt.faststring.analysis.model.Definition;
-import de.unifrankfurt.faststring.analysis.model.Use;
 
 public class DataFlowTestBuilder {
-
+	
+	private static final Logger LOG = LoggerFactory.getLogger(DataFlowTestBuilder.class);
+	
 	private Map<Integer, Reference> nodeMap;
 	
 	public DataFlowTestBuilder() {
 		nodeMap = Maps.newHashMap();
 	}
 	
-	public DataFlowTestBuilder addPhi(int def, Integer...uses) {
+	public DataFlowTestBuilder phi(int def, Integer...uses) {
 		List<Integer> usesList = Arrays.asList(uses);
-		Definition phiDefinition = Definition.createPhiDefinition(usesList);
-		addToMap(def, phiDefinition);
+		InstructionNode phi = new PhiInstructionNode(def, usesList);
+		addDefinition(def, phi);
 		
 		for (Integer v : uses) {
-			Use use = Use.createUsedInPhi(def, usesList);
-			
-			addToMap(v, use);
+			addUse(v, phi);
 		}
 		
 		return this;
 		
 	}
 	
-	public DataFlowTestBuilder addLabelUse(int rec, int def) {
-		Use use =  Use.createUsedAsReceiver(SubstringStringType.METHOD_SUBSTRING, def, Collections.<Integer>emptyList());
-		addToMap(rec, use);
+	public DataFlowTestBuilder labelUse(int rec, int def) {
+		InstructionNode call = new MethodCallInstruction(def, Arrays.asList(rec), SubstringStringType.METHOD_SUBSTRING, false);
+				
+//				Use.createUsedAsReceiver(SubstringStringType.METHOD_SUBSTRING, def, Collections.<Integer>emptyList());
+		addUse(rec, call);
+				
+		addDefinition(def, call);
 		
 		nodeMap.get(rec).setLabel(BuiltInTypes.SUBSTRING);
 		
-		Definition definition = Definition.createCallResultDefinition(SubstringStringType.METHOD_SUBSTRING, rec);		
-		addToMap(def, definition);
-		
 		return this;
 	}
 
-	public DataFlowTestBuilder addParameterDefinition(int i) {
-		addToMap(i, Definition.createParamDefinition(i));
+	public DataFlowTestBuilder parameterDefinition(int i) {
+		addDefinition(i, new ParameterDefinition(i));
 		return this;
 	}
 
+	public DataFlowTestBuilder return_(int i) {
+		addUse(i, new ReturnInstruction(i));
+		return this;
+	}
 	
-	private void addToMap(int v, Definition def) {
+	private void addDefinition(int v, InstructionNode def) {
 		ensureRef(v);
 		Reference ref = nodeMap.get(v);
 		
-		if (ref.getDef() == null) {
+		if (ref.getDefinition() == null) {
 			ref.setDefinition(def);
 		} else {
 			throw new IllegalStateException("definition already set " + ref);
 		}
 	}
 
-	private void addToMap(int v, Use use) {
+	private void addUse(int v, InstructionNode use) {
 		ensureRef(v);
 		nodeMap.get(v).getUses().add(use);
 	}
@@ -73,12 +78,17 @@ public class DataFlowTestBuilder {
 	private void ensureRef(Integer v) {
 		if (!nodeMap.containsKey(v)) {
 			nodeMap.put(v, new Reference(v));
-			nodeMap.get(v).setUsesMutable(Lists.<Use>newLinkedList());
+			nodeMap.get(v).setUsesMutable(Lists.<InstructionNode>newLinkedList());
 		}
 	}
 	
 	public DataFlowGraph create() {
-		return new DataFlowGraph(BuiltInTypes.SUBSTRING, nodeMap);
+		DataFlowGraph graph = new DataFlowGraph(BuiltInTypes.SUBSTRING, nodeMap);
+		LOG.debug("created test graph:  {}", graph);
+		
+		return graph;
 	}
+
+	
 	
 }

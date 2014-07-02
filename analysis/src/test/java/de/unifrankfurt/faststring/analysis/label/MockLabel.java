@@ -54,4 +54,10 @@ public class MockLabel extends BaseTypeLabel {
 		return "valueOf";
 	}
 
+	@Override
+	public boolean compatibleWith(TypeLabel label) {
+
+		return this.equals(label);
+	}
+
 }

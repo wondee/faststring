@@ -3,28 +3,23 @@ package de.unifrankfurt.faststring.analysis;
 import java.util.Collection;
 import java.util.List;
 import java.util.Queue;
+import java.util.Stack;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
-import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Multiset;
-import com.google.common.collect.Sets;
 
 import de.unifrankfurt.faststring.analysis.graph.DataFlowGraph;
+import de.unifrankfurt.faststring.analysis.graph.InstructionNode;
+import de.unifrankfurt.faststring.analysis.graph.PhiInstructionNode;
 import de.unifrankfurt.faststring.analysis.graph.Reference;
 import de.unifrankfurt.faststring.analysis.label.TypeLabel;
-import de.unifrankfurt.faststring.analysis.model.DataFlowObject;
-import de.unifrankfurt.faststring.analysis.model.Definition;
-import de.unifrankfurt.faststring.analysis.model.PhiObject;
-import de.unifrankfurt.faststring.analysis.model.Use;
 import de.unifrankfurt.faststring.analysis.util.GraphUtil;
 import de.unifrankfurt.faststring.analysis.util.QueueUtil;
 import de.unifrankfurt.faststring.analysis.util.QueueUtil.BaseQueueProcessingStrategy;
-import de.unifrankfurt.faststring.analysis.util.StringUtil;
 
 public class LabelAnalyzer extends BaseQueueProcessingStrategy<Reference>{
 
@@ -32,14 +27,16 @@ public class LabelAnalyzer extends BaseQueueProcessingStrategy<Reference>{
 
 	private final DataFlowGraph graph;
 
-	private Collection<PhiObject> phis;
+	private Stack<PhiInstructionNode> phis;
 	
+	private PhiLabelingStrategy strategy;
 	
-	public LabelAnalyzer(DataFlowGraph graph) {
+	public LabelAnalyzer(DataFlowGraph graph, PhiLabelingStrategy strategy) {
 		this.graph = graph;
-		phis = Sets.newHashSet();
+		phis = new Stack<>();
+		this.strategy = strategy;
 	}
-
+	
 	private Function<Integer, Reference> valueNumberToReference = new Function<Integer, Reference>() {
 		@Override
 		public Reference apply(Integer input) {
@@ -47,21 +44,24 @@ public class LabelAnalyzer extends BaseQueueProcessingStrategy<Reference>{
 		}
 	};
 	
-
-	public static void analyzeLabel(DataFlowGraph graph) {
-		analyzeLabel(graph, graph.getAllLabelMatchingReferences());
+	public static void analyzeLabel(DataFlowGraph graph, PhiLabelingStrategy strategy) {
+		analyzeLabel(graph, graph.getAllLabelMatchingReferences(), strategy);
 	}
 	
-	public static void analyzeLabel(DataFlowGraph graph, Collection<Reference> refs) {
+	public static void analyzeLabel(DataFlowGraph graph) {
+		analyzeLabel(graph, graph.getAllLabelMatchingReferences(), new CountingStrategy());
+	}
+	
+	public static void analyzeLabel(DataFlowGraph graph, Collection<Reference> refs, PhiLabelingStrategy strategy) {
 		if (refs.size() > 0) {
-			QueueUtil.processUntilQueueIsEmpty(refs, new LabelAnalyzer(graph));
+			QueueUtil.processUntilQueueIsEmpty(refs, new LabelAnalyzer(graph, strategy));
 			
 			Collection<Reference> finalRefs = graph.getAllLabelMatchingReferences();
 			
 			if (LOG.isDebugEnabled() && finalRefs.size() > 0) {
 				LOG.debug("found possible references: {}", GraphUtil.extractIntsFromStringReferences(finalRefs));
-				LOG.debug("definition conversion needed for: {}", StringUtil.toStringMap(GraphUtil.extractDefConversions(finalRefs)));
-				LOG.debug("usage conversion needed for: {}", StringUtil.toStringMap(GraphUtil.extractUsageConversions(finalRefs)));
+//				LOG.debug("definition conversion needed for: {}", StringUtil.toStringMap(GraphUtil.extractDefConversions(finalRefs)));
+//				LOG.debug("usage conversion needed for: {}", StringUtil.toStringMap(GraphUtil.extractUsageConversions(finalRefs)));
 			}
 			
 		} else {
@@ -72,39 +72,39 @@ public class LabelAnalyzer extends BaseQueueProcessingStrategy<Reference>{
 
 	@Override
 	public void process(Reference ref, Queue<Reference> refQueue) {
-		List<DataFlowObject> os = Lists.newLinkedList();
+		
+		List<InstructionNode> os = Lists.newLinkedList();
 
-		os.add(ref.getDef());
+		os.add(ref.getDefinition());
 		os.addAll(ref.getUses());
 
-		for (DataFlowObject o : os) {
+		for (InstructionNode o : os) {
 			
-			if (o instanceof PhiObject) {
-				PhiObject phi = (PhiObject) o;
+			if (o instanceof PhiInstructionNode) {
+				PhiInstructionNode phi = (PhiInstructionNode) o;
 				
 				if (!phis.contains(phi)) {
-					
+				
 					phis.add(phi);
-					List<Integer> connectedRefs = o.getConnectedRefs(null);
+					Collection<Integer> connectedRefs = phi.getConnectedRefs(ref.getRef());
 					
 					connectedRefs.remove(ref.getRef());
 					Collection<Reference> refs = Collections2.transform(connectedRefs, 
 							valueNumberToReference);
 					
 					refQueue.addAll(refs);
-					
-//					System.out.println(GraphUtil.extractIntsFromStringReferences(refQueue));
-//					System.out.println(phis);
 				}
 			} else {
-				if (o.isCompatibleWith(graph.getLabel())) {
+				final TypeLabel label = graph.getLabel();
+
+				if (o.isCompatibleWith(label, ref.getRef())) {
+					o.setLabel(label);
 					LOG.trace("inspecting {}", o);
-					for (Integer connectedRefId : o.getConnectedRefs(graph.getLabel())) {
+					for (Integer connectedRefId : o.getConnectedRefs(label, ref.getRef())) {
 						Reference connectedRef = graph.get(connectedRefId);
-						// TODO maybe somewhere else...
 						if (connectedRef.getLabel() == null) {
 							LOG.trace("setting label to {}", connectedRef);
-							connectedRef.setLabel(graph.getLabel());
+							connectedRef.setLabel(label);
 
 							refQueue.add(connectedRef);
 						}
@@ -118,53 +118,24 @@ public class LabelAnalyzer extends BaseQueueProcessingStrategy<Reference>{
 	@Override
 	public void finished() {
 		
-		for (PhiObject phi : phis) {
-			
-			Multiset<TypeLabel> counter = HashMultiset.create();
-			
-			for (Integer v : phi.getConnctedRefs()) {
-				counter.add(graph.get(v).getLabel());
-			}
-			
-			int countNone = counter.count(null);
-			int countLabel = counter.count(graph.getLabel());
-			
-			if (countLabel >= countNone) {
+		while(!phis.isEmpty()) {
+			PhiInstructionNode phi = phis.pop();
+			if (strategy.shouldBeLabeled(graph, phi)) {
 				phi.setLabel(graph.getLabel());
-			}			
+			}
 		}
 		
-		Collection<Reference> refs = graph.getReferences();
-		for (Reference ref : refs) {
-			List<DataFlowObject> list = Lists.<DataFlowObject>newLinkedList(ref.getUses());
+		for (Reference ref : graph.getReferences()) {			
+			ref.createBarriers();
 			
-			list.add(ref.getDef());
-			
-			if (ref.getLabel() != null) {
-			
-				for (DataFlowObject o : list) {
-					if (!o.isCompatibleWith(graph.getLabel())) {
-						if (o instanceof Definition) {
-							ref.setDefinitionConvertToOpt();
-						} else {
-							ref.setConvertUseFromOpt((Use)o);
-						}
-					}
-				}
-			} else {
-				for (DataFlowObject o : list) {
-					if (!o.isCompatibleWith(null)) {
-						if (o instanceof Definition) {
-							ref.setDefinitionConvertFromOpt();
-						} else {
-							ref.setConvertUseToOpt((Use)o);
-						}
-					}
-					
-				}
-			}
 		}
 	}
+	
+	
+	public interface PhiLabelingStrategy {
+		boolean shouldBeLabeled(DataFlowGraph graph, PhiInstructionNode phis);
+	}
+
 	
 
 }

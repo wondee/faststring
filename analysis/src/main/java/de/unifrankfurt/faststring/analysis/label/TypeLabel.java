@@ -88,4 +88,6 @@ public interface TypeLabel {
 
 	String getCreationMethodName();
 
+	boolean compatibleWith(TypeLabel label);
+
 }

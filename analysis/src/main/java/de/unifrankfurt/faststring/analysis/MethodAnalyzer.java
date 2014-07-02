@@ -1,18 +1,14 @@
 package de.unifrankfurt.faststring.analysis;
 
 import java.util.Collection;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.Sets;
 
 import de.unifrankfurt.faststring.analysis.graph.DataFlowGraph;
 import de.unifrankfurt.faststring.analysis.graph.DataFlowGraphBuilder;
 import de.unifrankfurt.faststring.analysis.graph.Reference;
 import de.unifrankfurt.faststring.analysis.label.TypeLabel;
-import de.unifrankfurt.faststring.analysis.model.Use;
 
 public class MethodAnalyzer {
 
@@ -37,42 +33,42 @@ public class MethodAnalyzer {
 		
 		Collection<Reference> refs = graph.getAllLabelMatchingReferences();
 
-		calculateMissingLocals(refs);
+//		calculateMissingLocals(refs);
 
 		AnalysisResult analysisResult = new AnalysisResult(refs, method.getMaxLocals(), label);
 
 		return analysisResult;
 	}
 
-	private void calculateMissingLocals(Collection<Reference> refs) {
-
-
-		for (Reference ref : refs) {
-
-//			Set<Integer> phiPointer = method.findAllUsesPhiPointer(ref.getRef());
-
-			LOG.trace("checking for {} ", ref);
-
-			Set<Integer> newLocals = Sets.newHashSet(ref.getDef().getLocalVariableIndex());
-
-			for (Use  use : ref.getUses()) {
-
-
-
-				Collection<Integer> locals = use.getLocalVariableIndex();
-				LOG.trace("use: {}", locals);
-
-				for (Integer local : locals) {
-					if (!newLocals.contains(local)) {
-						System.out.println("neuen gefunden! " + local);
-						newLocals.add(local);
-					}
-				};
-			}
-
-			ref.getDef().setLocalVariableIndices(newLocals);
-		}
-
-	}
+//	private void calculateMissingLocals(Collection<Reference> refs) {
+//
+//
+//		for (Reference ref : refs) {
+//
+////			Set<Integer> phiPointer = method.findAllUsesPhiPointer(ref.getRef());
+//
+//			LOG.trace("checking for {} ", ref);
+//
+//			Set<Integer> newLocals = Sets.newHashSet(ref.getDef().getLocalVariableIndex());
+//
+//			for (Use  use : ref.getUses()) {
+//
+//
+//
+//				Collection<Integer> locals = use.getLocalVariableIndex();
+//				LOG.trace("use: {}", locals);
+//
+//				for (Integer local : locals) {
+//					if (!newLocals.contains(local)) {
+//						System.out.println("neuen gefunden! " + local);
+//						newLocals.add(local);
+//					}
+//				};
+//			}
+//
+//			ref.getDef().setLocalVariableIndices(newLocals);
+//		}
+//
+//	}
 
 }

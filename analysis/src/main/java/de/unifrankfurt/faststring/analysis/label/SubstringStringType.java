@@ -96,4 +96,13 @@ public class SubstringStringType extends BaseTypeLabel {
 		return "valueOf";
 	}
 
+	@Override
+	public String toString() {
+		return "SUBSTRING";
+	}
+
+	@Override
+	public boolean compatibleWith(TypeLabel label) {
+		return this.equals(label);
+	}
 }

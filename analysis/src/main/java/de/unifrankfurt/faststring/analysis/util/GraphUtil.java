@@ -3,21 +3,16 @@ package de.unifrankfurt.faststring.analysis.util;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableMap.Builder;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 import de.unifrankfurt.faststring.analysis.graph.DataFlowGraph;
+import de.unifrankfurt.faststring.analysis.graph.InstructionNode;
 import de.unifrankfurt.faststring.analysis.graph.Reference;
-import de.unifrankfurt.faststring.analysis.model.Definition;
-import de.unifrankfurt.faststring.analysis.model.Use;
 
 
 public class GraphUtil {
@@ -43,63 +38,63 @@ public class GraphUtil {
 		
 	}
 	
-	private static final Predicate<Reference> isDefinitionConversation = new Predicate<Reference>() {
+	private static final Predicate<Reference> isDefinitionConversationToOpt = new Predicate<Reference>() {
 		@Override
 		public boolean apply(Reference input) {
 			return input.isDefinitionConversionToOpt();
 		}
 	};
 
-	private static Predicate<Reference> isUsesConversation =new Predicate<Reference>() {
-		@Override
-		public boolean apply(Reference input) {
-			return !input.getUseConversionsFromOpt().isEmpty();
-		}
-	};
+//	private static Predicate<Reference> isUsesConversation =new Predicate<Reference>() {
+//		@Override
+//		public boolean apply(Reference input) {
+//			return !input.getUseConversionsFromOpt().isEmpty();
+//		}
+//	};
 	
 	public static Iterable<Integer> extractIntsFromStringReferences(Iterable<Reference> refs) {
 		return Iterables.transform(refs, referenceToInt);
 	}
 
-	public static Map<Integer, Definition> extractDefConversions(Collection<Reference> candidates) {
+	public static Map<Integer, InstructionNode> extractDefConversionsToOpt(Collection<Reference> candidates) {
 		
-		Iterable<Reference> refs = Collections2.filter(candidates, isDefinitionConversation);
+		Iterable<Reference> refs = Collections2.filter(candidates, isDefinitionConversationToOpt);
 		
-		Map<Integer, Definition> defMap = Maps.newHashMap();
+		Map<Integer, InstructionNode> defMap = Maps.newHashMap();
 		
 		for (Reference ref : refs) {
-			defMap.put(ref.valueNumber(), ref.getDef());
+			defMap.put(ref.valueNumber(), ref.getDefinition());
 		}
 		
 		return defMap;
 	}
 	
-	public static Iterable<Integer> extractDefConversionsAsInt(Collection<Reference> candidates) {
-		return extractIntsFromStringReferences(Collections2.filter(candidates, isDefinitionConversation));
+	public static Iterable<Integer> extractDefConversionsToOptAsInt(Collection<Reference> candidates) {
+		return extractIntsFromStringReferences(Collections2.filter(candidates, isDefinitionConversationToOpt));
 	}
-
-	public static Map<Integer, Set<Use>> extractUsageConversions(Collection<Reference> finalRefs) {
-		
-		Collection<Reference> refsWithUseConversation = Collections2.filter(finalRefs, isUsesConversation);
-		Builder<Integer, Set<Use>> builder = new ImmutableMap.Builder<Integer, Set<Use>>();
-		
-		for (Reference ref : refsWithUseConversation) {
-			Set<Use> useConversations = Sets.newHashSet();
-			
-			for (int useId : ref.getUseConversionsFromOpt()) {
-				useConversations.add(ref.getUses().get(useId));
-			}
-			
-			builder.put(ref.getRef(), useConversations);
-		}
-		
-		return builder.build();
-		
-	}
-
-	public static Collection<Integer> extractUsageConversionsRefIds(Collection<Reference> refs) {
-		return extractUsageConversions(refs).keySet();
-	}
+//
+//	public static Map<Integer, Set<Use>> extractUsageConversions(Collection<Reference> finalRefs) {
+//		
+//		Collection<Reference> refsWithUseConversation = Collections2.filter(finalRefs, isUsesConversation);
+//		Builder<Integer, Set<Use>> builder = new ImmutableMap.Builder<Integer, Set<Use>>();
+//		
+//		for (Reference ref : refsWithUseConversation) {
+//			Set<Use> useConversations = Sets.newHashSet();
+//			
+//			for (int useId : ref.getUseConversionsFromOpt()) {
+//				useConversations.add(ref.getUses().get(useId));
+//			}
+//			
+//			builder.put(ref.getRef(), useConversations);
+//		}
+//		
+//		return builder.build();
+//		
+//	}
+//
+//	public static Collection<Integer> extractUsageConversionsRefIds(Collection<Reference> refs) {
+//		return extractUsageConversions(refs).keySet();
+//	}
 
 	public static Collection<Reference> findReferenceForValueNumbers(
 			DataFlowGraph graph, List<Integer> refs) {

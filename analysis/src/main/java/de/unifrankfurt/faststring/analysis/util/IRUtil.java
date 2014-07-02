@@ -53,15 +53,23 @@ public final class IRUtil {
 	}
 
 	public static int findUseIndex(int v, SSAInvokeInstruction invoke, int startWith) {
+		return findUseIndex(v, getUses(invoke), startWith);
+	}
+
+	public static int findUseIndex(int v, List<Integer> list) {
+		return findUseIndex(v, list, 0);
+	}
+
+	public static int findUseIndex(int v, List<Integer> list, int startWith) {
 		// start with 1 because 0 is the receiver
-		for (int i = startWith; i < invoke.getNumberOfUses(); i++) {
-			if (invoke.getUse(i) == v) {
+		for (int i = startWith; i < list.size(); i++) {
+			if (list.get(i) == v) {
 				return i;
 			}
 		}
-		throw new IllegalStateException("value number not found in uses list");
+		throw new IllegalStateException("value number " + v + " not found in uses list " + list +  " started with " + startWith);
 	}
-
+	
 	public static Map<SSAInstruction, Integer> createInstructionToIndexMap(IR ir) {
 		Map<SSAInstruction, Integer> map = Maps.newHashMap();
 
@@ -170,5 +178,6 @@ public final class IRUtil {
 		}
 
 	}
+
 
 }

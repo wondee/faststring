@@ -4,21 +4,23 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import de.unifrankfurt.faststring.analysis.label.TypeLabel;
-import de.unifrankfurt.faststring.analysis.model.Definition;
-import de.unifrankfurt.faststring.analysis.model.Use;
 
 
 public class Reference {
 
-	private int ref;
+	private int v;
 
-	private Definition def = null;
-	private List<Use> uses = null;
+	private InstructionNode definition = null;
+
+	private List<InstructionNode> uses = Lists.newLinkedList();
 
 	private TypeLabel label = null;
 
@@ -30,7 +32,7 @@ public class Reference {
 
 	public Reference(int ref) {
 		Preconditions.checkArgument(ref > 0, "valueNumber must be greater than 0");
-		this.ref = ref;
+		this.v = ref;
 
 	}
 
@@ -42,20 +44,17 @@ public class Reference {
 
 
 	public int valueNumber() {
-		return ref;
+		return v;
 	}
 
-	void setDefinition(Definition def) {
-		if (this.def != null) {
-			throw new IllegalStateException("def was tried to set twice");
-		}
-
-		this.def = def;
+	public void setDefinition(InstructionNode instructionNode) {
+		this.definition = instructionNode;
 	}
 
-	public Definition getDef() {
-		return def;
+	public InstructionNode getDefinition() {
+		return definition;
 	}
+	
 
 	public void setLabel(TypeLabel label) {
 		this.label = label;
@@ -66,32 +65,20 @@ public class Reference {
 		return label;
 	}
 
-	public List<Use> getUses() {
+	public List<InstructionNode> getUses() {
 		return uses;
 	}
 
 	public Integer getRef() {
-		return ref;
-	}
-
-	public void setDefinitionConvertToOpt() {
-		definitionConversionToOpt = true;
+		return v;
 	}
 
 	public boolean isDefinitionConversionToOpt() {
 		return definitionConversionToOpt;
 	}
-	
-	public void setDefinitionConvertFromOpt() {
-		definitionConversionFromOpt = true;
-	}
 
 	public boolean isDefinitionConversionFromOpt() {
 		return definitionConversionFromOpt;
-	}
-
-	public void setConvertUseFromOpt(Use use) {
-		setConvertToUse(use, true);
 	}
 
 	public Set<Integer> getUseConversionsFromOpt() {
@@ -102,29 +89,66 @@ public class Reference {
 		return useConversionsToOpt;
 	}
 	
-	public void setConvertUseToOpt(Use use) {
-		setConvertToUse(use, false);
+	void setUses(List<InstructionNode> uses) {
+		this.uses = ImmutableList.copyOf(uses);
+	}
+
+
+	public void createBarriers() {
+		checkDefinitionBarrier();
+		checkUseBarriers();
+		
 	}
 	
-	public void setConvertToUse(Use o, boolean from) {
-		int i = uses.indexOf(o);
-
-		if (i > -1) {
-			if (from) {
-				useConversionsFromOpt.add(i);
+	private void checkDefinitionBarrier() {
+		if (!definition.isLabel(label)) {
+			if (label == null) {
+				definitionConversionFromOpt = true;
 			} else {
-				useConversionsToOpt.add(i);
+				definitionConversionToOpt = true;
 			}
-		} else {
-			throw new IllegalStateException("no index found for " + o + " in list " + uses);
 		}
+	}
+	
+	private void checkUseBarriers() {
+		for (int i = 0; i < uses.size(); i++) {
+			InstructionNode use = uses.get(i);
+			
+			if (!use.isLabel(label)) {
+				if (label == null) {
+					useConversionsToOpt.add(i);
+				} else {
+					useConversionsFromOpt.add(i);
+				}
+			}
+		}
+	}
+	
+
+	void setUsesMutable(LinkedList<InstructionNode> uses) {
+		this.uses = uses;
+	}
 
 
+	public List<Integer> getConnectedRefs(final TypeLabel label) {
+		List<Integer> refs = Lists.newLinkedList(definition.getConnectedRefs(label, v));
+		
+		Iterables.<Integer>addAll(refs, 
+				Iterables.concat(Iterables.transform(uses, new Function<InstructionNode, List<Integer>>() {
+						@Override
+						public List<Integer> apply(InstructionNode input) {
+							return input.getConnectedRefs(label, v);
+						}
+					}
+				))
+			);
+		
+		return refs;
 	}
 	
 	@Override
 	public String toString() {
-		return "Reference [ref=" + ref + ", def=" + def
+		return "Reference [v=" + v + ", def=" + definition
 				+ ", uses=" + uses + "]";
 	}
 
@@ -133,7 +157,7 @@ public class Reference {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ref;
+		result = prime * result + v;
 		return result;
 	}
 
@@ -147,26 +171,18 @@ public class Reference {
 		if (getClass() != obj.getClass())
 			return false;
 		Reference other = (Reference) obj;
-		if (ref != other.ref)
+		if (v != other.v)
 			return false;
 		return true;
 	}
 
 
-	void setUses(List<Use> uses) {
-		if (this.uses != null) {
-			throw new IllegalStateException("uses was tried to set twice");
-		}
-		this.uses = ImmutableList.copyOf(uses);
-	}
 
 
 
 
 
-	void setUsesMutable(LinkedList<Use> uses) {
-		this.uses = uses;
-	}
+
 
 
 }

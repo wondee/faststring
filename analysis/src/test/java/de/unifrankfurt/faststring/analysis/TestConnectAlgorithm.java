@@ -14,6 +14,7 @@ import de.unifrankfurt.faststring.analysis.utils.BaseAnalysisTest;
  * @author markus
  *
  */
+@SuppressWarnings("deprecation")
 public class TestConnectAlgorithm extends BaseAnalysisTest {
 
 
@@ -21,6 +22,7 @@ public class TestConnectAlgorithm extends BaseAnalysisTest {
 
 
 
+	
 	@Test
 	public void simpleTest() {
 		IRAnalyzer analyzer = new IRAnalyzer(getIR(TEST_CLASS, "simple"));
