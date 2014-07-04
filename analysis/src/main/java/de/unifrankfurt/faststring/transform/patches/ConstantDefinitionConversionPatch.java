@@ -1,33 +1,25 @@
 package de.unifrankfurt.faststring.transform.patches;
 
+import com.ibm.wala.shrikeBT.ConstantInstruction;
+
 import de.unifrankfurt.faststring.analysis.label.TypeLabel;
+import de.unifrankfurt.faststring.transform.TransformationInfo.Constant;
 
 public class ConstantDefinitionConversionPatch extends
 		DefinitionConversionPatch {
 
-	public ConstantDefinitionConversionPatch(TypeLabel label, int optLocal) {
-		super(label, optLocal);
-		// TODO Auto-generated constructor stub
-	}
-
 	private Object value;
+
+	public ConstantDefinitionConversionPatch(TypeLabel label, Constant constant) {
+		super(label, constant.getLocal());
+		this.value = constant.getValue();
+	}
 
 	@Override
 	protected void pushOriginalToStack(OutputBuilder w) {
-		// TODO Auto-generated method stub
-		
-	}
+		// TODO check which type is original type and use that instead
+		w.emit(ConstantInstruction.makeString((String) value));
 
-//	public ConstantDefinitionConversionPatch(TypeLabel label, Constant constant) {
-//		super(label, constant.getLocal());
-//		this.value = constant.getValue();
-//	}
-//
-//	@Override
-//	protected void pushOriginalToStack(OutputBuilder w) {
-//		// TODO check which type is original type and use that instead
-//		w.emit(ConstantInstruction.makeString((String) value));
-//
-//	}
+	}
 
 }

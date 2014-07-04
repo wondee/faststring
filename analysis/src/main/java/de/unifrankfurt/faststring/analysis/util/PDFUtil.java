@@ -50,9 +50,9 @@ public final class PDFUtil {
 		if (new File(pdfFile).exists()) {
 			System.out.println(pdfFile + " skipped");
 		} else {
-			Graph<? extends ISSABasicBlock> g = ir.getControlFlowGraph();
+			Graph<ISSABasicBlock> g = ir.getControlFlowGraph();
 	
-			NodeDecorator labels = PDFViewUtil.makeIRDecorator(ir);
+			NodeDecorator<ISSABasicBlock> labels = PDFViewUtil.makeIRDecorator(ir);
 			// if (annotations != null) {
 			// labels = new ConcatenatingNodeDecorator(annotations, labels);
 			// }

@@ -6,7 +6,6 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import de.unifrankfurt.faststring.analysis.CountingStrategy;
 import de.unifrankfurt.faststring.analysis.LabelAnalyzer;
 import de.unifrankfurt.faststring.analysis.OptimisticStrategy;
 

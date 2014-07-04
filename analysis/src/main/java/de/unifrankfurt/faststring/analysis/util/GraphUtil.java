@@ -2,16 +2,12 @@ package de.unifrankfurt.faststring.analysis.util;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Maps;
 
 import de.unifrankfurt.faststring.analysis.graph.DataFlowGraph;
-import de.unifrankfurt.faststring.analysis.graph.InstructionNode;
 import de.unifrankfurt.faststring.analysis.graph.Reference;
 
 
@@ -52,27 +48,20 @@ public class GraphUtil {
 //		}
 //	};
 	
-	public static Iterable<Integer> extractIntsFromStringReferences(Iterable<Reference> refs) {
-		return Iterables.transform(refs, referenceToInt);
+	public static Collection<Integer> extractIntsFromStringReferences(Collection<Reference> refs) {
+		return Collections2.transform(refs, referenceToInt);
 	}
 
-	public static Map<Integer, InstructionNode> extractDefConversionsToOpt(Collection<Reference> candidates) {
-		
-		Iterable<Reference> refs = Collections2.filter(candidates, isDefinitionConversationToOpt);
-		
-		Map<Integer, InstructionNode> defMap = Maps.newHashMap();
-		
-		for (Reference ref : refs) {
-			defMap.put(ref.valueNumber(), ref.getDefinition());
-		}
-		
-		return defMap;
+	public static Collection<Reference> extractDefConversionsToOpt(Collection<Reference> candidates) {
+		return Collections2.filter(candidates, isDefinitionConversationToOpt);		
 	}
 	
 	public static Iterable<Integer> extractDefConversionsToOptAsInt(Collection<Reference> candidates) {
-		return extractIntsFromStringReferences(Collections2.filter(candidates, isDefinitionConversationToOpt));
+		return extractIntsFromStringReferences(extractDefConversionsToOpt(candidates));
 	}
-//
+	
+	
+	
 //	public static Map<Integer, Set<Use>> extractUsageConversions(Collection<Reference> finalRefs) {
 //		
 //		Collection<Reference> refsWithUseConversation = Collections2.filter(finalRefs, isUsesConversation);
