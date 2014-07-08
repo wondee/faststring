@@ -17,12 +17,12 @@ public class PhiInstructionNode extends InstructionNode {
 	public PhiInstructionNode(SSAPhiInstruction instruction) {
 		this(instruction.getDef(), IRUtil.getUses(instruction));
 	}
-	
+
 	public PhiInstructionNode(int def, List<Integer> uses) {
 		this.def = def;
 		this.uses = uses;
 	}
-	
+
 	@Override
 	public String toString() {
 		return "PhiNode [def=" + def + ", uses=" + uses + "]";
@@ -30,9 +30,9 @@ public class PhiInstructionNode extends InstructionNode {
 
 	@Override
 	public List<Integer> getConnectedRefs(TypeLabel label, int inV) {
-		List<Integer> refs = getConnctedRefs();		
+		List<Integer> refs = getConnctedRefs();
 		refs.remove((Integer)inV);
-		
+
 		return refs;
 	}
 
@@ -44,5 +44,10 @@ public class PhiInstructionNode extends InstructionNode {
 		List<Integer> refs = Lists.newLinkedList(uses);
 		refs.add(def);
 		return refs;
+	}
+
+	@Override
+	public void visit(Visitor visitor) {
+		visitor.visitPhi(this);
 	}
 }

@@ -2,6 +2,8 @@ package de.unifrankfurt.faststring.analysis.graph;
 
 import java.util.Collection;
 
+import com.google.common.collect.Sets;
+
 
 public class ParameterDefinition extends InstructionNode {
 
@@ -13,15 +15,18 @@ public class ParameterDefinition extends InstructionNode {
 
 	@Override
 	public Collection<Integer> getLocalVariableIndex(Integer v) {
-		Collection<Integer> localVariableIndex = super.getLocalVariableIndex(v);
-		localVariableIndex.add(index);
-		return localVariableIndex;
+		return Sets.newHashSet(index);
 	}
-	
+
 	@Override
 	public String toString() {
 		return "ParameterDefinition [index=" + index + "]";
 	}
 
-	
+	@Override
+	public void visit(Visitor visitor) {
+		visitor.visitParameter(this);
+	}
+
+
 }

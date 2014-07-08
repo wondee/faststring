@@ -60,14 +60,11 @@ public class JarManager {
 		PrintWriter writer = new PrintWriter(System.out);
 		instrumenter.setPassUnmodifiedClasses(true);
 
-		MethodTransformer transformer = new MethodTransformer();
 
 		ClassInstrumenter ci;
 		while ((ci = instrumenter.nextClass()) != null) {
 
 			for (int i = 0; i < ci.getReader().getMethodCount(); i++) {
-
-
 
 				MethodData methodData = ci.visitMethod(i);
 
@@ -79,7 +76,7 @@ public class JarManager {
 					new Disassembler(methodData).disassembleTo(writer);
 					writer.flush();
 
-					transformer.transformMethod(methodData, new TransformationInfo(result));
+					new MethodTransformer(methodData, new TransformationInfo(result)).transformMethod();
 
 					System.out.println("--- new code");
 					new Disassembler(methodData).disassembleTo(writer);

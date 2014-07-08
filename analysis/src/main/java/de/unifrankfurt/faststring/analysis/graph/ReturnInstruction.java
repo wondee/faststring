@@ -15,4 +15,9 @@ public class ReturnInstruction extends InstructionNode {
 				+ getLocalVariableIndex(result) + "]";
 	}
 
+	@Override
+	public void visit(Visitor visitor) {
+		visitor.visitReturn(this);
+	}
+
 }

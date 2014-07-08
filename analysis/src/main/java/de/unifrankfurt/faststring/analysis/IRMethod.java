@@ -60,12 +60,16 @@ public class IRMethod {
 
 	public Collection<Integer> getLocalVariableIndices(int bcIndex, int valueNumber) {
 
+		int lastIndex = findLastIndexBeforeBranch(ir.getInstructions()[bcIndex]);
+
 		Set<Integer> pointers = IRUtil.findAllDefPointersFor(defUse, valueNumber);
 
 		Set<Integer> locals = Sets.newHashSet();
 
 		for (Integer p : pointers) {
-			locals.addAll(IRHelper.findLocalVariableIndex(ir, bcIndex, p));
+			for (int i = bcIndex + 1; i < lastIndex; i++) {
+				locals.addAll(IRHelper.findLocalVariableIndex(ir, i, p));
+			}
 		}
 
 		return locals;
@@ -119,33 +123,33 @@ public class IRMethod {
 		return IRUtil.findAllUsesPointersFor(defUse, ref);
 	}
 
-	public IInstruction[] getRemainingInstructionsOfBlock(SSAInstruction instruction) {		
-		try {
-			
-			int from = getIndexFor(instruction) + 1;
-			int to = findLastIndexBeforeBranch(instruction);
-			
-			if (from < to) {
-				return Arrays.copyOfRange(
-						((IBytecodeMethod)ir.getMethod()).getInstructions(), from, to);
-			} else {
-				return new IInstruction[0];
-			}
-		} catch (InvalidClassFileException e) {
-			throw new IllegalStateException(e);
-		}
-		
-		
-	}
+//	public IInstruction[] getLastIndexOfSinglePathReachedBlock(int bcIndex) {
+//		try {
+//
+//			int from = bcIndex + 1;
+//			int to = findLastIndexBeforeBranch(ir.getInstructions()[bcIndex]);
+//
+//			if (from < to) {
+//				return Arrays.copyOfRange(
+//						((IBytecodeMethod)ir.getMethod()).getInstructions(), from, to);
+//			} else {
+//				return new IInstruction[0];
+//			}
+//		} catch (InvalidClassFileException e) {
+//			throw new IllegalStateException(e);
+//		}
+//
+//
+//	}
 
 	private int findLastIndexBeforeBranch(SSAInstruction instruction) {
 		ISSABasicBlock block = ir.getBasicBlockForInstruction(instruction);
 		SSACFG cfg = ir.getControlFlowGraph();
-		
+
 		while (cfg.getSuccNodeCount(block) == 2) {
-			block = cfg.getSuccNodes(block).next(); 
+			block = cfg.getSuccNodes(block).next();
 		}
-		
+
 		return block.getLastInstructionIndex();
 	}
 

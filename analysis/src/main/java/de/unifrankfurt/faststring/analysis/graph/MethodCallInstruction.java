@@ -18,20 +18,20 @@ public class MethodCallInstruction extends InstructionNode {
 	private List<Integer> uses;
 	private MethodReference target;
 	private boolean isStatic;
-		
+
 	public MethodCallInstruction(SSAInvokeInstruction instruction) {
-		
+
 		this(
-			instruction.getDef(), 
-			IRUtil.getUses(instruction), 
-			instruction.getDeclaredTarget(), 
+			instruction.getDef(),
+			IRUtil.getUses(instruction),
+			instruction.getDeclaredTarget(),
 			instruction.isStatic()
 		);
-		
+
 	}
-	
-	
-	
+
+
+
 	public MethodCallInstruction(int def, List<Integer> uses,
 			MethodReference target, boolean isStatic) {
 		super();
@@ -44,42 +44,42 @@ public class MethodCallInstruction extends InstructionNode {
 	private int getParam(int index) {
 		return uses.get((isStatic) ? index - 1 : index);
 	}
-	
+
 
 	@Override
 	public List<Integer> getConnectedRefs(TypeLabel label, int inV) {
 		return determineMethodCallType(inV).getConnectedRefs(label, inV);
 	}
-		
+
 	@Override
 	protected boolean isCompatibleWithActual(TypeLabel label, int inV) {
 		return determineMethodCallType(inV).isCompatibleWithActual(label);
-		
+
 	}
-	
+
 	private MethodCallType determineMethodCallType(int inV) {
 		if (inV == def) {
 			return new Defintion();
 		} else {
-			
+
 			int index = IRUtil.findUseIndex(inV, uses);
-			
+
 			if (index == 0 && !isStatic) {
 				return new Receiver();
 			} else {
 				return new Parameter(index);
 			}
-			
+
 		}
 	}
-	
+
 	interface MethodCallType {
 		boolean isCompatibleWithActual(TypeLabel label);
 
 		List<Integer> getConnectedRefs(TypeLabel label, int inV);
-		
+
 	}
-	
+
 	private class Defintion implements MethodCallType {
 		@Override
 		public boolean isCompatibleWithActual(TypeLabel label) {
@@ -89,15 +89,15 @@ public class MethodCallInstruction extends InstructionNode {
 		public List<Integer> getConnectedRefs(TypeLabel label, int inV) {
 			// TODO only returns receiver, maybe other params may also be interesting
 			if (label.canBeDefinedAsResultOf(target) && !isStatic) {
-				
+
 				return Lists.newArrayList(uses.get(0));
 			} else {
 				return ImmutableList.of();
 			}
 		}
-		
+
 	}
-	
+
 	private class Receiver implements MethodCallType {
 		@Override
 		public boolean isCompatibleWithActual(TypeLabel label) {
@@ -107,24 +107,24 @@ public class MethodCallInstruction extends InstructionNode {
 		@Override
 		public List<Integer> getConnectedRefs(TypeLabel label, int inV) {
 			ReceiverInfo receiverInfo = label.getReceiverUseInfo(target);
-			
+
 			List<Integer> newRefs = Lists.newLinkedList();
-			
+
 			if (def != -1 && receiverInfo.isDefLabelable()) {
 				newRefs.add(def);
 			}
-			
+
 			for (Integer index : receiverInfo.getLabelableParams()) {
 				newRefs.add(getParam(index));
 			}
-			
+
 			return newRefs;
 		}
-		
+
 	}
-	
+
 	private class Parameter implements MethodCallType {
-		
+
 		private int index;
 
 		public Parameter(int index) {
@@ -139,12 +139,12 @@ public class MethodCallInstruction extends InstructionNode {
 		@Override
 		public List<Integer> getConnectedRefs(TypeLabel label, int inV) {
 			if (label.canReturnedValueBeLabeled(target)) {
-				return Lists.newArrayList(def);			
+				return Lists.newArrayList(def);
 			} else {
 				return Lists.newArrayList();
 			}
 		}
-		
+
 	}
 
 	@Override
@@ -152,6 +152,13 @@ public class MethodCallInstruction extends InstructionNode {
 		return "MethodCallInstruction [def=" + def + ", uses=" + uses
 				+ ", target=" + target + ", isStatic=" + isStatic + ", localVarIndex=" + localMap + " ]";
 	}
-	
-	
+
+
+
+	@Override
+	public void visit(Visitor visitor) {
+		visitor.visitMethodCall(this);
+	}
+
+
 }

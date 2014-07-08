@@ -67,7 +67,7 @@ public abstract class InstructionNode implements Labelable {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * de.unifrankfurt.faststring.analysis.graph.Labelable#setLabel(de.unifrankfurt
 	 * .faststring.analysis.label.TypeLabel)
@@ -79,7 +79,7 @@ public abstract class InstructionNode implements Labelable {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see de.unifrankfurt.faststring.analysis.graph.Labelable#getLabel()
 	 */
 	@Override
@@ -87,9 +87,11 @@ public abstract class InstructionNode implements Labelable {
 		return label;
 	}
 
+	public abstract void visit(Visitor visitor);
+
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * de.unifrankfurt.faststring.analysis.graph.Labelable#isLabel(de.unifrankfurt
 	 * .faststring.analysis.label.TypeLabel)
@@ -97,5 +99,19 @@ public abstract class InstructionNode implements Labelable {
 	@Override
 	public boolean isLabel(TypeLabel label) {
 		return this.label == label;
+	}
+
+	public interface Visitor {
+
+		public void visitConstant(ConstantDefinition node);
+
+		public void visitMethodCall(MethodCallInstruction node);
+
+		public void visitParameter(ParameterDefinition node);
+
+		public void visitPhi(PhiInstructionNode node);
+
+		public void visitReturn(ReturnInstruction node);
+
 	}
 }
