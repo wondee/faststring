@@ -2,9 +2,6 @@ package de.unifrankfurt.faststring.analysis;
 
 import java.util.Collection;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import de.unifrankfurt.faststring.analysis.graph.DataFlowGraph;
 import de.unifrankfurt.faststring.analysis.graph.DataFlowGraphBuilder;
 import de.unifrankfurt.faststring.analysis.graph.Reference;
@@ -12,8 +9,8 @@ import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 
 public class MethodAnalyzer {
 
-	private static final Logger LOG = LoggerFactory
-			.getLogger(MethodAnalyzer.class);
+//	private static final Logger LOG = LoggerFactory
+//			.getLogger(MethodAnalyzer.class);
 
 	private IRMethod method;
 
@@ -26,11 +23,11 @@ public class MethodAnalyzer {
 
 	public AnalysisResult analyze() {
 		DataFlowGraph graph = new DataFlowGraphBuilder(label, method).createDataFlowGraph();
-		
-		
+
+
 		LabelAnalyzer.analyzeLabel(graph);
-		
-		
+
+
 		Collection<Reference> refs = graph.getAllLabelMatchingReferences();
 
 //		calculateMissingLocals(refs);

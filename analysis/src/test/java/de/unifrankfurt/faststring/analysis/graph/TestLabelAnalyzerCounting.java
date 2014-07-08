@@ -17,10 +17,10 @@ public class TestLabelAnalyzerCounting {
 			.labelUse(3, 4)
 			.return_(4)
 			.create());
-				
+
 		assertNotNull(graph.get(3).getLabel());
 		assertNotNull(graph.get(4).getLabel());
-		
+
 		assertTrue(graph.get(3).isDefinitionConversionToOpt());
 		assertList(graph.get(4).getUseConversionsFromOpt(), 0);
 	}
@@ -34,16 +34,17 @@ public class TestLabelAnalyzerCounting {
 			.phi(4, 1, 3)
 			.labelUse(4, 5)
 			.create());
-		
+
 		assertNotNull(graph.get(2).getLabel());
 		assertNotNull(graph.get(3).getLabel());
 		assertNotNull(graph.get(4).getLabel());
 		assertNotNull(graph.get(5).getLabel());
-		
+
 		assertList(graph.get(1).getUseConversionsToOpt(), 0);
 		assertTrue(graph.get(2).isDefinitionConversionToOpt());
+		assertFalse(graph.get(2).isDefinitionConversionFromOpt());
 	}
-	
+
 	@Test
 	public void testPhiWithLoop() throws Exception {
 		DataFlowGraph graph = analyze(
@@ -57,12 +58,12 @@ public class TestLabelAnalyzerCounting {
 			.return_(6)
 			.create()
 			);
-		
+
 		assertNotNull(graph.get(3).getLabel());
 		assertNotNull(graph.get(4).getLabel());
 		assertNotNull(graph.get(5).getLabel());
 		assertNotNull(graph.get(6).getLabel());
-	
+
 		assertList(graph.get(1).getUseConversionsToOpt(), 0);
 		assertList(graph.get(2).getUseConversionsToOpt(), 0);
 		assertList(graph.get(6).getUseConversionsFromOpt(), 0);
@@ -72,5 +73,5 @@ public class TestLabelAnalyzerCounting {
 		LabelAnalyzer.analyzeLabel(graph, new CountingStrategy());
 		return graph;
 	}
-	
+
 }

@@ -40,7 +40,7 @@ public class TransformationInfo {
 		Multimap<Integer, InstructionNode> defMap = HashMultimap.create();
 		Multimap<Integer, InstructionNode> bc2Use = HashMultimap.create();
 
-		defConversations = ImmutableSet.copyOf(GraphUtil.extractDefConversionsToOpt(result.getRefs()));
+		defConversations = ImmutableSet.copyOf(GraphUtil.extractReferencesWithDefConversionsToOpt(result.getRefs()));
 
 
 //		Collection<Set<Use>> values = GraphUtil.extractUsageConversions(result.getRefs()).values();

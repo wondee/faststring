@@ -2,12 +2,16 @@ package de.unifrankfurt.faststring.analysis.util;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.Maps;
 
 import de.unifrankfurt.faststring.analysis.graph.DataFlowGraph;
+import de.unifrankfurt.faststring.analysis.graph.InstructionNode;
 import de.unifrankfurt.faststring.analysis.graph.Reference;
 
 
@@ -19,21 +23,29 @@ public class GraphUtil {
 			return input.getRef();
 		}
 	};
-	
-	private static class IntToReference implements Function<Integer, Reference> {
-		
-		private DataFlowGraph graph;
-		
-		public IntToReference(DataFlowGraph graph) {
-			this.graph = graph;
-		}
+
+
+	public static final Function<Reference, InstructionNode> referenceToDefinition = new Function<Reference, InstructionNode>() {
 		@Override
-		public Reference apply(Integer i) {
-			return graph.get(i);
+		public InstructionNode apply(Reference input) {
+			return input.getDefinition();
 		}
-		
-	}
-	
+	};
+
+	public static final Function<Reference, Set<Integer>> referenceToUsageConversationToOpt = new Function<Reference, Set<Integer>>() {
+		@Override
+		public Set<Integer> apply(Reference input) {
+			return input.getUseConversionsToOpt();
+		}
+	};
+
+	public static final Function<Reference, Set<Integer>> referenceToUsageConversationFromOpt = new Function<Reference, Set<Integer>>() {
+		@Override
+		public Set<Integer> apply(Reference input) {
+			return input.getUseConversionsFromOpt();
+		}
+	};
+
 	private static final Predicate<Reference> isDefinitionConversationToOpt = new Predicate<Reference>() {
 		@Override
 		public boolean apply(Reference input) {
@@ -41,53 +53,89 @@ public class GraphUtil {
 		}
 	};
 
-//	private static Predicate<Reference> isUsesConversation =new Predicate<Reference>() {
-//		@Override
-//		public boolean apply(Reference input) {
-//			return !input.getUseConversionsFromOpt().isEmpty();
-//		}
-//	};
-	
+
+	private static final Predicate<Reference> isDefinitionConversationFromOpt = new Predicate<Reference>() {
+		@Override
+		public boolean apply(Reference input) {
+			return input.isDefinitionConversionFromOpt();
+		}
+	};
+
+
+	private static Predicate<Reference> isUseConversationToOpt = new Predicate<Reference>() {
+		@Override
+		public boolean apply(Reference input) {
+			return !input.getUseConversionsToOpt().isEmpty();
+		}
+	};
+
+
+	private static Predicate<Reference> isUseConversationFromOpt = new Predicate<Reference>() {
+		@Override
+		public boolean apply(Reference input) {
+			return !input.getUseConversionsFromOpt().isEmpty();
+		}
+	};
+
 	public static Collection<Integer> extractIntsFromStringReferences(Collection<Reference> refs) {
 		return Collections2.transform(refs, referenceToInt);
 	}
 
-	public static Collection<Reference> extractDefConversionsToOpt(Collection<Reference> candidates) {
-		return Collections2.filter(candidates, isDefinitionConversationToOpt);		
+	public static Collection<Reference> extractReferencesWithDefConversionsToOpt(Collection<Reference> candidates) {
+		return Collections2.filter(candidates, isDefinitionConversationToOpt);
 	}
-	
-	public static Iterable<Integer> extractDefConversionsToOptAsInt(Collection<Reference> candidates) {
-		return extractIntsFromStringReferences(extractDefConversionsToOpt(candidates));
+
+	public static Collection<Reference> extractReferencesWithDefConversionsFromOpt(Collection<Reference> candidates) {
+		return Collections2.filter(candidates, isDefinitionConversationFromOpt);
 	}
-	
-	
-	
-//	public static Map<Integer, Set<Use>> extractUsageConversions(Collection<Reference> finalRefs) {
-//		
-//		Collection<Reference> refsWithUseConversation = Collections2.filter(finalRefs, isUsesConversation);
-//		Builder<Integer, Set<Use>> builder = new ImmutableMap.Builder<Integer, Set<Use>>();
-//		
-//		for (Reference ref : refsWithUseConversation) {
-//			Set<Use> useConversations = Sets.newHashSet();
-//			
-//			for (int useId : ref.getUseConversionsFromOpt()) {
-//				useConversations.add(ref.getUses().get(useId));
-//			}
-//			
-//			builder.put(ref.getRef(), useConversations);
-//		}
-//		
-//		return builder.build();
-//		
-//	}
-//
-//	public static Collection<Integer> extractUsageConversionsRefIds(Collection<Reference> refs) {
-//		return extractUsageConversions(refs).keySet();
-//	}
+
+	public static Iterable<Integer> extractReferencesWithDefConversionsToOptAsInt(Collection<Reference> candidates) {
+		return extractIntsFromStringReferences(extractReferencesWithDefConversionsToOpt(candidates));
+	}
+
+	public static Iterable<Integer> extractReferencesWithDefConversionsFromOptAsInt(Collection<Reference> candidates) {
+		return extractIntsFromStringReferences(extractReferencesWithDefConversionsFromOpt(candidates));
+	}
+
+	public static Map<Integer, InstructionNode> extractDefConversionsFromOpt(Collection<Reference> candidates) {
+		return filterAndCreateMap(candidates, isDefinitionConversationFromOpt, referenceToDefinition);
+	}
+
+	public static Map<Integer, InstructionNode> extractDefConversionsToOpt(Collection<Reference> candidates) {
+		return filterAndCreateMap(candidates, isDefinitionConversationToOpt, referenceToDefinition);
+	}
+
+	public static Map<Integer, Set<Integer>> extractUseConversationsToOpt(Collection<Reference> candidates) {
+		return filterAndCreateMap(candidates, isUseConversationToOpt, referenceToUsageConversationToOpt);
+	}
+
+	private static <T> Map<Integer, T> filterAndCreateMap(Iterable<Reference> refs, Predicate<Reference> filter, Function<Reference, T> function) {
+		Map<Integer, T> defMap = Maps.newHashMap();
+
+		for (Reference ref : refs) {
+			defMap.put(ref.valueNumber(), function.apply(ref));
+		}
+
+		return defMap;
+	}
 
 	public static Collection<Reference> findReferenceForValueNumbers(
 			DataFlowGraph graph, List<Integer> refs) {
 		return Collections2.transform(refs, new IntToReference(graph));
+	}
+
+	private static class IntToReference implements Function<Integer, Reference> {
+
+		private DataFlowGraph graph;
+
+		public IntToReference(DataFlowGraph graph) {
+			this.graph = graph;
+		}
+		@Override
+		public Reference apply(Integer i) {
+			return graph.get(i);
+		}
+
 	}
 
 

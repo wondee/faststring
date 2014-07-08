@@ -23,7 +23,7 @@ public class TestLabelAnalyzerIntegration extends BaseAnalysisTest {
 		Collection<Reference> candidates = getAnalysisResult("simpleIfSubstring");
 
 		assertList(GraphUtil.extractIntsFromStringReferences(candidates), 4, 5, 9, 16, 22, 23);
-		assertList(GraphUtil.extractDefConversionsToOptAsInt(candidates), 4, 5);
+		assertList(GraphUtil.extractReferencesWithDefConversionsToOptAsInt(candidates), 4, 5);
 //		assertList(GraphUtil.extractUsageConversionsRefIds(candidates), 9, 16, 23);
 
 	}
@@ -33,7 +33,7 @@ public class TestLabelAnalyzerIntegration extends BaseAnalysisTest {
 		Collection<Reference> candidates = getAnalysisResult("returnOfUsed");
 
 		assertList(GraphUtil.extractIntsFromStringReferences(candidates), 4, 7);
-		assertList(GraphUtil.extractDefConversionsToOptAsInt(candidates), 4);
+		assertList(GraphUtil.extractReferencesWithDefConversionsToOptAsInt(candidates), 4);
 //		assertList(GraphUtil.extractUsageConversionsRefIds(candidates), 4, 7);
 
 	}
@@ -53,7 +53,7 @@ public class TestLabelAnalyzerIntegration extends BaseAnalysisTest {
 		Collection<Reference> candidates = getAnalysisResult("phiLoop");
 
 		assertList(GraphUtil.extractIntsFromStringReferences(candidates), 4, 5, 7, 10, 11);
-		assertList(GraphUtil.extractDefConversionsToOptAsInt(candidates), 4, 5);
+		assertList(GraphUtil.extractReferencesWithDefConversionsToOptAsInt(candidates), 4, 5);
 //		assertList(GraphUtil.extractUsageConversionsRefIds(candidates), 11);
 
 	}
