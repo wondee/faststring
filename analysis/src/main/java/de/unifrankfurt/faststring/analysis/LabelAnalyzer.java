@@ -61,8 +61,8 @@ public class LabelAnalyzer extends BaseQueueProcessingStrategy<Reference>{
 
 			if (LOG.isDebugEnabled() && finalRefs.size() > 0) {
 				LOG.debug("found possible references: {}", GraphUtil.extractIntsFromStringReferences(finalRefs));
-				LOG.debug("definition conversion to opt is needed for: {}", StringUtil.toStringMap(GraphUtil.extractDefConversionsToOpt(finalRefs)));
-				LOG.debug("definition conversion from opt is needed for: {}", StringUtil.toStringMap(GraphUtil.extractDefConversionsFromOpt(finalRefs)));
+				LOG.debug("definition conversion to opt is needed for: {}", StringUtil.toStringMap(GraphUtil.extractDefConversionsToOpt(finalRefs, graph.getLabel())));
+				LOG.debug("definition conversion from opt is needed for: {}", StringUtil.toStringMap(GraphUtil.extractDefConversionsFromOpt(finalRefs, graph.getLabel())));
 //				LOG.debug("usage conversion needed for: {}", StringUtil.toStringMap(GraphUtil.extractUsageConversionsToOpt(finalRefs)));
 			}
 
@@ -88,9 +88,9 @@ public class LabelAnalyzer extends BaseQueueProcessingStrategy<Reference>{
 				if (!phis.contains(phi)) {
 
 					phis.add(phi);
-					Collection<Integer> connectedRefs = phi.getConnectedRefs(ref.getRef());
+					Collection<Integer> connectedRefs = phi.getConnectedRefs(ref.valueNumber());
 
-					connectedRefs.remove(ref.getRef());
+					connectedRefs.remove(ref.valueNumber());
 					Collection<Reference> refs = Collections2.transform(connectedRefs,
 							valueNumberToReference);
 
@@ -99,10 +99,10 @@ public class LabelAnalyzer extends BaseQueueProcessingStrategy<Reference>{
 			} else {
 				final TypeLabel label = graph.getLabel();
 
-				if (o.isCompatibleWith(label, ref.getRef())) {
+				if (o.isCompatibleWith(label, ref.valueNumber())) {
 					o.setLabel(label);
 					LOG.trace("inspecting {}", o);
-					for (Integer connectedRefId : o.getConnectedRefs(label, ref.getRef())) {
+					for (Integer connectedRefId : o.getConnectedRefs(label, ref.valueNumber())) {
 						Reference connectedRef = graph.get(connectedRefId);
 						if (connectedRef.getLabel() == null) {
 							LOG.trace("setting label to {}", connectedRef);
@@ -127,10 +127,10 @@ public class LabelAnalyzer extends BaseQueueProcessingStrategy<Reference>{
 			}
 		}
 
-		for (Reference ref : graph.getReferences()) {
-			ref.createBarriers();
-
-		}
+//		for (Reference ref : graph.getReferences()) {
+//			ref.createBarriers();
+//
+//		}
 	}
 
 

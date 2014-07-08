@@ -1,13 +1,13 @@
 package de.unifrankfurt.faststring.analysis.util;
 
-import static de.unifrankfurt.faststring.analysis.utils.TestUtilities.assertList;
+import static de.unifrankfurt.faststring.utils.TestUtilities.assertList;
 
 import java.util.Collection;
 
 import org.junit.Ignore;
 import org.junit.Test;
 
-import de.unifrankfurt.faststring.analysis.utils.BaseAnalysisTest;
+import de.unifrankfurt.faststring.utils.BaseAnalysisTest;
 
 public class TestIRUtil extends BaseAnalysisTest {
 

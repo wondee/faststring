@@ -32,7 +32,7 @@ public class MethodAnalyzer {
 
 //		calculateMissingLocals(refs);
 
-		AnalysisResult analysisResult = new AnalysisResult(refs, method.getMaxLocals(), label);
+		AnalysisResult analysisResult = new AnalysisResult(refs, method.getMaxLocals(), label, method.getMethodName());
 
 		return analysisResult;
 	}

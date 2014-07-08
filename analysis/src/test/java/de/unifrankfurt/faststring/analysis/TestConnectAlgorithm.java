@@ -6,7 +6,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import de.unifrankfurt.faststring.analysis.util.IRUtil;
-import de.unifrankfurt.faststring.analysis.utils.BaseAnalysisTest;
+import de.unifrankfurt.faststring.utils.BaseAnalysisTest;
 
 /**
  * test for {@link IRUtil#isConnected(com.ibm.wala.ssa.IR, int, com.ibm.wala.ssa.SSAInstruction)}

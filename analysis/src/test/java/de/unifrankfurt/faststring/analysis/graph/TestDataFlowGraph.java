@@ -1,6 +1,6 @@
 package de.unifrankfurt.faststring.analysis.graph;
 
-import static de.unifrankfurt.faststring.analysis.utils.TestUtilities.assertList;
+import static de.unifrankfurt.faststring.utils.TestUtilities.assertList;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -15,7 +15,7 @@ import com.ibm.wala.ssa.IR;
 import de.unifrankfurt.faststring.analysis.IRMethod;
 import de.unifrankfurt.faststring.analysis.label.BuiltInTypes;
 import de.unifrankfurt.faststring.analysis.util.GraphUtil;
-import de.unifrankfurt.faststring.analysis.utils.BaseAnalysisTest;
+import de.unifrankfurt.faststring.utils.BaseAnalysisTest;
 
 public class TestDataFlowGraph extends BaseAnalysisTest {
 

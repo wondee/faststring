@@ -1,12 +1,13 @@
 package de.unifrankfurt.faststring.analysis.graph;
 
 import static org.junit.Assert.*;
-import static de.unifrankfurt.faststring.analysis.utils.TestUtilities.*;
+import static de.unifrankfurt.faststring.utils.TestUtilities.*;
 
 import org.junit.Test;
 
 import de.unifrankfurt.faststring.analysis.CountingStrategy;
 import de.unifrankfurt.faststring.analysis.LabelAnalyzer;
+import de.unifrankfurt.faststring.analysis.label.BuiltInTypes;
 
 public class TestLabelAnalyzerCounting {
 
@@ -21,8 +22,8 @@ public class TestLabelAnalyzerCounting {
 		assertNotNull(graph.get(3).getLabel());
 		assertNotNull(graph.get(4).getLabel());
 
-		assertTrue(graph.get(3).isDefinitionConversionToOpt());
-		assertList(graph.get(4).getUseConversionsFromOpt(), 0);
+		assertTrue(graph.get(3).isDefinitionConversionToOpt(BuiltInTypes.SUBSTRING));
+		assertList(graph.get(4).getUseConversionsFromOpt(BuiltInTypes.SUBSTRING), 0);
 	}
 
 	@Test
@@ -40,9 +41,9 @@ public class TestLabelAnalyzerCounting {
 		assertNotNull(graph.get(4).getLabel());
 		assertNotNull(graph.get(5).getLabel());
 
-		assertList(graph.get(1).getUseConversionsToOpt(), 0);
-		assertTrue(graph.get(2).isDefinitionConversionToOpt());
-		assertFalse(graph.get(2).isDefinitionConversionFromOpt());
+		assertList(graph.get(1).getUseConversionsToOpt(BuiltInTypes.SUBSTRING), 0);
+		assertTrue(graph.get(2).isDefinitionConversionToOpt(BuiltInTypes.SUBSTRING));
+		assertFalse(graph.get(2).isDefinitionConversionFromOpt(BuiltInTypes.SUBSTRING));
 	}
 
 	@Test
@@ -64,9 +65,9 @@ public class TestLabelAnalyzerCounting {
 		assertNotNull(graph.get(5).getLabel());
 		assertNotNull(graph.get(6).getLabel());
 
-		assertList(graph.get(1).getUseConversionsToOpt(), 0);
-		assertList(graph.get(2).getUseConversionsToOpt(), 0);
-		assertList(graph.get(6).getUseConversionsFromOpt(), 0);
+		assertList(graph.get(1).getUseConversionsToOpt(BuiltInTypes.SUBSTRING), 0);
+		assertList(graph.get(2).getUseConversionsToOpt(BuiltInTypes.SUBSTRING), 0);
+		assertList(graph.get(6).getUseConversionsFromOpt(BuiltInTypes.SUBSTRING), 0);
 	}
 
 	private DataFlowGraph analyze(DataFlowGraph graph) {

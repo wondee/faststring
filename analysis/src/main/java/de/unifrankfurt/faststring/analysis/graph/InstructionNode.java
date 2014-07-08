@@ -5,23 +5,20 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 
 import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 
-public abstract class InstructionNode {
+public abstract class InstructionNode implements Labelable {
 	private TypeLabel label;
 	private int byteCodeIndex = -1;
-	
-	private Collection<Integer> localVariableIndex = ImmutableList.of();
-	
-	private Map<Integer, Collection<Integer>> localMap = Maps.newHashMap();
-	
+
+	protected Map<Integer, Collection<Integer>> localMap = Maps.newHashMap();
+
 	public List<Integer> getConnectedRefs(TypeLabel label, int inV) {
 		return ImmutableList.of();
 	}
-	
+
 	public boolean isCompatibleWith(TypeLabel label, int inV) {
 		if (label == null) {
 			if (this.label == null) {
@@ -30,52 +27,75 @@ public abstract class InstructionNode {
 				return isCompatibleWithNullLabel(label, inV);
 			}
 		} else {
-			if (this.label == null) {				
-				return isCompatibleWithActual(label, inV);				
+			if (this.label == null) {
+				return isCompatibleWithActual(label, inV);
 			} else {
 				return this.label.compatibleWith(label);
 			}
-			
+
 		}
 	}
-	
+
 	protected boolean isCompatibleWithNullLabel(TypeLabel label, int inV) {
 		return false;
 	}
 
 	protected boolean isCompatibleWithActual(TypeLabel label, int inV) {
-		return this.label == label; 
+		return this.label == label;
 	}
-	
+
 	public void setByteCodeIndex(int index) {
 		this.byteCodeIndex = index;
 	}
-	
+
 	public int getByteCodeIndex() {
 		return byteCodeIndex;
 	}
 
-	public void setLocalVariableIndices(Collection<Integer> localVariableIndex) {
-		this.localVariableIndex = ImmutableSet.copyOf(localVariableIndex);
-	}
-
-	public Collection<Integer> getLocalVariableIndex() {
-		return localVariableIndex;
-	}
-	
-	public void setLabel(TypeLabel label) {
-		this.label = label;
-	}
-	
-	public TypeLabel getLabel() {
-		return label;
-	}
-	
-	public boolean isLabel(TypeLabel label) {
-		return this.label == label;
+	public Collection<Integer> getLocalVariableIndex(Integer v) {
+		return localMap.get(v);
 	}
 
 	public void addLocalVariableIndices(int v, Collection<Integer> locals) {
-		assert localMap.put(v, locals) == null;
+		if (!localMap.containsKey(v)) {
+			localMap.put(v, locals);
+		} else {
+			localMap.get(v).addAll(locals);
+		}
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.unifrankfurt.faststring.analysis.graph.Labelable#setLabel(de.unifrankfurt
+	 * .faststring.analysis.label.TypeLabel)
+	 */
+	@Override
+	public void setLabel(TypeLabel label) {
+		this.label = label;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.unifrankfurt.faststring.analysis.graph.Labelable#getLabel()
+	 */
+	@Override
+	public TypeLabel getLabel() {
+		return label;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.unifrankfurt.faststring.analysis.graph.Labelable#isLabel(de.unifrankfurt
+	 * .faststring.analysis.label.TypeLabel)
+	 */
+	@Override
+	public boolean isLabel(TypeLabel label) {
+		return this.label == label;
 	}
 }

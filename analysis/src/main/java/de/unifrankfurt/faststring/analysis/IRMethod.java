@@ -1,5 +1,6 @@
 package de.unifrankfurt.faststring.analysis;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
@@ -12,9 +13,12 @@ import com.google.common.collect.Sets;
 import com.google.common.primitives.Ints;
 import com.ibm.wala.classLoader.IBytecodeMethod;
 import com.ibm.wala.classLoader.ShrikeCTMethod;
+import com.ibm.wala.shrikeBT.IInstruction;
 import com.ibm.wala.shrikeCT.InvalidClassFileException;
 import com.ibm.wala.ssa.DefUse;
 import com.ibm.wala.ssa.IR;
+import com.ibm.wala.ssa.ISSABasicBlock;
+import com.ibm.wala.ssa.SSACFG;
 import com.ibm.wala.ssa.SSAInstruction;
 
 import de.unifrankfurt.faststring.analysis.util.IRUtil;
@@ -29,7 +33,6 @@ public class IRMethod {
 
 	private Map<SSAInstruction, Integer> instructionToIndexMap;
 
-
 	public IRMethod(IR ir, DefUse defUse) {
 		this.ir = ir;
 		this.defUse = defUse;
@@ -43,8 +46,8 @@ public class IRMethod {
 		return instructionToIndexMap.get(instruction);
 	}
 
-	public String getMethodSignature() {
-		return ir.getMethod().getSignature();
+	public String getMethodName() {
+		return ir.getMethod().getName().toString();
 	}
 
 	public SSAInstruction getDef(int v) {
@@ -114,7 +117,37 @@ public class IRMethod {
 
 	public Set<Integer> findAllUsesPhiPointer(Integer ref) {
 		return IRUtil.findAllUsesPointersFor(defUse, ref);
-
 	}
+
+	public IInstruction[] getRemainingInstructionsOfBlock(SSAInstruction instruction) {		
+		try {
+			
+			int from = getIndexFor(instruction) + 1;
+			int to = findLastIndexBeforeBranch(instruction);
+			
+			if (from < to) {
+				return Arrays.copyOfRange(
+						((IBytecodeMethod)ir.getMethod()).getInstructions(), from, to);
+			} else {
+				return new IInstruction[0];
+			}
+		} catch (InvalidClassFileException e) {
+			throw new IllegalStateException(e);
+		}
+		
+		
+	}
+
+	private int findLastIndexBeforeBranch(SSAInstruction instruction) {
+		ISSABasicBlock block = ir.getBasicBlockForInstruction(instruction);
+		SSACFG cfg = ir.getControlFlowGraph();
+		
+		while (cfg.getSuccNodeCount(block) == 2) {
+			block = cfg.getSuccNodes(block).next(); 
+		}
+		
+		return block.getLastInstructionIndex();
+	}
+
 
 }

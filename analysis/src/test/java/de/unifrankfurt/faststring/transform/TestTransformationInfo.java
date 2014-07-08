@@ -1,14 +1,16 @@
 package de.unifrankfurt.faststring.transform;
 
-import static de.unifrankfurt.faststring.analysis.utils.TestUtilities.assertList;
+import static de.unifrankfurt.faststring.utils.TestUtilities.assertList;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import de.unifrankfurt.faststring.analysis.AnalysisResult;
 import de.unifrankfurt.faststring.analysis.MethodAnalyzer;
 import de.unifrankfurt.faststring.analysis.label.BuiltInTypes;
-import de.unifrankfurt.faststring.analysis.utils.BaseAnalysisTest;
+import de.unifrankfurt.faststring.utils.BaseAnalysisTest;
 
+@Ignore 
 public class TestTransformationInfo extends BaseAnalysisTest  {
 	private static final String TEST_CLASS = "MethodAnalyzerTestClass";
 	

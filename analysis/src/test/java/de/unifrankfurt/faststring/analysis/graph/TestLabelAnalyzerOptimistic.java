@@ -1,6 +1,6 @@
 package de.unifrankfurt.faststring.analysis.graph;
 
-import static de.unifrankfurt.faststring.analysis.utils.TestUtilities.assertList;
+import static de.unifrankfurt.faststring.utils.TestUtilities.assertList;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import de.unifrankfurt.faststring.analysis.LabelAnalyzer;
 import de.unifrankfurt.faststring.analysis.OptimisticStrategy;
+import de.unifrankfurt.faststring.analysis.label.BuiltInTypes;
 
 public class TestLabelAnalyzerOptimistic {
 	@Test
@@ -21,8 +22,8 @@ public class TestLabelAnalyzerOptimistic {
 		assertNotNull(graph.get(3).getLabel());
 		assertNotNull(graph.get(4).getLabel());
 		
-		assertTrue(graph.get(3).isDefinitionConversionToOpt());
-		assertList(graph.get(4).getUseConversionsFromOpt(), 0);
+		assertTrue(graph.get(3).isDefinitionConversionToOpt(BuiltInTypes.SUBSTRING));
+		assertList(graph.get(4).getUseConversionsFromOpt(BuiltInTypes.SUBSTRING), 0);
 	}
 
 	@Test
@@ -40,8 +41,8 @@ public class TestLabelAnalyzerOptimistic {
 		assertNotNull(graph.get(4).getLabel());
 		assertNotNull(graph.get(5).getLabel());
 		
-		assertList(graph.get(1).getUseConversionsToOpt(), 0);
-		assertTrue(graph.get(2).isDefinitionConversionToOpt());
+		assertList(graph.get(1).getUseConversionsToOpt(BuiltInTypes.SUBSTRING), 0);
+		assertTrue(graph.get(2).isDefinitionConversionToOpt(BuiltInTypes.SUBSTRING));
 	}
 	
 	@Test
@@ -63,9 +64,9 @@ public class TestLabelAnalyzerOptimistic {
 		assertNotNull(graph.get(5).getLabel());
 		assertNotNull(graph.get(6).getLabel());
 	
-		assertList(graph.get(1).getUseConversionsToOpt(), 0);
-		assertList(graph.get(2).getUseConversionsToOpt(), 0);
-		assertList(graph.get(6).getUseConversionsFromOpt(), 0);
+		assertList(graph.get(1).getUseConversionsToOpt(BuiltInTypes.SUBSTRING), 0);
+		assertList(graph.get(2).getUseConversionsToOpt(BuiltInTypes.SUBSTRING), 0);
+		assertList(graph.get(6).getUseConversionsFromOpt(BuiltInTypes.SUBSTRING), 0);
 	}
 
 	private DataFlowGraph analyze(DataFlowGraph graph) {

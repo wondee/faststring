@@ -11,8 +11,8 @@ import de.unifrankfurt.faststring.analysis.MethodAnalyzer;
 import de.unifrankfurt.faststring.analysis.TargetApplication;
 import de.unifrankfurt.faststring.analysis.label.BuiltInTypes;
 import de.unifrankfurt.faststring.analysis.util.StringUtil;
-import de.unifrankfurt.faststring.analysis.utils.TestUtilities;
 import de.unifrankfurt.faststring.transform.JarManager;
+import de.unifrankfurt.faststring.utils.TestUtilities;
 
 public class ShrikeTest {
 

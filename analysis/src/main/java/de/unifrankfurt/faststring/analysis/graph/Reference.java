@@ -1,5 +1,6 @@
 package de.unifrankfurt.faststring.analysis.graph;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -14,7 +15,7 @@ import com.google.common.collect.Sets;
 import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 
 
-public class Reference {
+public class Reference implements Labelable {
 
 	private int v;
 
@@ -23,12 +24,6 @@ public class Reference {
 	private List<InstructionNode> uses = Lists.newLinkedList();
 
 	private TypeLabel label = null;
-
-	private boolean definitionConversionToOpt = false;
-	private boolean definitionConversionFromOpt = false;
-	
-	private Set<Integer> useConversionsToOpt = Sets.newHashSet();
-	private Set<Integer> useConversionsFromOpt = Sets.newHashSet();
 
 	public Reference(int ref) {
 		Preconditions.checkArgument(ref > 0, "valueNumber must be greater than 0");
@@ -42,11 +37,6 @@ public class Reference {
 		this.label = label;
 	}
 
-
-	public int valueNumber() {
-		return v;
-	}
-
 	public void setDefinition(InstructionNode instructionNode) {
 		this.definition = instructionNode;
 	}
@@ -55,12 +45,13 @@ public class Reference {
 		return definition;
 	}
 	
-
+	@Override
 	public void setLabel(TypeLabel label) {
 		this.label = label;
 
 	}
 
+	@Override
 	public TypeLabel getLabel() {
 		return label;
 	}
@@ -69,60 +60,74 @@ public class Reference {
 		return uses;
 	}
 
-	public Integer getRef() {
+	public Integer valueNumber() {
 		return v;
 	}
 
-	public boolean isDefinitionConversionToOpt() {
-		return definitionConversionToOpt;
-	}
-
-	public boolean isDefinitionConversionFromOpt() {
-		return definitionConversionFromOpt;
-	}
-
-	public Set<Integer> getUseConversionsFromOpt() {
-		return useConversionsFromOpt;
-	}
-
-	public Set<Integer> getUseConversionsToOpt() {
-		return useConversionsToOpt;
-	}
-	
 	void setUses(List<InstructionNode> uses) {
 		this.uses = ImmutableList.copyOf(uses);
 	}
 
 
-	public void createBarriers() {
-		checkDefinitionBarrier();
-		checkUseBarriers();
+	public boolean isDefinitionConversionToOpt(TypeLabel label) {
+		return isLabel(label) && !definition.isLabel(label);
+	}
+
+	public boolean isDefinitionConversionFromOpt(TypeLabel label) {
+		return !isLabel(label) && definition.isLabel(label);
+	}
+
+	public Collection<Integer> getUseConversionsFromOpt(TypeLabel label) {
+		Set<Integer> convs = Sets.newHashSet();
 		
-	}
-	
-	private void checkDefinitionBarrier() {
-		if (!definition.isLabel(label)) {
-			if (label == null) {
-				definitionConversionFromOpt = true;
-			} else {
-				definitionConversionToOpt = true;
-			}
-		}
-	}
-	
-	private void checkUseBarriers() {
 		for (int i = 0; i < uses.size(); i++) {
 			InstructionNode use = uses.get(i);
-			
-			if (!use.isLabel(label)) {
-				if (label == null) {
-					useConversionsToOpt.add(i);
-				} else {
-					useConversionsFromOpt.add(i);
-				}
+			if (isLabel(label) && !use.isLabel(label)) {
+				convs.add(i);
 			}
 		}
+		
+		return convs;
 	}
+
+	public Collection<Integer> getUseConversionsToOpt(TypeLabel label) {
+		Set<Integer> convs = Sets.newHashSet();
+		
+		for (int i = 0; i < uses.size(); i++) {
+			InstructionNode use = uses.get(i);
+			if (!isLabel(label) && use.isLabel(label)) {
+				convs.add(i);
+			}
+		}
+		
+		return convs;
+	}
+	
+	
+//	
+//	private void checkDefinitionBarrier() {
+//		if (!definition.isLabel(label)) {
+//			if (label == null) {
+//				definitionConversionFromOpt = true;
+//			} else {
+//				definitionConversionToOpt = true;
+//			}
+//		}
+//	}
+//	
+//	private void checkUseBarriers() {
+//		for (int i = 0; i < uses.size(); i++) {
+//			InstructionNode use = uses.get(i);
+//			
+//			if (!use.isLabel(label)) {
+//				if (label == null) {
+//					useConversionsToOpt.add(i);
+//				} else {
+//					useConversionsFromOpt.add(i);
+//				}
+//			}
+//		}
+//	}
 	
 
 	void setUsesMutable(LinkedList<InstructionNode> uses) {
@@ -177,10 +182,10 @@ public class Reference {
 	}
 
 
-
-
-
-
+	@Override
+	public boolean isLabel(TypeLabel label) {
+		return this.label == label;
+	}
 
 
 

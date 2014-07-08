@@ -1,5 +1,8 @@
 package de.unifrankfurt.faststring.transform;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.ibm.wala.shrikeBT.MethodData;
 import com.ibm.wala.shrikeBT.MethodEditor;
 import com.ibm.wala.shrikeBT.analysis.Analyzer.FailureException;
@@ -15,9 +18,10 @@ import de.unifrankfurt.faststring.transform.patches.PatchFactory;
 
 public class MethodTransformer {
 
+	private static final Logger LOG = LoggerFactory.getLogger(MethodTransformer.class);
+	
 	public void transformMethod(MethodData methodData, TransformationInfo transformationInfo) {
-		System.out.println("editing: " + methodData.getName());
-
+		LOG.info("editing: {}", methodData.getName());
 
 		MethodEditor editor = new MethodEditor(methodData);
 		editor.beginPass();
@@ -25,9 +29,6 @@ public class MethodTransformer {
 		PatchFactory patchFactory = new PatchFactory(transformationInfo, editor);
 
 		createConstants(patchFactory, editor, transformationInfo);
-
-
-//		editor.insertBefore(i, p);
 
 		try {
 			new Verifier(methodData).verify();
@@ -52,9 +53,7 @@ public class MethodTransformer {
 			InstructionNode definition = ref.getDefinition();
 			
 			if (definition instanceof ParameterDefinition) {
-				ParameterDefinition paramDef = (ParameterDefinition) definition;
-
-				for (Integer orgLocal : paramDef.getLocalVariableIndex()) {
+				for (Integer orgLocal : definition.getLocalVariableIndex(ref.valueNumber())) {
 					patchFactory.createOptConversation(orgLocal);
 				}
 			} else if (definition instanceof MethodCallInstruction) {
@@ -62,7 +61,7 @@ public class MethodTransformer {
 
 				System.out.println("local for call definition: " + callResultDef);
 
-				for (Integer local : callResultDef.getLocalVariableIndex()) {
+				for (Integer local : callResultDef.getLocalVariableIndex(ref.valueNumber())) {
 					patchFactory.createOptConversationFromStack(local, callResultDef.getByteCodeIndex());
 
 				}

@@ -1,4 +1,4 @@
-package de.unifrankfurt.faststring.analysis.utils;
+package de.unifrankfurt.faststring.utils;
 
 import java.io.IOException;
 

@@ -150,7 +150,7 @@ public class MethodCallInstruction extends InstructionNode {
 	@Override
 	public String toString() {
 		return "MethodCallInstruction [def=" + def + ", uses=" + uses
-				+ ", target=" + target + ", isStatic=" + isStatic + "]";
+				+ ", target=" + target + ", isStatic=" + isStatic + ", localVarIndex=" + localMap + " ]";
 	}
 	
 	

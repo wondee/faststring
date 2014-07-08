@@ -16,7 +16,7 @@ import com.ibm.wala.util.collections.Pair;
 
 import de.unifrankfurt.faststring.analysis.TargetApplication;
 import de.unifrankfurt.faststring.analysis.util.StringUtil;
-import de.unifrankfurt.faststring.analysis.utils.TestUtilities;
+import de.unifrankfurt.faststring.utils.TestUtilities;
 
 public class WalaTest {
 

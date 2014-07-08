@@ -1,4 +1,4 @@
-package de.unifrankfurt.faststring.analysis.utils;
+package de.unifrankfurt.faststring.utils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -49,7 +49,9 @@ public class PrintTestBytecode {
 			for (int i = 0; i < ci.getReader().getMethodCount(); i++) {
 				
 				MethodData methodData = ci.visitMethod(i);				
-				PrintWriter fileWriter = new PrintWriter(new FileOutputStream(classOut  + "." + methodData.getName()));
+				String name = methodData.getName().replace('<', '{').replace('>', '}');
+				
+				PrintWriter fileWriter = new PrintWriter(new FileOutputStream(classOut  + "." + name));
 				
 				LOG.info("writing bytecode for {}.{}", className, methodData.getName());
 				

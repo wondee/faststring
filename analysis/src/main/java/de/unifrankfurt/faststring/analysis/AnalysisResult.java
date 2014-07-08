@@ -21,10 +21,13 @@ public class AnalysisResult  {
 
 	private TypeLabel label;
 
-	public AnalysisResult(Collection<Reference> refs, int maxLocals, TypeLabel typeLabel) {
+	private String methodName;
+
+	public AnalysisResult(Collection<Reference> refs, int maxLocals, TypeLabel typeLabel, String methodName) {
 		this.refs = ImmutableSet.copyOf(refs);
 		this.maxLocals = maxLocals;
 		this.label = typeLabel;
+		this.methodName = methodName;
 	}
 
 
@@ -43,5 +46,9 @@ public class AnalysisResult  {
 
 	public TypeLabel getLabel() {
 		return label;
+	}
+
+	public String getMethodName() {
+		return methodName;
 	}
 }

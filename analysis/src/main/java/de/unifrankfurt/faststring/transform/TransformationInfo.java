@@ -16,6 +16,7 @@ import com.google.common.collect.Multimap;
 import de.unifrankfurt.faststring.analysis.AnalysisResult;
 import de.unifrankfurt.faststring.analysis.graph.ConstantDefinition;
 import de.unifrankfurt.faststring.analysis.graph.InstructionNode;
+import de.unifrankfurt.faststring.analysis.graph.Labelable;
 import de.unifrankfurt.faststring.analysis.graph.Reference;
 import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 import de.unifrankfurt.faststring.analysis.util.GraphUtil;
@@ -32,15 +33,18 @@ public class TransformationInfo {
 
 	private BiMap<Integer, Integer> org2opt;
 
+	private String methodName;
+
 //	private Multimap<Integer, Use> bc2Use;
 
 	public TransformationInfo(AnalysisResult result) {
 		label = result.getLabel();
+		methodName = result.getMethodName();
 
 		Multimap<Integer, InstructionNode> defMap = HashMultimap.create();
 		Multimap<Integer, InstructionNode> bc2Use = HashMultimap.create();
 
-		defConversations = ImmutableSet.copyOf(GraphUtil.extractReferencesWithDefConversionsToOpt(result.getRefs()));
+		defConversations = ImmutableSet.copyOf(GraphUtil.extractReferencesWithDefConversionsToOpt(result.getRefs(), label));
 
 
 //		Collection<Set<Use>> values = GraphUtil.extractUsageConversions(result.getRefs()).values();
@@ -49,13 +53,13 @@ public class TransformationInfo {
 		for (Reference ref : result.getRefs()) {
 			InstructionNode def = ref.getDefinition();
 
-			for (Integer id : def.getLocalVariableIndex()) {
+			for (Integer id : def.getLocalVariableIndex(ref.valueNumber())) {
 				defMap.put(id, def);
 			}
 
 
 			for (InstructionNode use : ref.getUses()) {
-				for (Integer id : use.getLocalVariableIndex()) {
+				for (Integer id : use.getLocalVariableIndex(ref.valueNumber())) {
 					defMap.put(id, use);
 				}
 
@@ -86,10 +90,10 @@ public class TransformationInfo {
 
 
 		for (Reference ref : result.getRefs()) {
-			InstructionNode def = ref.getDefinition();
+			Labelable def = ref.getDefinition();
 
 			if (def instanceof ConstantDefinition) {
-				map.put(ref.getRef(), new Constant((((ConstantDefinition)def).getValue()), maxLocals));
+				map.put(ref.valueNumber(), new Constant((((ConstantDefinition)def).getValue()), maxLocals));
 			}
 
 			maxLocals++;
@@ -155,5 +159,9 @@ public class TransformationInfo {
 
 	public int getOptLocal(Integer orgLocal) {
 		return org2opt.get(orgLocal);
+	}
+
+	public String getMethodName() {
+		return methodName;
 	}
 }

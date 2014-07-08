@@ -1,4 +1,4 @@
-package de.unifrankfurt.faststring.analysis.utils;
+package de.unifrankfurt.faststring.utils;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -12,8 +12,11 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.ImmutableMap.Builder;
 import com.ibm.wala.classLoader.IClass;
 import com.ibm.wala.classLoader.IMethod;
+import com.ibm.wala.classLoader.ShrikeClass;
 import com.ibm.wala.ipa.cha.ClassHierarchy;
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
+import com.ibm.wala.shrikeBT.shrikeCT.ClassInstrumenter;
+import com.ibm.wala.shrikeCT.InvalidClassFileException;
 import com.ibm.wala.ssa.DefUse;
 import com.ibm.wala.ssa.IR;
 
@@ -120,5 +123,15 @@ public abstract class BaseAnalysisTest {
 	
 	public static TargetApplication getTargetApplication() {
 		return targetApplication;
+	}
+	
+	protected static ClassInstrumenter getClassInstrumenter(String className) {
+		ShrikeClass shrikeClass = (ShrikeClass) lookUpClass(className);
+		
+		try {
+			return new ClassInstrumenter(className, shrikeClass.getReader());
+		} catch (InvalidClassFileException e) {
+			throw new IllegalStateException(e);
+		}
 	}
 }
