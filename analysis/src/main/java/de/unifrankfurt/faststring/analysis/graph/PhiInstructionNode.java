@@ -2,8 +2,10 @@ package de.unifrankfurt.faststring.analysis.graph;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.ibm.wala.ssa.SSAPhiInstruction;
 
 import de.unifrankfurt.faststring.analysis.label.TypeLabel;
@@ -25,7 +27,7 @@ public class PhiInstructionNode extends InstructionNode {
 
 	@Override
 	public String toString() {
-		return "PhiNode [def=" + def + ", uses=" + uses + "]";
+		return "PhiNode [def=" + def + ", uses=" + uses + ", bcIndex=" + getByteCodeIndex() + ", localMap=" + localMap + "]";
 	}
 
 	@Override
@@ -50,4 +52,5 @@ public class PhiInstructionNode extends InstructionNode {
 	public void visit(Visitor visitor) {
 		visitor.visitPhi(this);
 	}
+
 }

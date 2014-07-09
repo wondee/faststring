@@ -26,6 +26,13 @@ public class InstructionNodeFactory extends Visitor  {
 		this.ir = ir;
 	}
 
+
+	public InstructionNode createConstant(int v) {
+		ConstantDefinition constant = new ConstantDefinition(ir.getConstantValue(v));
+		constant.addLocalVariableIndices(v, ir.getLocalVariableIndices(0, v));
+		return constant;
+	}
+	
 	public InstructionNode create(SSAInstruction instruction) {
 		if (!cache.containsKey(instruction)) {
 
@@ -38,26 +45,19 @@ public class InstructionNodeFactory extends Visitor  {
 				InstructionNode result = res;
 				res = null;
 				Integer index = ir.getIndexFor(instruction);
+				
+//				result.setByteCodeIndex(ir.getByteCodeIndexFor(index));
+				result.setByteCodeIndex(index);
 
-				// null if it is not a bytecode instruction
-				if (index != null) {
-					result.setByteCodeIndex(ir.getByteCodeIndexFor(index));
+				List<Integer> vs = IRUtil.getUses(instruction);
 
-					List<Integer> vs = IRUtil.getUses(instruction);
+				int def = instruction.getDef();
+				if (def != -1) {
+					vs.add(def);
+				}
 
-					int def = instruction.getDef();
-					if (def != -1) {
-						vs.add(def);
-					}
-
-					for (int v : vs) {
-						result.addLocalVariableIndices(v, ir.getLocalVariableIndices(index, v));
-					}
-
-				} else {
-					if (!(instruction instanceof SSAPhiInstruction)) {
-						throw new IllegalStateException("no index found for: " + instruction);
-					}
+				for (int v : vs) {
+					result.addLocalVariableIndices(v, ir.getLocalVariableIndices(index, v));
 				}
 
 				cache.put(instruction, result);

@@ -1,74 +1,30 @@
 package de.unifrankfurt.faststring.transform;
 
 import static de.unifrankfurt.faststring.utils.TestUtilities.assertList;
+import static org.hamcrest.collection.IsIn.isIn;
+import static org.hamcrest.core.IsNot.not;
+import static org.junit.Assert.assertThat;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import de.unifrankfurt.faststring.analysis.AnalysisResult;
 import de.unifrankfurt.faststring.analysis.MethodAnalyzer;
 import de.unifrankfurt.faststring.analysis.label.BuiltInTypes;
 import de.unifrankfurt.faststring.utils.BaseAnalysisTest;
-
-@Ignore 
+ 
 public class TestTransformationInfo extends BaseAnalysisTest  {
-	private static final String TEST_CLASS = "MethodAnalyzerTestClass";
-	
-	
-	@Test 
-	public void testSimpleIfSubstring() {
-		TransformationInfo result = getTransformationInfo("simpleIfSubstring");
-	
-		assertList(result.getEffectedVars(), 2, 3, 4);
-	}
-
-	@Test  
-	public void testReturnOfUsed() {
-		TransformationInfo result = getTransformationInfo("returnOfUsed");
-		
-		assertList(result.getEffectedVars(), 2);
-	}
+	private static final String TEST_CLASS = "TransformationTestClass";
 	
 	@Test
-	public void testPhiSimple() {
-		TransformationInfo result = getTransformationInfo("phiSimple");
-		
-		assertList(result.getEffectedVars(), 2, 3);
-	}
-
-	@Test 
-	public void testPhiLoop() {
-		TransformationInfo result = getTransformationInfo("phiLoop");
+	public void testConstantDef() {
+		TransformationInfo result = getTransformationInfo("phiDef");
 
 		assertList(result.getEffectedVars(), 2, 3, 4);
-	}
+		
+		assertThat(result.getLocalForLabel(null, BuiltInTypes.SUBSTRING, 2), not(isIn(result.getEffectedVars())));
+		assertThat(result.getLocalForLabel(null, BuiltInTypes.SUBSTRING, 3), not(isIn(result.getEffectedVars())));
+		assertThat(result.getLocalForLabel(null, BuiltInTypes.SUBSTRING, 4), not(isIn(result.getEffectedVars())));
 	
-	@Test
-	public void testPhiLoopAndIf() {
-		TransformationInfo result = getTransformationInfo("phiLoopAndIf");
-		
-		assertList(result.getEffectedVars(), 2, 3, 4, 5);
-	}
-
-	@Test
-	public void testUsedAsCtorParam() {
-		TransformationInfo result = getTransformationInfo("usedAsCtorParam");
-		
-		assertList(result.getEffectedVars(), 1, 2);
-	}
-
-	@Test
-	public void testParamDef() {
-		TransformationInfo result = getTransformationInfo("paramDef");
-		
-		assertList(result.getEffectedVars(), 1, 2);
-	}
-	
-	@Test
-	public void testEffectedVars() {
-		TransformationInfo result = getTransformationInfo("effectedVars");
-
-		assertList(result.getEffectedVars(), 2, 4);
 	}
 	
 	private TransformationInfo getTransformationInfo(String methodName) {

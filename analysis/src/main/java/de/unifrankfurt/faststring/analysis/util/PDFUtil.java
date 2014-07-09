@@ -20,7 +20,7 @@ import com.ibm.wala.viz.PDFViewUtil;
 public final class PDFUtil {
 
 	private static final String PRINT_PROPERTIES = "/print.properties";
-	private static final String TARGET_IRS = "target/irs";
+	private static final String TARGET_IRS = "../analysis-test/target/irs";
 
 	private PDFUtil() {
 		// empty
@@ -46,17 +46,13 @@ public final class PDFUtil {
 				+ File.separatorChar + signature + ".pdf";
 		String dotFile = wp.getProperty(WalaProperties.OUTPUT_DIR)
 				+ File.separatorChar + "ir.dt";
-
+		System.out.println(pdfFile);
 		if (new File(pdfFile).exists()) {
 			System.out.println(pdfFile + " skipped");
 		} else {
 			Graph<ISSABasicBlock> g = ir.getControlFlowGraph();
 	
 			NodeDecorator<ISSABasicBlock> labels = PDFViewUtil.makeIRDecorator(ir);
-			// if (annotations != null) {
-			// labels = new ConcatenatingNodeDecorator(annotations, labels);
-			// }
-			System.out.println(ir);
 			g = CFGSanitizer.sanitize(ir, cha);
 	
 			DotUtil.dotify(g, labels, dotFile, pdfFile, (String)wp.get("dot"));

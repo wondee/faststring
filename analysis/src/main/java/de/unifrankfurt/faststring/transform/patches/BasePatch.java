@@ -1,7 +1,5 @@
 package de.unifrankfurt.faststring.transform.patches;
 
-import java.util.Arrays;
-
 import com.ibm.wala.shrikeBT.Instruction;
 import com.ibm.wala.shrikeBT.MethodEditor.Output;
 import com.ibm.wala.shrikeBT.MethodEditor.Patch;
@@ -23,10 +21,10 @@ public abstract class BasePatch extends Patch {
 		}
 
 		public OutputBuilder emit(Instruction ins) {
-			return emit(Arrays.asList(ins));
+			return emit(new Instruction[] {ins});
 		}
 
-		public OutputBuilder emit(Iterable<Instruction> inss) {
+		public OutputBuilder emit(Instruction ... inss) {
 			for (Instruction instruction : inss) {
 				w.emit(instruction);
 			}

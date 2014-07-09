@@ -1,5 +1,7 @@
 package de.unifrankfurt.faststring.transform;
 
+import java.util.Collection;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +18,7 @@ import de.unifrankfurt.faststring.analysis.graph.ParameterDefinition;
 import de.unifrankfurt.faststring.analysis.graph.PhiInstructionNode;
 import de.unifrankfurt.faststring.analysis.graph.Reference;
 import de.unifrankfurt.faststring.analysis.graph.ReturnInstruction;
-import de.unifrankfurt.faststring.transform.TransformationInfo.Constant;
+import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 import de.unifrankfurt.faststring.transform.patches.PatchFactory;
 
 
@@ -26,14 +28,12 @@ public class MethodTransformer {
 
 	private MethodData methodData;
 	private MethodEditor editor;
-	private PatchFactory patchFactory;
 	private TransformationInfo transformationInfo;
 
 	public MethodTransformer(MethodData methodData, TransformationInfo transformationInfo) {
 		this.methodData = methodData;
 		this.transformationInfo = transformationInfo;
 		this.editor = new MethodEditor(methodData);
-		this.patchFactory = new PatchFactory(transformationInfo, editor);
 	}
 
 	public void transformMethod() {
@@ -42,79 +42,92 @@ public class MethodTransformer {
 		editor.beginPass();
 
 		createConversations();
-
+		
 		try {
 			new Verifier(methodData).verify();
+			editor.applyPatches();
+			editor.endPass();
+
 		} catch (FailureException e) {
 			throw new IllegalStateException(e);
 		}
-
-		editor.applyPatches();
-		editor.endPass();
-
 	}
 
 	private void createConversations() {
 
-//		for (Constant constant : transformationInfo.getConstants()) {
-//			patchFactory.createConstantDefinition(constant);
-//		}
-//
-//		for (Reference ref : transformationInfo.getDefinitionConversationsToOpt()) {
-//
-//			InstructionNode definition = ref.getDefinition();
-//
-//			definition.visit(visitor);
-//
-//			if (definition instanceof ParameterDefinition) {
-//				for (Integer orgLocal : definition.getLocalVariableIndex(ref.valueNumber())) {
-//					patchFactory.createOptConversation(orgLocal);
-//				}
-//			} else if (definition instanceof MethodCallInstruction) {
-//				MethodCallInstruction callResultDef = (MethodCallInstruction) definition;
-//
-//				System.out.println("local for call definition: " + callResultDef);
-//
-//				for (Integer local : callResultDef.getLocalVariableIndex(ref.valueNumber())) {
-//					patchFactory.createOptConversationFromStack(local, callResultDef.getByteCodeIndex());
-//
-//				}
-////				callResultDef.
-//			} else if (definition instanceof )
-//		}
-
+		for (Reference ref : transformationInfo.getReferences()) {
+			
+			InstructionNode definition = ref.getDefinition();
+			createConversations(definition, ref);
+			
+		}
 
 	}
 
-	private class DefinitionConversationToOpt implements Visitor {
+	private void createConversations(InstructionNode instructionNode, Reference ref) {
+		if (!instructionNode.isLabel(ref.getLabel())) {
+			
+			DefinitionConverter converter = new DefinitionConverter(instructionNode.getLabel(), ref.getLabel());
+			convert(instructionNode, ref, converter);
+		}
+		
+		
+	}
 
+	private void convert(InstructionNode instructionNode, Reference ref, DefinitionConverter converter) {
+		Collection<Integer> locals = instructionNode.getLocalVariableIndex(ref.valueNumber());
+		if (!locals.isEmpty()) {
+			for (Integer local : locals) {
+				converter.setLocal(local);
+				instructionNode.visit(converter);
+				
+			}
+		} else {
+			instructionNode.visit(converter);
+		}
+	}
+
+	private class DefinitionConverter implements Visitor {
+		
+		private int local = -1;
+		
+		private PatchFactory patchFactory;
+
+		
+		public DefinitionConverter(TypeLabel from, TypeLabel to) {
+			this.patchFactory = new PatchFactory(transformationInfo, editor, from, to);
+		}
+
+		public void setLocal(int local) {
+			this.local = local;
+		}
+		
 		@Override
 		public void visitConstant(ConstantDefinition node) {
-//			patchFactory.createConstantDefinition(constant);
+			patchFactory.createConstantDefinition(local, node.getValue());
 		}
 
 		@Override
-		public void visitMethodCall(MethodCallInstruction node) {
-			// TODO Auto-generated method stub
-
+		public void visitMethodCall(MethodCallInstruction callResultDef) {
+			patchFactory.createConversationAfter(local, callResultDef.getByteCodeIndex());
 		}
 
 		@Override
 		public void visitParameter(ParameterDefinition node) {
-			// TODO Auto-generated method stub
-
+			patchFactory.createOptConversation(local);
 		}
 
 		@Override
 		public void visitPhi(PhiInstructionNode node) {
-			// TODO Auto-generated method stub
-
+			//TODO to be implemented
+			
+			// phi defs have merged locals additionally to the locals of their uses
+			// can those locals which are taken from the uses be removed from the def locals??
 		}
 
 		@Override
 		public void visitReturn(ReturnInstruction node) {
-			// TODO Auto-generated method stub
-
+			throw new UnsupportedOperationException("a return does not have a definition");
 		}
 
 	}

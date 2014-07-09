@@ -1,25 +1,19 @@
 package de.unifrankfurt.faststring.transform;
 
 import java.util.Collection;
-import java.util.Map;
 import java.util.Set;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+import com.ibm.wala.util.collections.Pair;
 
 import de.unifrankfurt.faststring.analysis.AnalysisResult;
-import de.unifrankfurt.faststring.analysis.graph.ConstantDefinition;
 import de.unifrankfurt.faststring.analysis.graph.InstructionNode;
-import de.unifrankfurt.faststring.analysis.graph.Labelable;
 import de.unifrankfurt.faststring.analysis.graph.Reference;
 import de.unifrankfurt.faststring.analysis.label.TypeLabel;
-import de.unifrankfurt.faststring.analysis.util.GraphUtil;
 
 
 public class TransformationInfo {
@@ -27,12 +21,11 @@ public class TransformationInfo {
 	private TypeLabel label;
 
 	private Multimap<Integer, InstructionNode> defMap;
-	private Map<Integer, Constant> constMap;
 
-	private ImmutableSet<Reference> defConversations;
+	private Collection<Reference> references;
 
-	private BiMap<Integer, Integer> org2opt;
-
+	private BiMap<Pair<TypeLabel, Integer>, Integer> locals;
+	
 	private String methodName;
 
 //	private Multimap<Integer, Use> bc2Use;
@@ -40,12 +33,10 @@ public class TransformationInfo {
 	public TransformationInfo(AnalysisResult result) {
 		label = result.getLabel();
 		methodName = result.getMethodName();
-
+		references = result.getRefs();
+		
 		Multimap<Integer, InstructionNode> defMap = HashMultimap.create();
 		Multimap<Integer, InstructionNode> bc2Use = HashMultimap.create();
-
-		defConversations = ImmutableSet.copyOf(GraphUtil.extractReferencesWithDefConversionsToOpt(result.getRefs(), label));
-
 
 //		Collection<Set<Use>> values = GraphUtil.extractUsageConversions(result.getRefs()).values();
 //		Set<Use> useConversations = Sets.newHashSet(Iterables.concat(values));
@@ -71,10 +62,7 @@ public class TransformationInfo {
 			}
 		}
 
-
-		int maxLocals = result.getMaxLocals();
-		constMap = createConstant2Optimized(result, maxLocals);
-		org2opt = createOriginal2Optimized(defMap.keySet(), maxLocals + constMap.size());
+		locals = createOriginal2Optimized(result.getLabel(), defMap.keySet(), result.getMaxLocals());
 
 
 //		System.out.println("defConversations" + StringUtil.toStringWithLineBreak(defConversations));
@@ -85,50 +73,13 @@ public class TransformationInfo {
 		init(defMap);
 	}
 
-	private Map<Integer, Constant> createConstant2Optimized(AnalysisResult result, int maxLocals) {
-		Map<Integer, Constant> map = Maps.newHashMap();
-
-
-		for (Reference ref : result.getRefs()) {
-			Labelable def = ref.getDefinition();
-
-			if (def instanceof ConstantDefinition) {
-				map.put(ref.valueNumber(), new Constant((((ConstantDefinition)def).getValue()), maxLocals));
-			}
-
-			maxLocals++;
-		}
-
-		return ImmutableMap.copyOf(map);
-	}
-
-	public class Constant {
-		private Object value;
-
-		private int local;
-
-		Constant(Object value, int local) {
-			this.value = value;
-			this.local = local;
-		}
-
-		public Object getValue() {
-			return value;
-		}
-
-		public int getLocal() {
-			return local;
-		}
-
-	}
-
-	private BiMap<Integer, Integer> createOriginal2Optimized(Set<Integer> keySet, int maxLocals) {
-		BiMap<Integer, Integer> map = HashBiMap.create(keySet.size());
+	private BiMap<Pair<TypeLabel, Integer>, Integer> createOriginal2Optimized(TypeLabel label, Set<Integer> keySet, int maxLocals) {
+		BiMap<Pair<TypeLabel, Integer>, Integer> map = HashBiMap.create(keySet.size());
 
 		int optLocal = maxLocals + 1;
 
 		for (Integer originalLocal : keySet) {
-			map.put(originalLocal, optLocal);
+			map.put(Pair.make(label, originalLocal), optLocal);
 			optLocal++;
 		}
 
@@ -144,24 +95,30 @@ public class TransformationInfo {
 		return defMap.keySet();
 	}
 
-	public Collection<Constant> getConstants() {
-		return constMap.values();
-
-	}
-
 	public TypeLabel getLabel() {
 		return label;
 	}
 
-	public Set<Reference> getDefinitionConversationsToOpt() {
-		return defConversations;
-	}
-
-	public int getOptLocal(Integer orgLocal) {
-		return org2opt.get(orgLocal);
-	}
-
 	public String getMethodName() {
 		return methodName;
+	}
+
+	public Collection<Reference> getReferences() {
+		return references;
+	}
+
+	public int getLocalForLabel(TypeLabel from, TypeLabel to, int local) {
+		
+		int orgLocal = (from != null) ? 
+				locals.inverse().get(local).snd : 
+				local;
+				
+		Integer integer = locals.get(Pair.make(to, orgLocal));
+		
+		if (integer == null) {
+			throw new IllegalStateException(String.format("no local found for: local %d from %s to %s in %s", local, from, to, locals));
+		}
+		
+		return integer;
 	}
 }

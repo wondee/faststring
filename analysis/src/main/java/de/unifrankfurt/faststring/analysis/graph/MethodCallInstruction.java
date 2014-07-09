@@ -20,7 +20,6 @@ public class MethodCallInstruction extends InstructionNode {
 	private boolean isStatic;
 
 	public MethodCallInstruction(SSAInvokeInstruction instruction) {
-
 		this(
 			instruction.getDef(),
 			IRUtil.getUses(instruction),
@@ -29,8 +28,6 @@ public class MethodCallInstruction extends InstructionNode {
 		);
 
 	}
-
-
 
 	public MethodCallInstruction(int def, List<Integer> uses,
 			MethodReference target, boolean isStatic) {
@@ -150,7 +147,8 @@ public class MethodCallInstruction extends InstructionNode {
 	@Override
 	public String toString() {
 		return "MethodCallInstruction [def=" + def + ", uses=" + uses
-				+ ", target=" + target + ", isStatic=" + isStatic + ", localVarIndex=" + localMap + " ]";
+				+ ", target=" + target + ", isStatic=" + isStatic + ", bcIndex=" + 
+				getByteCodeIndex() + " localVarIndex=" + localMap + " ]";
 	}
 
 

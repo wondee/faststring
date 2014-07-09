@@ -4,16 +4,18 @@ import com.ibm.wala.shrikeBT.DupInstruction;
 
 import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 
-public class OnStackOptConversationPatch extends DefinitionConversionPatch {
+public class OnStackConversationPatch extends PushCreateAndStoreToLocalConversionPatch {
 
-	public OnStackOptConversationPatch(TypeLabel label, int optLocal) {
+	private DupInstruction dup;
+
+	public OnStackConversationPatch(TypeLabel label, int optLocal) {
 		super(label, optLocal);
+		dup = DupInstruction.make(0);
 	}
 
 	@Override
 	protected void pushOriginalToStack(OutputBuilder w) {
-		w.emit(DupInstruction.make(0));
-
+		w.emit(dup);
 	}
 
 }

@@ -53,7 +53,33 @@
 					</dependency>
 				</dependencies>
 			</plugin>
-
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.2.1</version>
+				<executions>
+					<execution>
+						<id>printBytecode</id>
+						<phase>package</phase>
+						<goals>
+							<goal>java</goal>
+						</goals>
+						<configuration>
+							<mainClass>de.unifrankfurt.faststring.utils.PrintTestBytecode</mainClass>
+						</configuration>
+					</execution>
+					<execution>
+						<id>printIRs</id>
+						<phase>package</phase>
+						<goals>
+							<goal>java</goal>
+						</goals>
+						<configuration>
+							<mainClass>de.unifrankfurt.faststring.utils.PrintTestIRs</mainClass>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 
@@ -63,6 +89,17 @@
 			<groupId>de.unifrankfurt.faststring</groupId>
 			<artifactId>faststring-core</artifactId>
 			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>de.unifrankfurt.faststring</groupId>
+			<artifactId>faststring-analysis</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>de.unifrankfurt.faststring</groupId>
+			<artifactId>faststring-analysis</artifactId>
+			<version>${project.version}</version>
+			<classifier>tests</classifier>
 		</dependency>
 	</dependencies>
 

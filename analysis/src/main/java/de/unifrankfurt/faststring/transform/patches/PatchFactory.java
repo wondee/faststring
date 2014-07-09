@@ -3,37 +3,42 @@ package de.unifrankfurt.faststring.transform.patches;
 import com.ibm.wala.shrikeBT.MethodEditor;
 import com.ibm.wala.shrikeBT.MethodEditor.Patch;
 
+import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 import de.unifrankfurt.faststring.transform.TransformationInfo;
-import de.unifrankfurt.faststring.transform.TransformationInfo.Constant;
 
 
 public class PatchFactory {
 
 	private MethodEditor editor;
-
 	private TransformationInfo info;
+	private TypeLabel from;
+	private TypeLabel to;
 
 
-	public PatchFactory(TransformationInfo transformationInfo, MethodEditor editor) {
+	public PatchFactory(TransformationInfo transformationInfo, MethodEditor editor, TypeLabel from, TypeLabel to) {
 		this.info = transformationInfo;
 		this.editor = editor;
+		this.from = from;
+		this.to = to;
 	}
 
-
-	public void createConstantDefinition(final Constant constant) {
-		insertAtStart(new ConstantDefinitionConversionPatch(info.getLabel(), constant));
+	public void createConstantDefinition(int local, Object value) {
+		if (local != -1) {
+			editor.insertAtStart(new ConstantDefinitionConversionPatch(to, info.getLocalForLabel(from, to, local), value));
+		} 
 	}
 
 	public void createOptConversation(int local) {
-		insertAtStart(new OptConversationPatch(info.getLabel(), local, info.getOptLocal(local)));
+		editor.insertAtStart(new LoadFromLocalConversationPatch(to, local, info.getLocalForLabel(from, to, local)));
 	}
 
-	private void insertAtStart(Patch patch) {
-		editor.insertAtStart(patch);
-	}
-
-	public void createOptConversationFromStack(int local, int bcIndex) {
-		editor.insertAfter(bcIndex, new OnStackOptConversationPatch(info.getLabel(), info.getOptLocal(local)));
+	public void createConversationAfter(int local, int bcIndex) {
+		Patch patch = (local != -1) ? 
+				new OnStackConversationPatch(to, info.getLocalForLabel(from, to, local)) :
+				new ConversationToLabelPatch(to);
+		
+		
+		editor.insertAfter(bcIndex, patch);
 	}
 
 }

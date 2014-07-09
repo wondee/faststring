@@ -1,6 +1,7 @@
 package de.unifrankfurt.faststring.analysis.graph;
 
 
+
 public class ConstantDefinition extends InstructionNode {
 
 	private Object value;
@@ -9,20 +10,21 @@ public class ConstantDefinition extends InstructionNode {
 		this.value = value;
 	}
 
-
 	public Object getValue() {
 		return value;
 	}
-
+	
 	@Override
 	public String toString() {
-		return "ConstantDefinition [value=" + value + "]";
+		return "ConstantDefinition [value=" + value + ", locals=" + localMap + "]";
 	}
-
 
 	@Override
 	public void visit(Visitor visitor) {
 		visitor.visitConstant(this);
 	}
+
+
+
 
 }
