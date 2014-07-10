@@ -6,6 +6,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.collect.Iterables;
@@ -27,17 +28,17 @@ public class TestDataFlowGraph extends BaseAnalysisTest {
 
 		assertTrue(graph.contains(4));
 		assertTrue(graph.contains(5));
-		assertTrue(graph.contains(7));
-		assertTrue(graph.contains(10));
+		assertTrue(graph.contains(8));
 		assertTrue(graph.contains(11));
+		assertTrue(graph.contains(12));
 
 		assertEquals(5, graph.size());
 
 		assertThat(graph.get(5).getDefinition(), instanceOf(ConstantNode.class));
-		assertThat(graph.get(10).getDefinition(), instanceOf(MethodCallInstruction.class));
-		assertThat(graph.get(7).getDefinition(), instanceOf(PhiNode.class));
+		assertThat(graph.get(11).getDefinition(), instanceOf(MethodCallInstruction.class));
+		assertThat(graph.get(8).getDefinition(), instanceOf(PhiNode.class));
 
-		assertList(getStartingPointsAsInts(graph), 7);
+		assertList(getStartingPointsAsInts(graph), 8);
 	}
 
 	@Test
@@ -48,17 +49,17 @@ public class TestDataFlowGraph extends BaseAnalysisTest {
 		assertTrue(graph.contains(4));
 		assertTrue(graph.contains(5));
 		assertTrue(graph.contains(9));
-		assertTrue(graph.contains(16));
-		assertTrue(graph.contains(22));
-		assertTrue(graph.contains(20));
-		assertTrue(graph.contains(23));
+		assertTrue(graph.contains(17));
+		assertTrue(graph.contains(21));
+		assertTrue(graph.contains(24));
+		assertTrue(graph.contains(25));
 
 
 		assertEquals(7, graph.size());
 
 		assertThat(graph.get(4).getDefinition(), instanceOf(ConstantNode.class));
 		assertThat(graph.get(9).getDefinition(), instanceOf(MethodCallInstruction.class));
-		assertThat(graph.get(20).getDefinition(), instanceOf(MethodCallInstruction.class));
+		assertThat(graph.get(24).getDefinition(), instanceOf(MethodCallInstruction.class));
 
 
 		assertList(getStartingPointsAsInts(graph), 4, 5);
@@ -66,6 +67,7 @@ public class TestDataFlowGraph extends BaseAnalysisTest {
 
 
 	@Test
+	@Ignore
 	public void testPhiLoopAndIf() {
 		DataFlowGraph graph = createGraph("MethodAnalyzerTestClass", "phiLoopAndIf");
 
@@ -80,7 +82,6 @@ public class TestDataFlowGraph extends BaseAnalysisTest {
 		assertTrue(graph.contains(19));
 
 		assertEquals(9, graph.size());
-
 
 		assertThat(graph.get(4).getDefinition(), instanceOf(ConstantNode.class));
 		assertThat(graph.get(5).getDefinition(), instanceOf(ConstantNode.class));

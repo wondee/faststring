@@ -12,10 +12,10 @@ public class TestBaseTypeLabel extends BaseAnalysisTest {
 
 	@Test
 	public void testFindTypeUses() throws Exception {
-		assertList(findTypeUses("phiLoop"), 7);
+		assertList(findTypeUses("phiLoop"), 8);
 		assertList(findTypeUses("paramDef"), 2, 6);
 		assertList(findTypeUses("simpleIfSubstring"), 4, 5);
-		assertList(findTypeUses("phiLoopAndIf"), 7, 8, 12);
+		assertList(findTypeUses("phiLoopAndIf"), 7, 10, 15);
 		assertList(findTypeUses("returnOfUsed"), 4);
 
 	}

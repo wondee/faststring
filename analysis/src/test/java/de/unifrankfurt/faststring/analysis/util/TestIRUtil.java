@@ -14,8 +14,8 @@ public class TestIRUtil extends BaseAnalysisTest {
 
 	@Test
 	public void testPhiLoop() {
-		assertList(getAllPointersFor("phiLoop", 7), 4, 5, 7, 10, 11);
-		assertList(getAllPointersFor("phiLoop", 11), 5, 10, 11);
+		assertList(getAllPointersFor("phiLoop", 8), 4, 5, 8, 11, 12);
+		assertList(getAllPointersFor("phiLoop", 12), 5, 11, 12);
 		assertList(getAllPointersFor("phiLoop", 5), 5);
 		assertList(getAllPointersFor("phiLoop", 4), 4);
 
