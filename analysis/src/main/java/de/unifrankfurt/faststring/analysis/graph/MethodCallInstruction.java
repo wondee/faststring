@@ -158,5 +158,9 @@ public class MethodCallInstruction extends InstructionNode {
 		visitor.visitMethodCall(this);
 	}
 
+	public boolean isReceiver(int v) {
+		return determineMethodCallType(v) instanceof Receiver;
+	}
+
 
 }

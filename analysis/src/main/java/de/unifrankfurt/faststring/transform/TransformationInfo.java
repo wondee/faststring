@@ -38,12 +38,12 @@ public class TransformationInfo {
 		for (Reference ref : result.getRefs()) {
 			InstructionNode def = ref.getDefinition();
 			
-			for (Integer local : def.getLocalVariableIndex(ref.valueNumber())) {
+			for (Integer local : def.getLocals(ref.valueNumber())) {
 				effectedVars.add(local);
 			}
 
 			for (InstructionNode use : ref.getUses()) {
-				for (Integer local : use.getLocalVariableIndex(ref.valueNumber())) {
+				for (Integer local : use.getLocals(ref.valueNumber())) {
 					effectedVars.add(local);
 				}
 
@@ -51,12 +51,6 @@ public class TransformationInfo {
 		}
 
 		locals = createOriginal2Optimized(result.getLabel(), effectedVars, result.getMaxLocals());
-
-
-//		System.out.println("defConversations" + StringUtil.toStringWithLineBreak(defConversations));
-//		System.out.println("useConversations" + StringUtil.toStringWithLineBreak(useConversations));
-//		System.out.println("bcIndex" + StringUtil.toStringMap(bc2Use.asMap()));
-//		System.out.println("org2opt" + StringUtil.toStringMap(org2opt));
 
 	}
 	
@@ -98,7 +92,8 @@ public class TransformationInfo {
 		Integer integer = locals.get(Pair.make(to, orgLocal));
 		
 		if (integer == null) {
-			throw new IllegalStateException(String.format("no local found for: local %d from %s to %s in %s", local, from, to, locals));
+			throw new IllegalStateException(String.format("no local found for: local %d from %s to %s in %s", 
+					local, from, to, locals));
 		}
 		
 		return integer;

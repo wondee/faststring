@@ -13,7 +13,7 @@ import de.unifrankfurt.faststring.analysis.label.BuiltInTypes;
 import de.unifrankfurt.faststring.utils.BaseAnalysisTest;
  
 public class TestTransformationInfo extends BaseAnalysisTest  {
-	private static final String TEST_CLASS = "TransformationTestClass";
+	private static final String TEST_CLASS = "TransformationDefinitionTestClass";
 	
 	@Test
 	public void testConstantDef() {

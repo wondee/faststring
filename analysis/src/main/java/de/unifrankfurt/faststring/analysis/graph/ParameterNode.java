@@ -14,7 +14,7 @@ public class ParameterNode extends InstructionNode {
 	}
 
 	@Override
-	public Collection<Integer> getLocalVariableIndex(Integer v) {
+	public Collection<Integer> getLocals(Integer v) {
 		return Sets.newHashSet(index);
 	}
 

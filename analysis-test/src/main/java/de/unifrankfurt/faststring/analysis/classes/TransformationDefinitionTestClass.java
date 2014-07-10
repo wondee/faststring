@@ -1,6 +1,6 @@
 package de.unifrankfurt.faststring.analysis.classes;
 
-public class TransformationTestClass {
+public class TransformationDefinitionTestClass {
 
 	public String callDef() {
 		String b = phiDef(true);

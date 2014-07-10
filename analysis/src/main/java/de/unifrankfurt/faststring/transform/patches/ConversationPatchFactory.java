@@ -7,7 +7,7 @@ import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 import de.unifrankfurt.faststring.transform.TransformationInfo;
 
 
-public class PatchFactory {
+public class ConversationPatchFactory {
 
 	private MethodEditor editor;
 	private TransformationInfo info;
@@ -15,7 +15,7 @@ public class PatchFactory {
 	private TypeLabel to;
 
 
-	public PatchFactory(TransformationInfo transformationInfo, MethodEditor editor, TypeLabel from, TypeLabel to) {
+	public ConversationPatchFactory(TransformationInfo transformationInfo, MethodEditor editor, TypeLabel from, TypeLabel to) {
 		this.info = transformationInfo;
 		this.editor = editor;
 		this.from = from;
@@ -34,6 +34,10 @@ public class PatchFactory {
 		
 		
 		editor.insertAfter(bcIndex, patch);
+	}
+
+	public void createConversationBefore(int bcIndex) {
+		editor.insertBefore(bcIndex, new ConversationToLabelPatch(to));
 	}
 
 }

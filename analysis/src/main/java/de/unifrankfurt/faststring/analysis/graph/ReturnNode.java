@@ -12,7 +12,7 @@ public class ReturnNode extends InstructionNode {
 	public String toString() {
 		return "ReturnInstruction [result=" + result + ", getByteCodeIndex()="
 				+ getByteCodeIndex() + ", getLocalVariableIndex()="
-				+ getLocalVariableIndex(result) + "]";
+				+ getLocals(result) + "]";
 	}
 
 	@Override

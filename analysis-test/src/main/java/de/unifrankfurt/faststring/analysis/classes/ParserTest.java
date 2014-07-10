@@ -1,4 +1,4 @@
-package substring;
+package de.unifrankfurt.faststring.analysis.classes;
 
 public class ParserTest {
 

@@ -52,7 +52,7 @@ public abstract class InstructionNode implements Labelable {
 		return byteCodeIndex;
 	}
 
-	public Collection<Integer> getLocalVariableIndex(Integer v) {
+	public Collection<Integer> getLocals(Integer v) {
 		return localMap.get(v);
 	}
 
@@ -106,17 +106,17 @@ public abstract class InstructionNode implements Labelable {
 		return isLabel(other.getLabel());
 	}
 	
-	public interface Visitor {
+	public static class Visitor {
 
-		public void visitConstant(ConstantNode node);
+		public void visitConstant(ConstantNode node) {}
 
-		public void visitMethodCall(MethodCallInstruction node);
+		public void visitMethodCall(MethodCallInstruction node) {}
 
-		public void visitParameter(ParameterNode node);
+		public void visitParameter(ParameterNode node) {}
 
-		public void visitPhi(PhiNode node);
+		public void visitPhi(PhiNode node) {}
 
-		public void visitReturn(ReturnNode node);
+		public void visitReturn(ReturnNode node) {}
 
 	}
 }

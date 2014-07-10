@@ -1,40 +1,29 @@
 package de.unifrankfurt.faststring.transform;
 
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
-import static org.junit.Assert.*;
-
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.Map;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 import org.junit.Ignore;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Maps;
-import com.ibm.wala.shrikeBT.ConstantInstruction;
-import com.ibm.wala.shrikeBT.Disassembler;
 import com.ibm.wala.shrikeBT.DupInstruction;
 import com.ibm.wala.shrikeBT.InvokeInstruction;
 import com.ibm.wala.shrikeBT.LoadInstruction;
 import com.ibm.wala.shrikeBT.MethodData;
 import com.ibm.wala.shrikeBT.StoreInstruction;
-import com.ibm.wala.shrikeBT.shrikeCT.ClassInstrumenter;
-import com.ibm.wala.shrikeCT.ClassReader;
-import com.ibm.wala.shrikeCT.InvalidClassFileException;
 
-import de.unifrankfurt.faststring.analysis.AnalysisResult;
-import de.unifrankfurt.faststring.analysis.MethodAnalyzer;
 import de.unifrankfurt.faststring.analysis.label.BuiltInTypes;
-import de.unifrankfurt.faststring.utils.BaseAnalysisTest;
+import de.unifrankfurt.faststring.utils.BaseTransformerTest;
 
-public class TestMethodTransformerDefinitionConversations extends BaseAnalysisTest {
-
-	private static final Logger LOG = LoggerFactory.getLogger(TestMethodTransformerDefinitionConversations.class);
-
-	private static final String TEST_CLASS = "TransformationTestClass";
-
+public class TestMethodTransformerDefinitionConversations extends BaseTransformerTest {
+	
+	private static final String TEST_CLASS = "TransformationDefinitionTestClass";
+	
+	public String getTestClass() {
+		return TEST_CLASS;
+	}
+	
 	@Test
 	public void testParamDef() throws Exception {
 		final String methodName = "paramDef";
@@ -148,42 +137,5 @@ public class TestMethodTransformerDefinitionConversations extends BaseAnalysisTe
 		final String methodName = "phiUsesLocalFromUse";
 
 		analyze(methodName);
-	}
-
-	private TransformationInfo analyze(final String methodName) {
-		MethodAnalyzer analyzer = new MethodAnalyzer(getIRMethod(TEST_CLASS, methodName), BuiltInTypes.SUBSTRING);
-		AnalysisResult result = analyzer.analyze();
-
-		return new TransformationInfo(result);
-	}
-
-	private MethodData transform(TransformationInfo info)
-			throws InvalidClassFileException, IOException {
-		ClassInstrumenter ci = getClassInstrumenter(TEST_CLASS);
-
-
-		ClassReader reader = ci.getReader();
-		int count = reader.getMethodCount();
-
-		Map<String, Integer> methodMap = Maps.newHashMapWithExpectedSize(count);
-
-		for (int i = 0; i < count; i++) {
-			methodMap.put(reader.getMethodName(i), i) ;
-		}
-
-		Integer paramDef = methodMap.get(info.getMethodName());
-
-		MethodData methodData = ci.visitMethod(paramDef);
-
-		new MethodTransformer(methodData, info).transformMethod();
-
-		if (LOG.isDebugEnabled()) {
-			StringWriter writer = new StringWriter();
-			new Disassembler(methodData).disassembleTo("  ", writer);
-
-			LOG.debug("transformed code: \n{}", writer.toString());
-		}
-
-		return methodData;
 	}
 }

@@ -51,4 +51,12 @@ public class PhiNode extends InstructionNode {
 		visitor.visitPhi(this);
 	}
 
+	public Integer getDef() {
+		return def;
+	}
+
+	public List<Integer> getUses() {
+		return uses;
+	}
+
 }
