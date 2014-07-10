@@ -10,14 +10,14 @@ import com.ibm.wala.shrikeBT.MethodEditor;
 import com.ibm.wala.shrikeBT.analysis.Analyzer.FailureException;
 import com.ibm.wala.shrikeBT.analysis.Verifier;
 
-import de.unifrankfurt.faststring.analysis.graph.ConstantDefinition;
+import de.unifrankfurt.faststring.analysis.graph.ConstantNode;
 import de.unifrankfurt.faststring.analysis.graph.InstructionNode;
 import de.unifrankfurt.faststring.analysis.graph.InstructionNode.Visitor;
 import de.unifrankfurt.faststring.analysis.graph.MethodCallInstruction;
-import de.unifrankfurt.faststring.analysis.graph.ParameterDefinition;
-import de.unifrankfurt.faststring.analysis.graph.PhiInstructionNode;
+import de.unifrankfurt.faststring.analysis.graph.ParameterNode;
+import de.unifrankfurt.faststring.analysis.graph.PhiNode;
 import de.unifrankfurt.faststring.analysis.graph.Reference;
-import de.unifrankfurt.faststring.analysis.graph.ReturnInstruction;
+import de.unifrankfurt.faststring.analysis.graph.ReturnNode;
 import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 import de.unifrankfurt.faststring.transform.patches.PatchFactory;
 
@@ -103,8 +103,8 @@ public class MethodTransformer {
 		}
 		
 		@Override
-		public void visitConstant(ConstantDefinition node) {
-			patchFactory.createConstantDefinition(local, node.getValue());
+		public void visitConstant(ConstantNode node) {
+			patchFactory.createConversationAfter(local, node.getByteCodeIndex());
 		}
 
 		@Override
@@ -113,12 +113,12 @@ public class MethodTransformer {
 		}
 
 		@Override
-		public void visitParameter(ParameterDefinition node) {
+		public void visitParameter(ParameterNode node) {
 			patchFactory.createOptConversation(local);
 		}
 
 		@Override
-		public void visitPhi(PhiInstructionNode node) {
+		public void visitPhi(PhiNode node) {
 			//TODO to be implemented
 			
 			// phi defs have merged locals additionally to the locals of their uses
@@ -126,7 +126,7 @@ public class MethodTransformer {
 		}
 
 		@Override
-		public void visitReturn(ReturnInstruction node) {
+		public void visitReturn(ReturnNode node) {
 			throw new UnsupportedOperationException("a return does not have a definition");
 		}
 

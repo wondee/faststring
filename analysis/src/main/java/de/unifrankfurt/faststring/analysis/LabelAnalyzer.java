@@ -14,7 +14,7 @@ import com.google.common.collect.Lists;
 
 import de.unifrankfurt.faststring.analysis.graph.DataFlowGraph;
 import de.unifrankfurt.faststring.analysis.graph.InstructionNode;
-import de.unifrankfurt.faststring.analysis.graph.PhiInstructionNode;
+import de.unifrankfurt.faststring.analysis.graph.PhiNode;
 import de.unifrankfurt.faststring.analysis.graph.Reference;
 import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 import de.unifrankfurt.faststring.analysis.util.GraphUtil;
@@ -28,7 +28,7 @@ public class LabelAnalyzer extends BaseQueueProcessingStrategy<Reference>{
 
 	private final DataFlowGraph graph;
 
-	private Stack<PhiInstructionNode> phis;
+	private Stack<PhiNode> phis;
 
 	private PhiLabelingStrategy strategy;
 
@@ -82,8 +82,8 @@ public class LabelAnalyzer extends BaseQueueProcessingStrategy<Reference>{
 
 		for (InstructionNode o : os) {
 
-			if (o instanceof PhiInstructionNode) {
-				PhiInstructionNode phi = (PhiInstructionNode) o;
+			if (o instanceof PhiNode) {
+				PhiNode phi = (PhiNode) o;
 
 				if (!phis.contains(phi)) {
 
@@ -121,7 +121,7 @@ public class LabelAnalyzer extends BaseQueueProcessingStrategy<Reference>{
 	public void finished() {
 
 		while(!phis.isEmpty()) {
-			PhiInstructionNode phi = phis.pop();
+			PhiNode phi = phis.pop();
 			if (strategy.shouldBeLabeled(graph, phi)) {
 				phi.setLabel(graph.getLabel());
 			}
@@ -135,7 +135,7 @@ public class LabelAnalyzer extends BaseQueueProcessingStrategy<Reference>{
 
 
 	public interface PhiLabelingStrategy {
-		boolean shouldBeLabeled(DataFlowGraph graph, PhiInstructionNode phis);
+		boolean shouldBeLabeled(DataFlowGraph graph, PhiNode phis);
 	}
 
 

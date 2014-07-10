@@ -22,11 +22,6 @@ public class PatchFactory {
 		this.to = to;
 	}
 
-	public void createConstantDefinition(int local, Object value) {
-		if (local != -1) {
-			editor.insertAtStart(new ConstantDefinitionConversionPatch(to, info.getLocalForLabel(from, to, local), value));
-		} 
-	}
 
 	public void createOptConversation(int local) {
 		editor.insertAtStart(new LoadFromLocalConversationPatch(to, local, info.getLocalForLabel(from, to, local)));

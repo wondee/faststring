@@ -4,10 +4,12 @@ import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 
 public interface Labelable {
 
-	public abstract void setLabel(TypeLabel label);
+	abstract void setLabel(TypeLabel label);
 
-	public abstract TypeLabel getLabel();
+	abstract TypeLabel getLabel();
 
-	public abstract boolean isLabel(TypeLabel label);
+	boolean isLabel(TypeLabel label);
+	
+	boolean isSameLabel(Labelable other);
 
 }

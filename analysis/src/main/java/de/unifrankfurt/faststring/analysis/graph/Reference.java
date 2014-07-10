@@ -188,6 +188,12 @@ public class Reference implements Labelable {
 	}
 
 
+	@Override
+	public boolean isSameLabel(Labelable other) {
+		return this.isLabel(other.getLabel());
+	}
+
+
 
 
 }

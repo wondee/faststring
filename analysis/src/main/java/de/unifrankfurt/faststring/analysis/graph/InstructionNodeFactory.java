@@ -1,5 +1,6 @@
 package de.unifrankfurt.faststring.analysis.graph;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -28,8 +29,11 @@ public class InstructionNodeFactory extends Visitor  {
 
 
 	public InstructionNode createConstant(int v) {
-		ConstantDefinition constant = new ConstantDefinition(ir.getConstantValue(v));
-		constant.addLocalVariableIndices(v, ir.getLocalVariableIndices(0, v));
+		
+		ConstantNode constant = new ConstantNode(ir.getConstantValue(v), ir.getConstantIndex(v));
+		Collection<Integer> locals = ir.getLocalVariableIndices(0, v);
+		constant.addLocalVariableIndices(v, locals);
+		
 		return constant;
 	}
 	
@@ -46,7 +50,6 @@ public class InstructionNodeFactory extends Visitor  {
 				res = null;
 				Integer index = ir.getIndexFor(instruction);
 				
-//				result.setByteCodeIndex(ir.getByteCodeIndexFor(index));
 				result.setByteCodeIndex(index);
 
 				List<Integer> vs = IRUtil.getUses(instruction);
@@ -92,24 +95,24 @@ public class InstructionNodeFactory extends Visitor  {
 
 	@Override
 	public void visitPhi(SSAPhiInstruction instruction) {
-		res = new PhiInstructionNode(instruction.getDef(), IRUtil.getUses(instruction));
+		res = new PhiNode(instruction.getDef(), IRUtil.getUses(instruction));
 
 	}
 
 	@Override
 	public void visitReturn(SSAReturnInstruction instruction) {
-		res = new ReturnInstruction(instruction.getResult());
+		res = new ReturnNode(instruction.getResult());
 	}
 
 	@Override
 	public void visitPut(SSAPutInstruction instruction) {
-		res = new ReturnInstruction(instruction.getUse(0));
+		res = new ReturnNode(instruction.getUse(0));
 
 	}
 
 	@Override
 	public void visitArrayStore(SSAArrayStoreInstruction instruction) {
-		res = new ReturnInstruction(instruction.getValue());
+		res = new ReturnNode(instruction.getValue());
 	}
 
 }

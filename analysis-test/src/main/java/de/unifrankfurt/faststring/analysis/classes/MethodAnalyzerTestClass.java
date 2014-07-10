@@ -102,4 +102,14 @@ public class MethodAnalyzerTestClass {
 		i = c.length();
 		return c;
 	}
+	
+	public void constantTest() {
+		String a = "test";
+		String b = "test";
+		a.substring(3);
+		b.subSequence(3, 5);
+		
+		"abcd".substring(32);
+	}
+
 }

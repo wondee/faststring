@@ -25,7 +25,7 @@ public class DataFlowTestBuilder {
 	
 	public DataFlowTestBuilder phi(int def, Integer...uses) {
 		List<Integer> usesList = Arrays.asList(uses);
-		InstructionNode phi = new PhiInstructionNode(def, usesList);
+		InstructionNode phi = new PhiNode(def, usesList);
 		addDefinition(def, phi);
 		
 		for (Integer v : uses) {
@@ -50,12 +50,12 @@ public class DataFlowTestBuilder {
 	}
 
 	public DataFlowTestBuilder parameterDefinition(int i) {
-		addDefinition(i, new ParameterDefinition(i));
+		addDefinition(i, new ParameterNode(i));
 		return this;
 	}
 
 	public DataFlowTestBuilder return_(int i) {
-		addUse(i, new ReturnInstruction(i));
+		addUse(i, new ReturnNode(i));
 		return this;
 	}
 	

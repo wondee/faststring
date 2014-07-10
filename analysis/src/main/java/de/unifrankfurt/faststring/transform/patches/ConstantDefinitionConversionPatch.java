@@ -4,6 +4,7 @@ import com.ibm.wala.shrikeBT.ConstantInstruction;
 
 import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 
+@Deprecated
 public class ConstantDefinitionConversionPatch extends PushCreateAndStoreToLocalConversionPatch {
 
 	private ConstantInstruction createConstant;

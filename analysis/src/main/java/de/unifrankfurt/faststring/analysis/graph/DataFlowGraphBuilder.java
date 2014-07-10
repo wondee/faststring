@@ -117,7 +117,7 @@ public class DataFlowGraphBuilder {
 		
 		if (instruction == null) {
 			if (ir.getParams().contains(v)) {
-				definition = new ParameterDefinition(ir.getParamIndexFor(v));
+				definition = new ParameterNode(ir.getParamIndexFor(v));
 			} else if (ir.isConstant(v)) {
 				definition = instructionFactory.createConstant(v);
 			}

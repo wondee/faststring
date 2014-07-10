@@ -2,12 +2,13 @@ package de.unifrankfurt.faststring.analysis.graph;
 
 
 
-public class ConstantDefinition extends InstructionNode {
+public class ConstantNode extends InstructionNode {
 
 	private Object value;
 
-	public ConstantDefinition(Object value) {
+	public ConstantNode(Object value, int bcIndex) {
 		this.value = value;
+		setByteCodeIndex(bcIndex);
 	}
 
 	public Object getValue() {
@@ -16,7 +17,7 @@ public class ConstantDefinition extends InstructionNode {
 	
 	@Override
 	public String toString() {
-		return "ConstantDefinition [value=" + value + ", locals=" + localMap + "]";
+		return "ConstantDefinition [value=" + value + ", bcIndex=" + getByteCodeIndex() + ", locals=" + localMap + "]";
 	}
 
 	@Override

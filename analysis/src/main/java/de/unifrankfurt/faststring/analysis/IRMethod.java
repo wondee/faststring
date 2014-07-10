@@ -125,9 +125,6 @@ public class IRMethod {
 		return ((ShrikeCTMethod)ir.getMethod()).getMaxLocals();
 	}
 
-//	public Set<Integer> findAllUsesPhiPointer(Integer ref) {
-//		return IRUtil.findAllUsesPointersFor(defUse, ref);
-//	}
 
 //	public IInstruction[] getLastIndexOfSinglePathReachedBlock(int bcIndex) {
 //		try {
@@ -185,6 +182,37 @@ public class IRMethod {
 			}
 			
 		}
+	}
+
+//	public int findConstantBytecodeIndex(int v, SSAInstruction instruction) {
+//		try {
+//
+//			List<Integer> uses = Lists.reverse(IRUtil.getUses(instruction));
+//			
+//			int constant = IRUtil.findUseIndex(v, uses);
+//			
+//			int last = getIndexFor(instruction);
+//			int first = findFirstIndexBeforeBranch(last);
+//		
+//			IInstruction[] instructions = ((IBytecodeMethod)ir.getMethod()).getInstructions();
+//			
+//			new LocalVariableSolver(uses, constant);
+//			
+//			for (int i = last; i >= first; i--) {
+//				IInstruction iInstruction = instructions[i];
+////				iInstruction.visit(v);
+//			}
+//			
+//			
+//			return 0;
+//		} catch (InvalidClassFileException e) {
+//			throw new IllegalStateException(e);
+//		}
+//		
+//	}
+
+	public Integer getConstantIndex(int v) {
+		return ir.getSymbolTable().getIndex(v);
 	}
 
 

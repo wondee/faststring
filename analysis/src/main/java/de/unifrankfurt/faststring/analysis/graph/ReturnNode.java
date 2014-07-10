@@ -1,10 +1,10 @@
 package de.unifrankfurt.faststring.analysis.graph;
 
-public class ReturnInstruction extends InstructionNode {
+public class ReturnNode extends InstructionNode {
 
 	private int result;
 
-	public ReturnInstruction(int result) {
+	public ReturnNode(int result) {
 		this.result = result;
 	}
 

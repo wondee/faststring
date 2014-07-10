@@ -5,11 +5,11 @@ import java.util.Collection;
 import com.google.common.collect.Sets;
 
 
-public class ParameterDefinition extends InstructionNode {
+public class ParameterNode extends InstructionNode {
 
 	private int index;
 
-	public ParameterDefinition(int paramIndexFor) {
+	public ParameterNode(int paramIndexFor) {
 		this.index = paramIndexFor;
 	}
 

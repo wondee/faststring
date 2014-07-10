@@ -30,7 +30,7 @@ public class TransformationTestClass {
 		
 		a.substring(3);
 	}
-
+	
 	public void constantDefWithoutLocal() {
 		"test".substring(4);
 	}

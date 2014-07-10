@@ -1,10 +1,8 @@
 package de.unifrankfurt.faststring.analysis.graph;
 
-import java.util.Set;
+import java.util.List;
 import java.util.Stack;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Sets;
 import com.ibm.wala.shrikeBT.ArrayLengthInstruction;
 import com.ibm.wala.shrikeBT.IArrayLoadInstruction;
 import com.ibm.wala.shrikeBT.IArrayStoreInstruction;
@@ -19,20 +17,13 @@ public class LocalVariableSolver extends Visitor {
 	private Stack<Integer> stack = new Stack<>();
 	private int toCheck;
 
-	private Set<Integer> possibleLocals = Sets.newHashSet();
-
 	private boolean finished = false;
 
-	public LocalVariableSolver(int toCheck) {
-		Preconditions.checkArgument(toCheck > -1, "toCheck must be equals or greater than 0, but was %d", toCheck);
+	public LocalVariableSolver(List<Integer> uses, int toCheck) {
 
 		stack.push(toCheck);
 		this.toCheck = toCheck;
 
-	}
-
-	public Set<Integer> getPossibleLocals() {
-		return possibleLocals;
 	}
 
 
@@ -54,7 +45,7 @@ public class LocalVariableSolver extends Visitor {
 	@Override
 	public void visitLocalStore(IStoreInstruction instruction) {
 		if (stack.peek() == toCheck) {
-			possibleLocals.add(instruction.getVarIndex());
+//			possibleLocals.add(instruction.getVarIndex());
 		}
 
 		popFromStack(instruction.getPoppedCount());

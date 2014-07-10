@@ -13,7 +13,6 @@ import com.google.common.collect.Sets;
 import com.ibm.wala.ssa.DefUse;
 import com.ibm.wala.ssa.IR;
 import com.ibm.wala.ssa.SSAInstruction;
-import com.ibm.wala.ssa.SSAInvokeInstruction;
 import com.ibm.wala.ssa.SSAPhiInstruction;
 
 import de.unifrankfurt.faststring.analysis.util.QueueUtil.BaseQueueProcessingStrategy;
@@ -48,11 +47,11 @@ public final class IRUtil {
 		return getUsesList(ins, 0);
 	}
 
-	public static int findUseIndex(int v, SSAInvokeInstruction invoke) {
+	public static int findUseIndex(int v, SSAInstruction invoke) {
 		return findUseIndex(v, invoke, 1);
 	}
 
-	public static int findUseIndex(int v, SSAInvokeInstruction invoke, int startWith) {
+	public static int findUseIndex(int v, SSAInstruction invoke, int startWith) {
 		return findUseIndex(v, getUses(invoke), startWith);
 	}
 
@@ -178,6 +177,7 @@ public final class IRUtil {
 		}
 
 	}
+
 
 
 }

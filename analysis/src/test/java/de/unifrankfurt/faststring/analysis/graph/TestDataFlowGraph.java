@@ -33,9 +33,9 @@ public class TestDataFlowGraph extends BaseAnalysisTest {
 
 		assertEquals(5, graph.size());
 
-		assertThat(graph.get(5).getDefinition(), instanceOf(ConstantDefinition.class));
+		assertThat(graph.get(5).getDefinition(), instanceOf(ConstantNode.class));
 		assertThat(graph.get(10).getDefinition(), instanceOf(MethodCallInstruction.class));
-		assertThat(graph.get(7).getDefinition(), instanceOf(PhiInstructionNode.class));
+		assertThat(graph.get(7).getDefinition(), instanceOf(PhiNode.class));
 
 		assertList(getStartingPointsAsInts(graph), 7);
 	}
@@ -56,7 +56,7 @@ public class TestDataFlowGraph extends BaseAnalysisTest {
 
 		assertEquals(7, graph.size());
 
-		assertThat(graph.get(4).getDefinition(), instanceOf(ConstantDefinition.class));
+		assertThat(graph.get(4).getDefinition(), instanceOf(ConstantNode.class));
 		assertThat(graph.get(9).getDefinition(), instanceOf(MethodCallInstruction.class));
 		assertThat(graph.get(20).getDefinition(), instanceOf(MethodCallInstruction.class));
 
@@ -82,9 +82,9 @@ public class TestDataFlowGraph extends BaseAnalysisTest {
 		assertEquals(9, graph.size());
 
 
-		assertThat(graph.get(4).getDefinition(), instanceOf(ConstantDefinition.class));
-		assertThat(graph.get(5).getDefinition(), instanceOf(ConstantDefinition.class));
-		assertThat(graph.get(12).getDefinition(), instanceOf(PhiInstructionNode.class));
+		assertThat(graph.get(4).getDefinition(), instanceOf(ConstantNode.class));
+		assertThat(graph.get(5).getDefinition(), instanceOf(ConstantNode.class));
+		assertThat(graph.get(12).getDefinition(), instanceOf(PhiNode.class));
 		assertThat(graph.get(19).getDefinition(), instanceOf(MethodCallInstruction.class));
 
 		assertList(getStartingPointsAsInts(graph), 7, 8, 12);

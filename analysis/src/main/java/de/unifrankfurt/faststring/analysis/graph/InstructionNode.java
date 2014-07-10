@@ -101,17 +101,22 @@ public abstract class InstructionNode implements Labelable {
 		return this.label == label;
 	}
 
+	@Override
+	public boolean isSameLabel(Labelable other) {
+		return isLabel(other.getLabel());
+	}
+	
 	public interface Visitor {
 
-		public void visitConstant(ConstantDefinition node);
+		public void visitConstant(ConstantNode node);
 
 		public void visitMethodCall(MethodCallInstruction node);
 
-		public void visitParameter(ParameterDefinition node);
+		public void visitParameter(ParameterNode node);
 
-		public void visitPhi(PhiInstructionNode node);
+		public void visitPhi(PhiNode node);
 
-		public void visitReturn(ReturnInstruction node);
+		public void visitReturn(ReturnNode node);
 
 	}
 }

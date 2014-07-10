@@ -5,13 +5,13 @@ import com.google.common.collect.Multiset;
 
 import de.unifrankfurt.faststring.analysis.LabelAnalyzer.PhiLabelingStrategy;
 import de.unifrankfurt.faststring.analysis.graph.DataFlowGraph;
-import de.unifrankfurt.faststring.analysis.graph.PhiInstructionNode;
+import de.unifrankfurt.faststring.analysis.graph.PhiNode;
 import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 
 public class CountingStrategy implements PhiLabelingStrategy {
 
 	@Override
-	public boolean shouldBeLabeled(DataFlowGraph graph, PhiInstructionNode phi) {
+	public boolean shouldBeLabeled(DataFlowGraph graph, PhiNode phi) {
 		
 		Multiset<TypeLabel> counter = HashMultiset.create();
 		

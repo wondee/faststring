@@ -62,31 +62,26 @@ public class TestMethodTransformerDefinitionConversations extends BaseAnalysisTe
 		TransformationInfo info = analyze(methodName);
 		MethodData data = transform(info);
 		
-		assertThat(data.getInstructions()[0], instanceOf(ConstantInstruction.class));
-		assertThat(data.getInstructions()[1], instanceOf(InvokeInstruction.class));
-		assertThat(data.getInstructions()[2], instanceOf(StoreInstruction.class));
+		assertThat(data.getInstructions()[1], instanceOf(DupInstruction.class));
+		assertThat(data.getInstructions()[2], instanceOf(InvokeInstruction.class));
+		assertThat(data.getInstructions()[3], instanceOf(StoreInstruction.class));
 
-		StoreInstruction store = (StoreInstruction) data.getInstructions()[2];
+		StoreInstruction store = (StoreInstruction) data.getInstructions()[3];
 		
 		assertEquals(info.getLocalForLabel(null, BuiltInTypes.SUBSTRING, 1), store.getVarIndex());
 
 	}
 	
 	@Test
-	@Ignore
 	public void testConstDefWithoutLocal() throws Exception {
 		final String methodName = "constantDefWithoutLocal";
 
 		TransformationInfo info = analyze(methodName);
 		MethodData data = transform(info);
 		
-		assertThat(data.getInstructions()[0], instanceOf(ConstantInstruction.class));
 		assertThat(data.getInstructions()[1], instanceOf(InvokeInstruction.class));
-		assertThat(data.getInstructions()[2], instanceOf(StoreInstruction.class));
 
-		StoreInstruction store = (StoreInstruction) data.getInstructions()[2];
-		
-		assertEquals(info.getLocalForLabel(null, BuiltInTypes.SUBSTRING, 2), store.getVarIndex());
+		assertEquals(6, data.getInstructions().length);
 	}
 	
 	@Test
@@ -116,6 +111,18 @@ public class TestMethodTransformerDefinitionConversations extends BaseAnalysisTe
 		assertThat(data.getInstructions()[3], instanceOf(InvokeInstruction.class));
 
 	}
+	
+	@Test
+	public void testCallDefToOriginal() throws Exception {
+		final String methodName = "callDefToOriginal";
+
+		TransformationInfo info = analyze(methodName);
+		MethodData data = transform(info);
+
+		assertThat(data.getInstructions()[1], instanceOf(InvokeInstruction.class));
+
+	}
+	
 	
 	@Test
 	@Ignore
