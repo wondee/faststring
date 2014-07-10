@@ -49,7 +49,7 @@ public class PrintTestBytecode {
 			for (int i = 0; i < ci.getReader().getMethodCount(); i++) {
 				
 				MethodData methodData = ci.visitMethod(i);				
-				String name = methodData.getName().replace('<', '{').replace('>', '}');
+				String name = TestUtilities.replaceInitChars(methodData.getName());
 				
 				PrintWriter fileWriter = new PrintWriter(new FileOutputStream(classOut  + "." + name));
 				

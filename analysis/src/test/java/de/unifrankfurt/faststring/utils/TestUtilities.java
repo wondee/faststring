@@ -65,4 +65,8 @@ public final class TestUtilities {
 			throw new TestInitializingException("Failed to load testclasses", e);
 		}
 	}
+	
+	public static String replaceInitChars(String methodName) {
+		return methodName.replace('<', '{').replace('>', '}');
+	}
 }

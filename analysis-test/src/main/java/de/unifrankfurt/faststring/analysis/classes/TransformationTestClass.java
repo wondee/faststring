@@ -14,6 +14,12 @@ public class TransformationTestClass {
 		return b;
 	}
 	
+	public void callDefToOriginal() {
+		String b = "".substring(3);
+		
+		b.intern();
+	}
+	
 	public void paramDef(String a) {
 		String b = a.substring(4);
 		b.substring(3, 6);
