@@ -37,7 +37,7 @@ public class DataFlowTestBuilder {
 	}
 	
 	public DataFlowTestBuilder labelUse(int rec, int def) {
-		InstructionNode call = new MethodCallInstruction(def, Arrays.asList(rec), SubstringStringType.METHOD_SUBSTRING, false);
+		InstructionNode call = new MethodCallNode(def, Arrays.asList(rec), SubstringStringType.METHOD_SUBSTRING, false);
 				
 //				Use.createUsedAsReceiver(SubstringStringType.METHOD_SUBSTRING, def, Collections.<Integer>emptyList());
 		addUse(rec, call);

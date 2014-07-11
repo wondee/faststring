@@ -5,7 +5,7 @@ import java.util.Collection;
 import com.ibm.wala.ssa.SSAInstruction;
 import com.ibm.wala.types.MethodReference;
 
-import de.unifrankfurt.faststring.analysis.IRMethod;
+import de.unifrankfurt.faststring.analysis.AnalyzedMethod;
 import de.unifrankfurt.faststring.analysis.graph.DataFlowGraphBuilder;
 import de.unifrankfurt.faststring.analysis.graph.Reference;
 
@@ -58,12 +58,12 @@ public interface TypeLabel {
 	int check(SSAInstruction ins);
 
 	/**
-	 * finds all uses of this label matching methods that are found in the given {@link IRMethod}
+	 * finds all uses of this label matching methods that are found in the given {@link AnalyzedMethod}
 	 *
-	 * @param ir the {@link IRMethod} of the method that is checked
+	 * @param ir the {@link AnalyzedMethod} of the method that is checked
 	 * @return a collection containing {@link Reference}s that are used in the given method
 	 */
-	Collection<Reference> findTypeUses(IRMethod ir);
+	Collection<Reference> findTypeUses(AnalyzedMethod ir);
 
 	/**
 	 * creates a {@link ReceiverInfo} object that holds information about the labeled references used as

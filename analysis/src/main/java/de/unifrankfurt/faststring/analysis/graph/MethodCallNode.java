@@ -12,14 +12,16 @@ import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 import de.unifrankfurt.faststring.analysis.util.IRUtil;
 
 
-public class MethodCallInstruction extends InstructionNode {
+public class MethodCallNode extends InstructionNode {
 
 	private int def;
 	private List<Integer> uses;
 	private MethodReference target;
 	private boolean isStatic;
 
-	public MethodCallInstruction(SSAInvokeInstruction instruction) {
+	private int storeIndex;
+	
+	public MethodCallNode(SSAInvokeInstruction instruction) {
 		this(
 			instruction.getDef(),
 			IRUtil.getUses(instruction),
@@ -29,7 +31,7 @@ public class MethodCallInstruction extends InstructionNode {
 
 	}
 
-	public MethodCallInstruction(int def, List<Integer> uses,
+	public MethodCallNode(int def, List<Integer> uses,
 			MethodReference target, boolean isStatic) {
 		super();
 		this.def = def;
@@ -148,7 +150,7 @@ public class MethodCallInstruction extends InstructionNode {
 	public String toString() {
 		return "MethodCallInstruction [def=" + def + ", uses=" + uses
 				+ ", target=" + target + ", isStatic=" + isStatic + ", bcIndex=" + 
-				getByteCodeIndex() + " localVarIndex=" + localMap + " ]";
+				getByteCodeIndex() + " localVarIndex=" + localMap + ", loadMap=" + loadMap + " ]";
 	}
 
 
@@ -162,5 +164,11 @@ public class MethodCallInstruction extends InstructionNode {
 		return determineMethodCallType(v) instanceof Receiver;
 	}
 
-
+	public void setStore(int storeIndex) {
+		this.storeIndex = storeIndex;
+	}
+	
+	public int getStore() {
+		return storeIndex;
+	}
 }

@@ -20,7 +20,7 @@ import com.ibm.wala.shrikeCT.InvalidClassFileException;
 import com.ibm.wala.ssa.DefUse;
 import com.ibm.wala.ssa.IR;
 
-import de.unifrankfurt.faststring.analysis.IRMethod;
+import de.unifrankfurt.faststring.analysis.AnalyzedMethod;
 import de.unifrankfurt.faststring.analysis.TargetApplication;
 
 /**
@@ -117,7 +117,7 @@ public abstract class BaseAnalysisTest {
 		return getIR(className, methodName).getMethod();
 	}
 	
-	protected static IRMethod getIRMethod(String className, String methodName) {
+	protected static AnalyzedMethod getIRMethod(String className, String methodName) {
 		return targetApplication.findIRMethodForMethod(getMethod(className, methodName));
 	}
 	

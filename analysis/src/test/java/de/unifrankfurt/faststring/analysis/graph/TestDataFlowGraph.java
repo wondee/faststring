@@ -13,7 +13,7 @@ import com.google.common.collect.Iterables;
 import com.ibm.wala.ssa.DefUse;
 import com.ibm.wala.ssa.IR;
 
-import de.unifrankfurt.faststring.analysis.IRMethod;
+import de.unifrankfurt.faststring.analysis.AnalyzedMethod;
 import de.unifrankfurt.faststring.analysis.label.BuiltInTypes;
 import de.unifrankfurt.faststring.analysis.util.GraphUtil;
 import de.unifrankfurt.faststring.utils.BaseAnalysisTest;
@@ -35,7 +35,7 @@ public class TestDataFlowGraph extends BaseAnalysisTest {
 		assertEquals(5, graph.size());
 
 		assertThat(graph.get(5).getDefinition(), instanceOf(ConstantNode.class));
-		assertThat(graph.get(11).getDefinition(), instanceOf(MethodCallInstruction.class));
+		assertThat(graph.get(11).getDefinition(), instanceOf(MethodCallNode.class));
 		assertThat(graph.get(8).getDefinition(), instanceOf(PhiNode.class));
 
 		assertList(getStartingPointsAsInts(graph), 8);
@@ -58,8 +58,8 @@ public class TestDataFlowGraph extends BaseAnalysisTest {
 		assertEquals(7, graph.size());
 
 		assertThat(graph.get(4).getDefinition(), instanceOf(ConstantNode.class));
-		assertThat(graph.get(9).getDefinition(), instanceOf(MethodCallInstruction.class));
-		assertThat(graph.get(24).getDefinition(), instanceOf(MethodCallInstruction.class));
+		assertThat(graph.get(9).getDefinition(), instanceOf(MethodCallNode.class));
+		assertThat(graph.get(24).getDefinition(), instanceOf(MethodCallNode.class));
 
 
 		assertList(getStartingPointsAsInts(graph), 4, 5);
@@ -86,7 +86,7 @@ public class TestDataFlowGraph extends BaseAnalysisTest {
 		assertThat(graph.get(4).getDefinition(), instanceOf(ConstantNode.class));
 		assertThat(graph.get(5).getDefinition(), instanceOf(ConstantNode.class));
 		assertThat(graph.get(12).getDefinition(), instanceOf(PhiNode.class));
-		assertThat(graph.get(19).getDefinition(), instanceOf(MethodCallInstruction.class));
+		assertThat(graph.get(19).getDefinition(), instanceOf(MethodCallNode.class));
 
 		assertList(getStartingPointsAsInts(graph), 7, 8, 12);
 	}
@@ -113,7 +113,7 @@ public class TestDataFlowGraph extends BaseAnalysisTest {
 		IR ir = getIR(className, methodName);
 		DefUse defUse = new DefUse(ir);
 
-		return new DataFlowGraphBuilder(BuiltInTypes.SUBSTRING, new IRMethod(ir, defUse)).createDataFlowGraph();
+		return new DataFlowGraphBuilder(BuiltInTypes.SUBSTRING, new AnalyzedMethod(ir, defUse)).createDataFlowGraph();
 	}
 
 }

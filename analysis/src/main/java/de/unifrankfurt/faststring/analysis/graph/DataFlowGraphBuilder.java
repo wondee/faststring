@@ -23,7 +23,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.ibm.wala.ssa.SSAInstruction;
 
-import de.unifrankfurt.faststring.analysis.IRMethod;
+import de.unifrankfurt.faststring.analysis.AnalyzedMethod;
 import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 import de.unifrankfurt.faststring.analysis.util.UniqueQueue;
 
@@ -32,7 +32,7 @@ public class DataFlowGraphBuilder {
 	private static final Logger LOG = LoggerFactory.getLogger(DataFlowGraphBuilder.class);
 	
 	private final TypeLabel label;
-	private final IRMethod ir;
+	private final AnalyzedMethod method;
 	
 	private InstructionNodeFactory instructionFactory;
 	
@@ -52,14 +52,14 @@ public class DataFlowGraphBuilder {
 //	};
 
 	
-	public DataFlowGraphBuilder(TypeLabel label, IRMethod ir) {
-		this.ir = ir;
+	public DataFlowGraphBuilder(TypeLabel label, AnalyzedMethod ir) {
+		this.method = ir;
 		this.label = label;
 		this.instructionFactory = new InstructionNodeFactory(ir);
 	}
 
 	public DataFlowGraph createDataFlowGraph() {
-		return createDataFlowGraph(label.findTypeUses(ir));
+		return createDataFlowGraph(label.findTypeUses(method));
 	}
 	
 	public DataFlowGraph createDataFlowGraph(Collection<Reference> stringRefs) {
@@ -96,13 +96,20 @@ public class DataFlowGraphBuilder {
 	}
 
 	private void checkUses(Reference ref) {
-		List<SSAInstruction> uses = Lists.newArrayList(ir.getUses(ref.valueNumber()));
+		List<SSAInstruction> uses = Lists.newArrayList(method.getUses(ref.valueNumber()));
 
 		Builder<InstructionNode> builder = new ImmutableList.Builder<InstructionNode>();
 		
 		for (SSAInstruction ins : uses) {
+			InstructionNode use = instructionFactory.create(ins);
 			
-			builder.add(instructionFactory.create(ins));
+			for (Integer local : use.getLocals(ref.valueNumber())) {
+				int load = method.getLoadFor(local, use.getByteCodeIndex());
+				
+				use.addLoad(local, load);
+			}
+			
+			builder.add(use);
 			
 		}
 		ref.setUses(builder.build());
@@ -111,14 +118,14 @@ public class DataFlowGraphBuilder {
 	private void checkDefinition(Reference ref) {
 		
 		int v = ref.valueNumber();
-		SSAInstruction instruction = ir.getDef(v);
+		SSAInstruction instruction = method.getDef(v);
 		
 		InstructionNode definition = null;
 		
 		if (instruction == null) {
-			if (ir.getParams().contains(v)) {
-				definition = new ParameterNode(ir.getParamIndexFor(v));
-			} else if (ir.isConstant(v)) {
+			if (method.getParams().contains(v)) {
+				definition = new ParameterNode(method.getParamIndexFor(v));
+			} else if (method.isConstant(v)) {
 				definition = instructionFactory.createConstant(v);
 			}
 		} else {

@@ -12,11 +12,11 @@ public class MethodAnalyzer {
 //	private static final Logger LOG = LoggerFactory
 //			.getLogger(MethodAnalyzer.class);
 
-	private IRMethod method;
+	private AnalyzedMethod method;
 
 	private TypeLabel label;
 
-	public MethodAnalyzer(IRMethod m, TypeLabel label) {
+	public MethodAnalyzer(AnalyzedMethod m, TypeLabel label) {
 		this.method = m;
 		this.label = label;
 	}

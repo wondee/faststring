@@ -8,7 +8,7 @@ import com.ibm.wala.ssa.SSAAbstractInvokeInstruction;
 import com.ibm.wala.ssa.SSAInstruction;
 import com.ibm.wala.types.MethodReference;
 
-import de.unifrankfurt.faststring.analysis.IRMethod;
+import de.unifrankfurt.faststring.analysis.AnalyzedMethod;
 import de.unifrankfurt.faststring.analysis.graph.Reference;
 
 public abstract class BaseTypeLabel implements TypeLabel {
@@ -35,7 +35,7 @@ public abstract class BaseTypeLabel implements TypeLabel {
 		return -1;
 	}
 	
-	public Collection<Reference> findTypeUses(IRMethod ir) {
+	public Collection<Reference> findTypeUses(AnalyzedMethod ir) {
 		Set<Reference> references = Sets.newHashSet();
 		
 		for (int i = 0; i < ir.getInstructions().length; i++) {

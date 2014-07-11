@@ -196,8 +196,8 @@ public final class TargetApplication {
 		return cache.getSSACache().findOrCreateDU(method, Everywhere.EVERYWHERE, options.getSSAOptions()) ;
 	}
 
-	public IRMethod findIRMethodForMethod(IMethod m) {
-		return new IRMethod(findIRForMethod(m), findDefUseForMethod(m));
+	public AnalyzedMethod findIRMethodForMethod(IMethod m) {
+		return new AnalyzedMethod(findIRForMethod(m), findDefUseForMethod(m));
 	}
 	
 	public ClassHierarchy getClassHierachy() {

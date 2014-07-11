@@ -13,25 +13,25 @@ import com.ibm.wala.ssa.SSAPhiInstruction;
 import com.ibm.wala.ssa.SSAPutInstruction;
 import com.ibm.wala.ssa.SSAReturnInstruction;
 
-import de.unifrankfurt.faststring.analysis.IRMethod;
+import de.unifrankfurt.faststring.analysis.AnalyzedMethod;
 import de.unifrankfurt.faststring.analysis.util.IRUtil;
 
 public class InstructionNodeFactory extends Visitor  {
 
 	private InstructionNode res;
-	private IRMethod ir;
+	private AnalyzedMethod method;
 
 	private Map<SSAInstruction, InstructionNode> cache = Maps.newHashMap();
 
-	public InstructionNodeFactory(IRMethod ir) {
-		this.ir = ir;
+	public InstructionNodeFactory(AnalyzedMethod ir) {
+		this.method = ir;
 	}
 
 
 	public InstructionNode createConstant(int v) {
 		
-		ConstantNode constant = new ConstantNode(ir.getConstantValue(v), ir.getConstantIndex(v));
-		Collection<Integer> locals = ir.getLocalVariableIndices(0, v);
+		ConstantNode constant = new ConstantNode(method.getConstantValue(v), method.getConstantIndex(v));
+		Collection<Integer> locals = method.getLocalVariableIndices(0, v);
 		constant.addLocalVariableIndices(v, locals);
 		
 		return constant;
@@ -48,7 +48,7 @@ public class InstructionNodeFactory extends Visitor  {
 
 				InstructionNode result = res;
 				res = null;
-				Integer index = ir.getIndexFor(instruction);
+				Integer index = method.getIndexFor(instruction);
 				
 				result.setByteCodeIndex(index);
 
@@ -60,9 +60,13 @@ public class InstructionNodeFactory extends Visitor  {
 				}
 
 				for (int v : vs) {
-					result.addLocalVariableIndices(v, ir.getLocalVariableIndices(index, v));
+					result.addLocalVariableIndices(v, method.getLocalVariableIndices(index, v));
 				}
 
+//				if (result instanceof MethodCallNode) {
+//					method.getStoreForLocal(index, result.getDef());
+//				}
+				
 				cache.put(instruction, result);
 
 				return result;
@@ -90,7 +94,7 @@ public class InstructionNodeFactory extends Visitor  {
 
 	@Override
 	public void visitInvoke(SSAInvokeInstruction invoke) {
-		res = new MethodCallInstruction(invoke);
+		res = new MethodCallNode(invoke);
 	}
 
 	@Override

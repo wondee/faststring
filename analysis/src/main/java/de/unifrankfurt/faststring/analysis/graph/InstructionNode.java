@@ -13,7 +13,8 @@ public abstract class InstructionNode implements Labelable {
 	private TypeLabel label;
 	private int byteCodeIndex = -1;
 
-	protected Map<Integer, Collection<Integer>> localMap = Maps.newHashMap();
+	Map<Integer, Collection<Integer>> localMap = Maps.newHashMap();
+	Map<Integer, Integer> loadMap = Maps.newHashMap();
 
 	public List<Integer> getConnectedRefs(TypeLabel label, int inV) {
 		return ImmutableList.of();
@@ -65,6 +66,15 @@ public abstract class InstructionNode implements Labelable {
 
 	}
 
+	public void addLoad(Integer local, int load) {
+		Integer old = loadMap.put(local, load);
+		
+		if (old != null) {
+			throw new IllegalStateException(String.format("old value was removed from loadMap local %d old %d new %d", local, old, load));
+		}
+		
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 *
@@ -110,7 +120,7 @@ public abstract class InstructionNode implements Labelable {
 
 		public void visitConstant(ConstantNode node) {}
 
-		public void visitMethodCall(MethodCallInstruction node) {}
+		public void visitMethodCall(MethodCallNode node) {}
 
 		public void visitParameter(ParameterNode node) {}
 
@@ -119,4 +129,5 @@ public abstract class InstructionNode implements Labelable {
 		public void visitReturn(ReturnNode node) {}
 
 	}
+
 }

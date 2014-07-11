@@ -17,4 +17,5 @@ public class TransformationUseTestClass {
 		String b = "test";
 		((is)?a : b).substring(3);
 	}
+	
 }

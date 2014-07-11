@@ -1,13 +1,11 @@
 package de.unifrankfurt.faststring.transform;
 
-import java.util.Arrays;
 import java.util.Collection;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Sets;
-import com.ibm.wala.shrikeBT.IInstruction;
 import com.ibm.wala.shrikeBT.IInvokeInstruction.Dispatch;
 import com.ibm.wala.shrikeBT.InvokeInstruction;
 import com.ibm.wala.shrikeBT.MethodData;
@@ -17,12 +15,11 @@ import com.ibm.wala.shrikeBT.MethodEditor.Patch;
 import com.ibm.wala.shrikeBT.Util;
 import com.ibm.wala.shrikeBT.analysis.Analyzer.FailureException;
 import com.ibm.wala.shrikeBT.analysis.Verifier;
-import com.ibm.wala.util.strings.StringStuff;
 
 import de.unifrankfurt.faststring.analysis.graph.ConstantNode;
 import de.unifrankfurt.faststring.analysis.graph.InstructionNode;
 import de.unifrankfurt.faststring.analysis.graph.InstructionNode.Visitor;
-import de.unifrankfurt.faststring.analysis.graph.MethodCallInstruction;
+import de.unifrankfurt.faststring.analysis.graph.MethodCallNode;
 import de.unifrankfurt.faststring.analysis.graph.ParameterNode;
 import de.unifrankfurt.faststring.analysis.graph.PhiNode;
 import de.unifrankfurt.faststring.analysis.graph.Reference;
@@ -106,7 +103,7 @@ public class MethodTransformer {
 	}
 
 	private void createUseConversations(Reference ref, InstructionNode instructionNode) {
-		Converter converter = new UseConverter(ref.getLabel(), instructionNode.getLabel());
+//		Converter converter = new UseConverter(ref.getLabel(), instructionNode.getLabel());
 //		
 //		if 
 //		
@@ -138,18 +135,12 @@ public class MethodTransformer {
 		}
 		
 		@Override
-		public void visitMethodCall(MethodCallInstruction node) {
+		public void visitMethodCall(MethodCallNode node) {
 			
 			if (node.isReceiver(v)) {
 				int bcIndex = node.getByteCodeIndex();
 				
 				final InvokeInstruction invoke = (InvokeInstruction) editor.getInstructions()[bcIndex];
-				
-				System.out.println(invoke.getMethodName());
-				System.out.println(invoke.getMethodSignature());
-				
-				System.out.println(Arrays.toString(Util.getParamsTypes(null, invoke.getMethodSignature())));
-				
 				
 				final InvokeInstruction invokeOpt = InvokeInstruction.make(invoke.getMethodSignature(), 
 						Util.makeType(label.getOptimizedType()), invoke.getMethodName(), Dispatch.VIRTUAL);
@@ -179,40 +170,40 @@ public class MethodTransformer {
 		}
 	}
 	
-	private class UseConverter extends Converter {
-
-		public UseConverter(TypeLabel from, TypeLabel to) {
-			super(from, to);
-		}
-
-		@Override
-		public void visitConstant(ConstantNode node) {
-			throw new UnsupportedOperationException("a constant can not be a use");
-		}
-
-		@Override
-		public void visitMethodCall(MethodCallInstruction node) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void visitParameter(ParameterNode node) {
-			throw new UnsupportedOperationException("a parameter can not be a use");
-		}
-
-		@Override
-		public void visitPhi(PhiNode node) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void visitReturn(ReturnNode node) {
-			
-		}
-		
-	}
+//	private class UseConverter extends Converter {
+//
+//		public UseConverter(TypeLabel from, TypeLabel to) {
+//			super(from, to);
+//		}
+//
+//		@Override
+//		public void visitConstant(ConstantNode node) {
+//			throw new UnsupportedOperationException("a constant can not be a use");
+//		}
+//
+//		@Override
+//		public void visitMethodCall(MethodCallInstruction node) {
+//			// TODO Auto-generated method stub
+//			
+//		}
+//
+//		@Override
+//		public void visitParameter(ParameterNode node) {
+//			throw new UnsupportedOperationException("a parameter can not be a use");
+//		}
+//
+//		@Override
+//		public void visitPhi(PhiNode node) {
+//			// TODO Auto-generated method stub
+//			
+//		}
+//
+//		@Override
+//		public void visitReturn(ReturnNode node) {
+//			
+//		}
+//		
+//	}
 	
 	private class DefinitionConverter extends Converter {
 
@@ -227,7 +218,7 @@ public class MethodTransformer {
 		}
 
 		@Override
-		public void visitMethodCall(MethodCallInstruction callResultDef) {
+		public void visitMethodCall(MethodCallNode callResultDef) {
 			patchFactory.createConversationAfter(local, callResultDef.getByteCodeIndex());
 		}
 
