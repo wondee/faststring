@@ -2,6 +2,7 @@ package de.unifrankfurt.faststring.analysis;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
@@ -26,6 +27,7 @@ import com.ibm.wala.ssa.SSACFG.BasicBlock;
 import com.ibm.wala.ssa.SSAInstruction;
 import com.ibm.wala.ssa.SSAPhiInstruction;
 
+import de.unifrankfurt.faststring.analysis.graph.LoadLocator;
 import de.unifrankfurt.faststring.analysis.util.IRUtil;
 import de.unifrankfurt.faststring.analysis.util.QueueUtil;
 import de.unifrankfurt.faststring.analysis.util.QueueUtil.BaseQueueProcessingStrategy;
@@ -50,7 +52,7 @@ public class AnalyzedMethod {
 	}
 
 	public Integer getIndexFor(SSAInstruction instruction) {
-		
+
 		if (instruction instanceof SSAPhiInstruction) {
 			return getIndexForPhi(instruction);
 		} else {
@@ -78,49 +80,62 @@ public class AnalyzedMethod {
 
 		int lastIndex = findLastIndexBeforeBranch(bcIndex);
 
-		Set<Integer> pointers = IRUtil.findAllDefPointersFor(defUse, valueNumber);
-
 		Set<Integer> locals = Sets.newHashSet();
 
-		for (Integer p : pointers) {
-			for (int i = bcIndex + 1; i < lastIndex; i++) {
-				locals.addAll(IRHelper.findLocalVariableIndex(ir, i, p));
-			}
+		for (int i = bcIndex + 1; i < lastIndex; i++) {
+			locals.addAll(IRHelper.findLocalVariableIndex(ir, i, valueNumber));
 		}
 
 		return locals;
 
 	}
 
+	public void getLoadFor(int local, SSAInstruction instruction) {
+		List<Integer> initialStack = IRUtil.getUses(instruction);
+
+		LoadLocator locator = new LoadLocator(initialStack, local);
+
+		SSACFG cfg = ir.getControlFlowGraph();
+		ISSABasicBlock block = ir.getBasicBlockForInstruction(instruction);
+
+		Integer startIndex = getIndexFor(instruction);
+
+
+		for (int i = startIndex; i < 0; i--) {
+			IInstruction ins = getBytecodeInstructions()[i];
+			ins.visit(locator);
+		}
+
+	}
+
+
 	/**
 	 * assumption: the load of this local is the first one that appears when searching backwards the cfg
-	 * 
+	 *
 	 * @param local the local that is loaded
 	 * @param bcIndex the bytecode index where this local is used
-	 * @return 
+	 * @return
 	 */
 	public int getLoadFor(int local, int bcIndex) {
-
-		
 		SSACFG cfg = ir.getControlFlowGraph();
-		
+
 		ISSABasicBlock block = cfg.getBlockForInstruction(bcIndex);
-		
+
 		int first = block.getFirstInstructionIndex();
-		
+
 		int loadIndex = checkBlockForLoad(local, bcIndex, first);
-		
+
 		if (loadIndex == -1) {
 			CFGTraversingStrategy strategy = new CFGTraversingStrategy(cfg, local);
 			QueueUtil.processUntilQueueIsEmpty(cfg.getPredNodes(block), strategy);
-			
+
 			loadIndex = strategy.getLoadIndex();
-			
+
 			if (loadIndex == -1) {
 				throw new IllegalStateException(String.format("no load found for local %d from bytecode index %d", local, bcIndex));
 			}
 		}
-		
+
 		return loadIndex;
 	}
 
@@ -133,7 +148,7 @@ public class AnalyzedMethod {
 			this.cfg = cfg;
 			this.local = local;
 		}
-		
+
 		@Override
 		public void process(ISSABasicBlock block, Queue<ISSABasicBlock> queue) {
 			int found = checkBlockForLoad(local, block.getLastInstructionIndex(), block.getFirstInstructionIndex());
@@ -143,9 +158,9 @@ public class AnalyzedMethod {
 			if (loadIndex == -1) {
 				queue.addAll(Lists.newArrayList(cfg.getPredNodes(block)));
 			}
-			
+
 		}
-		
+
 		private void setLoadIndex(int loadIndex) {
 			if (this.loadIndex != loadIndex) {
 				if (this.loadIndex == -1) {
@@ -155,19 +170,19 @@ public class AnalyzedMethod {
 				}
 			}
 		}
-		
+
 		public int getLoadIndex() {
 			return loadIndex;
 		}
 	}
-	
-		
+
+
 	private int checkBlockForLoad(int local, int bcIndex, int first) {
 		IInstruction[] bcInstructions = getBytecodeInstructions();
 		for (int i = bcIndex; i >= first; i--) {
 			if (bcInstructions[i] instanceof LoadInstruction) {
 				LoadInstruction load = (LoadInstruction) bcInstructions[i];
-				
+
 				if (load.getVarIndex() == local) {
 					return i;
 				}
@@ -178,14 +193,14 @@ public class AnalyzedMethod {
 
 	private IInstruction[] getBytecodeInstructions() {
 		if (bytecodeInstructions == null) {
-		
+
 			try {
 				bytecodeInstructions = ((IBytecodeMethod)ir.getMethod()).getInstructions();
 			} catch (InvalidClassFileException e) {
 				throw new IllegalStateException(e);
 			}
 		}
-		
+
 		return bytecodeInstructions;
 	}
 
@@ -252,11 +267,11 @@ public class AnalyzedMethod {
 //
 //	}
 
-	private int findLastIndexBeforeBranch(int bcIndex) {		
+	private int findLastIndexBeforeBranch(int bcIndex) {
 		SSACFG cfg = ir.getControlFlowGraph();
 
 		ISSABasicBlock block = cfg.getBlockForInstruction(bcIndex);
-		
+
 		while (cfg.getSuccNodeCount(block) == 2) {
 			block = cfg.getSuccNodes(block).next();
 		}
@@ -268,9 +283,9 @@ public class AnalyzedMethod {
 		if (phi2BlockMap == null) {
 			initializePhiMap();
 		}
-		
+
 		int def = instruction.getDef();
-		
+
 		BasicBlock basicBlock = ir.getControlFlowGraph().getBasicBlock(phi2BlockMap.get(def));
 		return basicBlock.getFirstInstructionIndex();
 	}
@@ -278,16 +293,16 @@ public class AnalyzedMethod {
 	private void initializePhiMap() {
 		phi2BlockMap = Maps.newHashMap();
 		SSACFG cfg = ir.getControlFlowGraph();
-		
+
 		for (int blockIndex = 0; blockIndex < cfg.getMaxNumber(); blockIndex++) {
 			BasicBlock block = cfg.getBasicBlock(blockIndex);
 			Iterator<SSAPhiInstruction> iter = block.iteratePhis();
-			
+
 			while (iter.hasNext()) {
 				SSAPhiInstruction phi = iter.next();
 				phi2BlockMap.put(phi.getDef(), blockIndex);
 			}
-			
+
 		}
 	}
 
@@ -295,32 +310,33 @@ public class AnalyzedMethod {
 //		try {
 //
 //			List<Integer> uses = Lists.reverse(IRUtil.getUses(instruction));
-//			
+//
 //			int constant = IRUtil.findUseIndex(v, uses);
-//			
+//
 //			int last = getIndexFor(instruction);
 //			int first = findFirstIndexBeforeBranch(last);
-//		
+//
 //			IInstruction[] instructions = ((IBytecodeMethod)ir.getMethod()).getInstructions();
-//			
+//
 //			new LocalVariableSolver(uses, constant);
-//			
+//
 //			for (int i = last; i >= first; i--) {
 //				IInstruction iInstruction = instructions[i];
 ////				iInstruction.visit(v);
 //			}
-//			
-//			
+//
+//
 //			return 0;
 //		} catch (InvalidClassFileException e) {
 //			throw new IllegalStateException(e);
 //		}
-//		
+//
 //	}
 
 	public Integer getConstantIndex(int v) {
 		return ir.getSymbolTable().getIndex(v);
 	}
+
 
 
 }

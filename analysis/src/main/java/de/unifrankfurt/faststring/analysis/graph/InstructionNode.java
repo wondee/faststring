@@ -68,13 +68,13 @@ public abstract class InstructionNode implements Labelable {
 
 	public void addLoad(Integer local, int load) {
 		Integer old = loadMap.put(local, load);
-		
-		if (old != null) {
+
+		if (old != null && old != load) {
 			throw new IllegalStateException(String.format("old value was removed from loadMap local %d old %d new %d", local, old, load));
 		}
-		
+
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 *
@@ -115,7 +115,7 @@ public abstract class InstructionNode implements Labelable {
 	public boolean isSameLabel(Labelable other) {
 		return isLabel(other.getLabel());
 	}
-	
+
 	public static class Visitor {
 
 		public void visitConstant(ConstantNode node) {}

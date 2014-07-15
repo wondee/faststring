@@ -25,21 +25,21 @@ public abstract class BaseTransformerTest extends BaseAnalysisTest {
 
 	private static final Logger LOG = LoggerFactory.getLogger(BaseTransformerTest.class);
 
-	private static Map<String, Integer> methodMap;
-	
+	private Map<String, Integer> methodMap;
+
 	public abstract String getTestClass();
-	
+
 	@Before
 	public void beforeClass() throws InvalidClassFileException {
 		if (methodMap == null) {
-			
+
 			ClassInstrumenter ci = getClassInstrumenter(getTestClass());
-	
+
 			ClassReader reader = ci.getReader();
 			int count = reader.getMethodCount();
-	
+
 			methodMap = Maps.newHashMapWithExpectedSize(count);
-	
+
 			for (int i = 0; i < count; i++) {
 				methodMap.put(reader.getMethodName(i), i);
 			}
@@ -54,9 +54,8 @@ public abstract class BaseTransformerTest extends BaseAnalysisTest {
 		return new TransformationInfo(result);
 	}
 
-	protected MethodData transform(TransformationInfo info)
-			throws InvalidClassFileException, IOException {
-		
+	protected MethodData transform(TransformationInfo info)	throws InvalidClassFileException, IOException {
+
 		MethodData methodData = getClassInstrumenter(getTestClass()).visitMethod(methodMap.get(info.getMethodName()));
 		new MethodTransformer(methodData, info).transformMethod();
 

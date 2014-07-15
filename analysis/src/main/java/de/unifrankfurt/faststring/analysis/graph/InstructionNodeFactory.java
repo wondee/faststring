@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.ibm.wala.ssa.SSAArrayStoreInstruction;
 import com.ibm.wala.ssa.SSAInstruction;
 import com.ibm.wala.ssa.SSAInstruction.Visitor;
@@ -29,14 +30,14 @@ public class InstructionNodeFactory extends Visitor  {
 
 
 	public InstructionNode createConstant(int v) {
-		
+
 		ConstantNode constant = new ConstantNode(method.getConstantValue(v), method.getConstantIndex(v));
 		Collection<Integer> locals = method.getLocalVariableIndices(0, v);
 		constant.addLocalVariableIndices(v, locals);
-		
+
 		return constant;
 	}
-	
+
 	public InstructionNode create(SSAInstruction instruction) {
 		if (!cache.containsKey(instruction)) {
 
@@ -49,24 +50,34 @@ public class InstructionNodeFactory extends Visitor  {
 				InstructionNode result = res;
 				res = null;
 				Integer index = method.getIndexFor(instruction);
-				
+
 				result.setByteCodeIndex(index);
 
 				List<Integer> vs = IRUtil.getUses(instruction);
 
-				int def = instruction.getDef();
-				if (def != -1) {
-					vs.add(def);
+				if (vs.size() == Sets.newHashSet(vs).size()) {
+					int def = instruction.getDef();
+					if (def != -1) {
+						vs.add(def);
+					}
+
+					for (int v : vs) {
+						result.addLocalVariableIndices(v, method.getLocalVariableIndices(index, v));
+						for (int local : result.getLocals(v)) {
+							method.getLoadFor(local, instruction);
+						}
+					}
+
+				} else {
+					throw new UnsupportedOperationException("now we need to implement it");
 				}
 
-				for (int v : vs) {
-					result.addLocalVariableIndices(v, method.getLocalVariableIndices(index, v));
-				}
+
 
 //				if (result instanceof MethodCallNode) {
 //					method.getStoreForLocal(index, result.getDef());
 //				}
-				
+
 				cache.put(instruction, result);
 
 				return result;

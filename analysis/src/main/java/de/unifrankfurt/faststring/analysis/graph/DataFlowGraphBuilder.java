@@ -30,12 +30,12 @@ import de.unifrankfurt.faststring.analysis.util.UniqueQueue;
 public class DataFlowGraphBuilder {
 
 	private static final Logger LOG = LoggerFactory.getLogger(DataFlowGraphBuilder.class);
-	
+
 	private final TypeLabel label;
 	private final AnalyzedMethod method;
-	
+
 	private InstructionNodeFactory instructionFactory;
-	
+
 	private Function<Integer, Reference> toReferences = new Function<Integer, Reference>() {
 		@Override
 		public Reference apply(Integer ref) {
@@ -51,7 +51,7 @@ public class DataFlowGraphBuilder {
 //		}
 //	};
 
-	
+
 	public DataFlowGraphBuilder(TypeLabel label, AnalyzedMethod ir) {
 		this.method = ir;
 		this.label = label;
@@ -61,67 +61,67 @@ public class DataFlowGraphBuilder {
 	public DataFlowGraph createDataFlowGraph() {
 		return createDataFlowGraph(label.findTypeUses(method));
 	}
-	
+
 	public DataFlowGraph createDataFlowGraph(Collection<Reference> stringRefs) {
-		
+
 		Queue<Reference> refs = new UniqueQueue<Reference>(stringRefs);
-		
+
 		Map<Integer, Reference> refMap = Maps.newHashMap();
-		
+
 		while(!refs.isEmpty()) {
 			Reference stringRef = refs.remove();
 			int ref = stringRef.valueNumber();
-			
+
 			if (!refMap.containsKey(ref)) {
 				refMap.put(ref, stringRef);
 			}
 
 			checkDefinition(stringRef);
 			checkUses(stringRef);
-			
+
 			refs.addAll(findNewRefs(stringRef, refMap.keySet()));
 		}
 
 		DataFlowGraph graph = new DataFlowGraph(label, ImmutableMap.copyOf(refMap));
 		LOG.debug("created dataflow graph for : {}", graph);
-		
+
 		return graph;
 	}
-	
+
 
 	private Collection<Reference> findNewRefs(Reference ref, Set<Integer> contained) {
-		
+
 		return Sets.newHashSet(transform(filter(ref.getConnectedRefs(label), not(in(contained))), toReferences));
-		
+
 	}
 
 	private void checkUses(Reference ref) {
 		List<SSAInstruction> uses = Lists.newArrayList(method.getUses(ref.valueNumber()));
 
 		Builder<InstructionNode> builder = new ImmutableList.Builder<InstructionNode>();
-		
+
 		for (SSAInstruction ins : uses) {
 			InstructionNode use = instructionFactory.create(ins);
-			
-			for (Integer local : use.getLocals(ref.valueNumber())) {
-				int load = method.getLoadFor(local, use.getByteCodeIndex());
-				
-				use.addLoad(local, load);
-			}
-			
+
+//			for (Integer local : use.getLocals(ref.valueNumber())) {
+//				int load = method.getLoadFor(local, use.getByteCodeIndex());
+//
+//				use.addLoad(local, load);
+//			}
+
 			builder.add(use);
-			
+
 		}
 		ref.setUses(builder.build());
 	}
 
 	private void checkDefinition(Reference ref) {
-		
+
 		int v = ref.valueNumber();
 		SSAInstruction instruction = method.getDef(v);
-		
+
 		InstructionNode definition = null;
-		
+
 		if (instruction == null) {
 			if (method.getParams().contains(v)) {
 				definition = new ParameterNode(method.getParamIndexFor(v));
@@ -129,17 +129,17 @@ public class DataFlowGraphBuilder {
 				definition = instructionFactory.createConstant(v);
 			}
 		} else {
-			definition = instructionFactory.create(instruction);	
+			definition = instructionFactory.create(instruction);
 		}
-		
+
 		if (definition == null) {
 			throw new IllegalStateException("no definition could be found for v=" + v + "(def: " + instruction + ")");
 		} else {
 			ref.setDefinition(definition);
 		}
-		
-		
+
+
 	}
-	
-	
+
+
 }

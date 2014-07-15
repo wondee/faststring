@@ -48,7 +48,7 @@ public class MethodTransformer {
 		editor.beginPass();
 
 		createConversations();
-		
+
 		try {
 			new Verifier(methodData).verify();
 			editor.applyPatches();
@@ -62,14 +62,14 @@ public class MethodTransformer {
 	private void createConversations() {
 
 		for (Reference ref : transformationInfo.getReferences()) {
-			
+
 			createDefinitionConversations(ref.getDefinition(), ref);
-			
+
 			for (InstructionNode use : ref.getUses()) {
 				createUseOptimization(ref, use);
 				createUseConversations(ref, use);
-			} 
-			
+			}
+
 		}
 
 	}
@@ -82,50 +82,46 @@ public class MethodTransformer {
 	private void createDefinitionConversations(InstructionNode instructionNode, Reference ref) {
 		if (!instructionNode.isLabel(ref.getLabel())) {
 			Converter converter = new DefinitionConverter(instructionNode.getLabel(), ref.getLabel());
-			
-			if (instructionNode instanceof PhiNode) {
-				instructionNode.visit(converter);
-			} else {
-				Collection<Integer> locals = instructionNode.getLocals(ref.valueNumber());
-				if (!locals.isEmpty()) {
-					for (Integer local : locals) {
-						converter.setLocal(local);
-						instructionNode.visit(converter);
-						
-					}
-				} else {
-					converter.setLocal(-1);
+
+			Collection<Integer> locals = instructionNode.getLocals(ref.valueNumber());
+			if (!locals.isEmpty()) {
+				for (Integer local : locals) {
+					converter.setLocal(local);
 					instructionNode.visit(converter);
+
 				}
+			} else {
+				converter.setLocal(-1);
+				instructionNode.visit(converter);
 			}
 		}
-		
+
 	}
 
 	private void createUseConversations(Reference ref, InstructionNode instructionNode) {
 //		Converter converter = new UseConverter(ref.getLabel(), instructionNode.getLabel());
-//		
-//		if 
-//		
+//
+//		if
+//
 //		instructionNode.visit(visitor);
-//		
+//
 //		Collection<Integer> locals = instructionNode.getLocals(ref.valueNumber());
 //		if (!locals.isEmpty()) {
 //			for (Integer local : locals) {
 //				converter.setLocal(local);
 //				instructionNode.visit(converter);
-//				
+//
 //			}
 //		} else {
 //			converter.setLocal(-1);
 //			instructionNode.visit(converter);
 //		}
-		
-		
+
+
 	}
 
 	private class Optimizer extends Visitor {
-		
+
 		private int v;
 		private TypeLabel label;
 
@@ -133,30 +129,30 @@ public class MethodTransformer {
 			this.v = v;
 			this.label = label;
 		}
-		
+
 		@Override
 		public void visitMethodCall(MethodCallNode node) {
-			
+
 			if (node.isReceiver(v)) {
 				int bcIndex = node.getByteCodeIndex();
-				
+
 				final InvokeInstruction invoke = (InvokeInstruction) editor.getInstructions()[bcIndex];
-				
-				final InvokeInstruction invokeOpt = InvokeInstruction.make(invoke.getMethodSignature(), 
+
+				final InvokeInstruction invokeOpt = InvokeInstruction.make(invoke.getMethodSignature(),
 						Util.makeType(label.getOptimizedType()), invoke.getMethodName(), Dispatch.VIRTUAL);
-				
-				editor.replaceWith(node.getByteCodeIndex(), new Patch() {	
+
+				editor.replaceWith(node.getByteCodeIndex(), new Patch() {
 					@Override
 					public void emitTo(Output w) {
 						w.emit(invokeOpt);
 					}
 				});
-				
+
 			}
 		}
-		
+
 	}
-	
+
 	private abstract class Converter extends Visitor {
 		int local = -1;
 		ConversationPatchFactory patchFactory;
@@ -169,7 +165,7 @@ public class MethodTransformer {
 			this.local = local;
 		}
 	}
-	
+
 //	private class UseConverter extends Converter {
 //
 //		public UseConverter(TypeLabel from, TypeLabel to) {
@@ -184,7 +180,7 @@ public class MethodTransformer {
 //		@Override
 //		public void visitMethodCall(MethodCallInstruction node) {
 //			// TODO Auto-generated method stub
-//			
+//
 //		}
 //
 //		@Override
@@ -195,23 +191,23 @@ public class MethodTransformer {
 //		@Override
 //		public void visitPhi(PhiNode node) {
 //			// TODO Auto-generated method stub
-//			
+//
 //		}
 //
 //		@Override
 //		public void visitReturn(ReturnNode node) {
-//			
+//
 //		}
-//		
+//
 //	}
-	
+
 	private class DefinitionConverter extends Converter {
 
 		public DefinitionConverter(TypeLabel from, TypeLabel to) {
 			super(from, to);
 		}
 
-		
+
 		@Override
 		public void visitConstant(ConstantNode node) {
 			patchFactory.createConversationAfter(local, node.getByteCodeIndex());
@@ -224,29 +220,32 @@ public class MethodTransformer {
 
 		@Override
 		public void visitParameter(ParameterNode node) {
-			patchFactory.createOptConversation(local);
+			patchFactory.createConversationAtStart(local);
 		}
 
 		@Override
 		public void visitPhi(PhiNode node) {
 			//TODO to be implemented
-			
+
 			// phi defs have merged locals additionally to the locals of their uses
 			// can those locals which are taken from the uses be removed from the def locals??
-			
+
 			// first try: just convert on stack. Should be right when no store appears afterwards
-			// 
-			
-			Collection<Integer> defLocals = node.getLocals(node.getDef());
-			Collection<Integer> useLocals = Sets.newHashSet();
-			for (Integer use : node.getUses()) {
-				useLocals.addAll(node.getLocals(use));
-			}
-			
-			if (defLocals.equals(useLocals)) {
-				patchFactory.createConversationBefore(node.getByteCodeIndex());
-			}
-			
+			//
+
+
+			patchFactory.createConversationBefore(local, node.getByteCodeIndex());
+
+//			Collection<Integer> defLocals = node.getLocals(node.getDef());
+//			Collection<Integer> useLocals = Sets.newHashSet();
+//			for (Integer use : node.getUses()) {
+//				useLocals.addAll(node.getLocals(use));
+//			}
+//
+//			if (defLocals.equals(useLocals)) {
+//				patchFactory.createConversationBefore(node.getByteCodeIndex());
+//			}
+
 		}
 
 		@Override

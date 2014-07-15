@@ -10,22 +10,28 @@ import de.unifrankfurt.faststring.utils.BaseTransformerTest;
 public class TestMethodTransformerUseConversations extends BaseTransformerTest {
 
 	private static final String TEST_CLASS = "TransformationUseTestClass";
-	
+
 	@Test
 	public void testSimpleSubstring() throws Exception {
-		
+
 		TransformationInfo info = analyze("simpleSubstring");
 		MethodData data = transform(info);
-		
+
 		assertTrue(data.getHasChanged());
-		
+
 	}
-	
+
 	@Test
 	public void testSimpleSubstringWithPhi() throws Exception {
 		TransformationInfo info = analyze("simpleSubstringWithPhi");
 		MethodData data = transform(info);
 	}
+
+	@Test
+	public void testTest() throws Exception {
+		TransformationInfo info = analyze("test");
+	}
+
 
 	@Override
 	public String getTestClass() {
