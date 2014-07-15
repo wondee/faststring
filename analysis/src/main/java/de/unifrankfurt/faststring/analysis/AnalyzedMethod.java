@@ -2,22 +2,18 @@ package de.unifrankfurt.faststring.analysis;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.primitives.Ints;
 import com.ibm.wala.classLoader.IBytecodeMethod;
 import com.ibm.wala.classLoader.ShrikeCTMethod;
 import com.ibm.wala.shrikeBT.IInstruction;
-import com.ibm.wala.shrikeBT.LoadInstruction;
 import com.ibm.wala.shrikeCT.InvalidClassFileException;
 import com.ibm.wala.ssa.DefUse;
 import com.ibm.wala.ssa.IR;
@@ -29,12 +25,9 @@ import com.ibm.wala.ssa.SSAPhiInstruction;
 
 import de.unifrankfurt.faststring.analysis.graph.LoadLocator;
 import de.unifrankfurt.faststring.analysis.util.IRUtil;
-import de.unifrankfurt.faststring.analysis.util.QueueUtil;
-import de.unifrankfurt.faststring.analysis.util.QueueUtil.BaseQueueProcessingStrategy;
 
 public class AnalyzedMethod {
 
-	@SuppressWarnings("unused")
 	private static final Logger LOG = LoggerFactory.getLogger(AnalyzedMethod.class);
 
 	private IR ir;
@@ -90,106 +83,123 @@ public class AnalyzedMethod {
 
 	}
 
-	public void getLoadFor(int local, SSAInstruction instruction) {
-		List<Integer> initialStack = IRUtil.getUses(instruction);
-
-		LoadLocator locator = new LoadLocator(initialStack, local);
-
+	public int getLoadFor(int local, int index, int stackSize, int bcIndex) {
+		LOG.trace("getLoad(local={},index={},stackSize={},bytecodeIndex={}", local, index, stackSize, bcIndex);
+		
+		LoadLocator locator = new LoadLocator(stackSize, index, local);
+		
 		SSACFG cfg = ir.getControlFlowGraph();
-		ISSABasicBlock block = ir.getBasicBlockForInstruction(instruction);
-
-		Integer startIndex = getIndexFor(instruction);
-
-
-		for (int i = startIndex; i < 0; i--) {
-			IInstruction ins = getBytecodeInstructions()[i];
-			ins.visit(locator);
-		}
-
-	}
-
-
-	/**
-	 * assumption: the load of this local is the first one that appears when searching backwards the cfg
-	 *
-	 * @param local the local that is loaded
-	 * @param bcIndex the bytecode index where this local is used
-	 * @return
-	 */
-	public int getLoadFor(int local, int bcIndex) {
-		SSACFG cfg = ir.getControlFlowGraph();
-
 		ISSABasicBlock block = cfg.getBlockForInstruction(bcIndex);
-
-		int first = block.getFirstInstructionIndex();
-
-		int loadIndex = checkBlockForLoad(local, bcIndex, first);
-
-		if (loadIndex == -1) {
-			CFGTraversingStrategy strategy = new CFGTraversingStrategy(cfg, local);
-			QueueUtil.processUntilQueueIsEmpty(cfg.getPredNodes(block), strategy);
-
-			loadIndex = strategy.getLoadIndex();
-
-			if (loadIndex == -1) {
-				throw new IllegalStateException(String.format("no load found for local %d from bytecode index %d", local, bcIndex));
-			}
-		}
-
-		return loadIndex;
-	}
-
-	class CFGTraversingStrategy extends BaseQueueProcessingStrategy<ISSABasicBlock> {
-		private int local;
-		private int loadIndex = -1;
-		private SSACFG cfg;
-
-		public CFGTraversingStrategy(SSACFG cfg, int local) {
-			this.cfg = cfg;
-			this.local = local;
-		}
-
-		@Override
-		public void process(ISSABasicBlock block, Queue<ISSABasicBlock> queue) {
-			int found = checkBlockForLoad(local, block.getLastInstructionIndex(), block.getFirstInstructionIndex());
-			if (found != -1) {
-				setLoadIndex(found);
-			}
-			if (loadIndex == -1) {
-				queue.addAll(Lists.newArrayList(cfg.getPredNodes(block)));
-			}
-
-		}
-
-		private void setLoadIndex(int loadIndex) {
-			if (this.loadIndex != loadIndex) {
-				if (this.loadIndex == -1) {
-					this.loadIndex = loadIndex;
-				} else {
-					throw new IllegalStateException(String.format("two loads where found %d and %d ", loadIndex, this.loadIndex));
-				}
-			}
-		}
-
-		public int getLoadIndex() {
-			return loadIndex;
-		}
-	}
-
-
-	private int checkBlockForLoad(int local, int bcIndex, int first) {
-		IInstruction[] bcInstructions = getBytecodeInstructions();
-		for (int i = bcIndex; i >= first; i--) {
-			if (bcInstructions[i] instanceof LoadInstruction) {
-				LoadInstruction load = (LoadInstruction) bcInstructions[i];
-
-				if (load.getVarIndex() == local) {
+		
+		int start = bcIndex - 1;
+		
+		do {
+		
+			for (int i = start; i > block.getFirstInstructionIndex(); i--) {
+				IInstruction instruction = getBytecodeInstructions()[i];
+				
+				boolean found = locator.process(instruction);
+				
+				if (found)  {
 					return i;
 				}
 			}
-		}
+		
+			if (cfg.getPredNodeCount(block) == 1) {
+				block = cfg.getPredNodes(block).next();
+				start = block.getLastInstructionIndex();
+			} else {
+				block = null;
+			}
+			
+		} while(block != null);
+		
 		return -1;
+
 	}
+
+
+//	/**
+//	 * assumption: the load of this local is the first one that appears when searching backwards the cfg
+//	 *
+//	 * @param local the local that is loaded
+//	 * @param bcIndex the bytecode index where this local is used
+//	 * @return
+//	 */
+//	public int getLoadFor(int local, int bcIndex) {
+//		SSACFG cfg = ir.getControlFlowGraph();
+//
+//		ISSABasicBlock block = cfg.getBlockForInstruction(bcIndex);
+//
+//		int first = block.getFirstInstructionIndex();
+//
+//		int loadIndex = checkBlockForLoad(local, bcIndex, first);
+//
+//		if (loadIndex == -1) {
+//			CFGTraversingStrategy strategy = new CFGTraversingStrategy(cfg, local);
+//			QueueUtil.processUntilQueueIsEmpty(cfg.getPredNodes(block), strategy);
+//
+//			loadIndex = strategy.getLoadIndex();
+//
+//			if (loadIndex == -1) {
+//				throw new IllegalStateException(String.format("no load found for local %d from bytecode index %d", local, bcIndex));
+//			}
+//		}
+//
+//		return loadIndex;
+//	}
+//
+//	class CFGTraversingStrategy extends BaseQueueProcessingStrategy<ISSABasicBlock> {
+//		private int local;
+//		private int loadIndex = -1;
+//		private SSACFG cfg;
+//
+//		public CFGTraversingStrategy(SSACFG cfg, int local) {
+//			this.cfg = cfg;
+//			this.local = local;
+//		}
+//
+//		@Override
+//		public void process(ISSABasicBlock block, Queue<ISSABasicBlock> queue) {
+//			int found = checkBlockForLoad(local, block.getLastInstructionIndex(), block.getFirstInstructionIndex());
+//			if (found != -1) {
+//				setLoadIndex(found);
+//			}
+//			if (loadIndex == -1) {
+//				queue.addAll(Lists.newArrayList(cfg.getPredNodes(block)));
+//			}
+//
+//		}
+//
+//		private void setLoadIndex(int loadIndex) {
+//			if (this.loadIndex != loadIndex) {
+//				if (this.loadIndex == -1) {
+//					this.loadIndex = loadIndex;
+//				} else {
+//					throw new IllegalStateException(String.format("two loads where found %d and %d ", loadIndex, this.loadIndex));
+//				}
+//			}
+//		}
+//
+//		public int getLoadIndex() {
+//			return loadIndex;
+//		}
+//	}
+//
+//
+//	private int checkBlockForLoad(int local, int bcIndex, int first) {
+//		IInstruction[] bcInstructions = getBytecodeInstructions();
+//		for (int i = bcIndex; i >= first; i--) {
+//			if (bcInstructions[i] instanceof LoadInstruction) {
+//				LoadInstruction load = (LoadInstruction) bcInstructions[i];
+//
+//				if (load.getVarIndex() == local) {
+//					return i;
+//				}
+//			}
+//		}
+//		return -1;
+//	}
 
 	private IInstruction[] getBytecodeInstructions() {
 		if (bytecodeInstructions == null) {

@@ -1,54 +1,67 @@
 package de.unifrankfurt.faststring.analysis.graph;
 
-import java.util.List;
-import java.util.Stack;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Lists;
-import com.ibm.wala.shrikeBT.ConstantInstruction;
-import com.ibm.wala.shrikeBT.DupInstruction;
-import com.ibm.wala.shrikeBT.IInvokeInstruction;
-import com.ibm.wala.shrikeBT.ILoadInstruction;
-import com.ibm.wala.shrikeBT.IInstruction.Visitor;
+import com.google.common.base.Preconditions;
+import com.ibm.wala.shrikeBT.IInstruction;
+import com.ibm.wala.shrikeBT.LoadInstruction;
 
-public class LoadLocator extends Visitor {
+public class LoadLocator {
 
-	private final Stack<Object> stack;
-	private int positionOfCheck;
+	private static final Logger LOG = LoggerFactory.getLogger(LoadLocator.class);
+	
+	private int size;
+	private int offset;
+	private int local;
+	
 
-	public LoadLocator(List<Integer> initialStack, int index) {
-		stack = new Stack<>();
+	public LoadLocator(int size, int index, int local) {
 
-		for (int v : Lists.reverse(initialStack)) {
-			stack.push(v);
+		Preconditions.checkArgument(index > -1);
+		Preconditions.checkArgument(size > 1);
+		Preconditions.checkArgument(index < size);
+		
+		this.offset = index;
+		this.size = size;
+		this.local = local;
+		
+	}
+
+
+	public boolean process(IInstruction instruction) {
+		LOG.trace("processing: {}", instruction);
+		if (instruction.getPushedWordSize() > 0) {
+			if (offset == size - 1) {
+				if (instruction instanceof LoadInstruction) {
+					LoadInstruction load = (LoadInstruction) instruction;
+
+					if (load.getVarIndex() == local) {
+						return true;						
+					} else {
+						throw new IllegalStateException("excpected local was " + local + ", but was " + load.getVarIndex());	
+					}
+				} else {
+					throw new IllegalStateException("instruction is no load: " + instruction);
+				}
+			} else {
+				size--;
+				
+				if (size < offset) {
+					throw new IllegalStateException("size " + size + " got lower than the offset " + offset);
+				}
+			}
 		}
-
-		positionOfCheck = index;
+		
+		int poppedCount = instruction.getPoppedCount();
+		if (poppedCount > 0) {
+			size += poppedCount;
+		}
+		
+		LOG.trace("size={}, offset={}", size, offset);
+		
+		return false;
 	}
 
-	private void removeFromStack() {
-		stack.pop();
-	}
-
-	@Override
-	public void visitConstant(ConstantInstruction instruction) {
-		removeFromStack();
-		;
-	}
-
-
-	@Override
-	public void visitInvoke(IInvokeInstruction instruction) {
-		super.visitInvoke(instruction);
-	}
-
-	@Override
-	public void visitDup(DupInstruction instruction) {
-		super.visitDup(instruction);
-	}
-
-	@Override
-	public void visitLocalLoad(ILoadInstruction instruction) {
-		super.visitLocalLoad(instruction);
-	}
 
 }

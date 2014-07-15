@@ -4,6 +4,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.ibm.wala.ssa.SSAArrayStoreInstruction;
@@ -19,6 +22,8 @@ import de.unifrankfurt.faststring.analysis.util.IRUtil;
 
 public class InstructionNodeFactory extends Visitor  {
 
+	private static Logger LOG = LoggerFactory.getLogger(InstructionNodeFactory.class); 
+	
 	private InstructionNode res;
 	private AnalyzedMethod method;
 
@@ -64,7 +69,10 @@ public class InstructionNodeFactory extends Visitor  {
 					for (int v : vs) {
 						result.addLocalVariableIndices(v, method.getLocalVariableIndices(index, v));
 						for (int local : result.getLocals(v)) {
-							method.getLoadFor(local, instruction);
+							LOG.debug("determine load instruction for v={} at {}", v, instruction);
+							int loadIndex = method.getLoadFor(local, vs.indexOf(v), vs.size(), index);
+							
+							result.addLoad(local, loadIndex);
 						}
 					}
 

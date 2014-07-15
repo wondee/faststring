@@ -47,11 +47,15 @@ public abstract class BaseTransformerTest extends BaseAnalysisTest {
 	}
 
 	protected TransformationInfo analyze(final String methodName) {
-		MethodAnalyzer analyzer = new MethodAnalyzer(getIRMethod(getTestClass(),
-				methodName), BuiltInTypes.SUBSTRING);
-		AnalysisResult result = analyzer.analyze();
+		AnalysisResult result = analyzeToResult(methodName);
 
 		return new TransformationInfo(result);
+	}
+
+	protected AnalysisResult analyzeToResult(final String methodName) {
+		MethodAnalyzer analyzer = new MethodAnalyzer(getIRMethod(getTestClass(),
+				methodName), BuiltInTypes.SUBSTRING);
+		return analyzer.analyze();
 	}
 
 	protected MethodData transform(TransformationInfo info)	throws InvalidClassFileException, IOException {

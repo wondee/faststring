@@ -130,4 +130,8 @@ public abstract class InstructionNode implements Labelable {
 
 	}
 
+	public Integer getLoad(int i) {
+		return loadMap.get(i);
+	}
+
 }
