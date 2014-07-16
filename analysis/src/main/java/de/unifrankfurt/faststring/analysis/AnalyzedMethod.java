@@ -84,36 +84,36 @@ public class AnalyzedMethod {
 	}
 
 	public int getLoadFor(int local, int index, int stackSize, int bcIndex) {
-		LOG.trace("getLoad(local={},index={},stackSize={},bytecodeIndex={}", local, index, stackSize, bcIndex);
-		
+		LOG.trace("getLoad(local={},index={},stackSize={},bytecodeIndex={})", local, index, stackSize, bcIndex);
+
 		LoadLocator locator = new LoadLocator(stackSize, index, local);
-		
+
 		SSACFG cfg = ir.getControlFlowGraph();
 		ISSABasicBlock block = cfg.getBlockForInstruction(bcIndex);
-		
+
 		int start = bcIndex - 1;
-		
+
 		do {
-		
+
 			for (int i = start; i > block.getFirstInstructionIndex(); i--) {
 				IInstruction instruction = getBytecodeInstructions()[i];
-				
+
 				boolean found = locator.process(instruction);
-				
+
 				if (found)  {
 					return i;
 				}
 			}
-		
+
 			if (cfg.getPredNodeCount(block) == 1) {
 				block = cfg.getPredNodes(block).next();
 				start = block.getLastInstructionIndex();
 			} else {
 				block = null;
 			}
-			
+
 		} while(block != null);
-		
+
 		return -1;
 
 	}

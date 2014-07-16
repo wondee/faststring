@@ -22,8 +22,8 @@ import de.unifrankfurt.faststring.analysis.util.IRUtil;
 
 public class InstructionNodeFactory extends Visitor  {
 
-	private static Logger LOG = LoggerFactory.getLogger(InstructionNodeFactory.class); 
-	
+	private static Logger LOG = LoggerFactory.getLogger(InstructionNodeFactory.class);
+
 	private InstructionNode res;
 	private AnalyzedMethod method;
 
@@ -61,17 +61,17 @@ public class InstructionNodeFactory extends Visitor  {
 				List<Integer> vs = IRUtil.getUses(instruction);
 
 				if (vs.size() == Sets.newHashSet(vs).size()) {
-					int def = instruction.getDef();
-					if (def != -1) {
-						vs.add(def);
-					}
+//					int def = instruction.getDef();
+//					if (def != -1) {
+//						vs.add(def);
+//					}
 
 					for (int v : vs) {
 						result.addLocalVariableIndices(v, method.getLocalVariableIndices(index, v));
 						for (int local : result.getLocals(v)) {
 							LOG.debug("determine load instruction for v={} at {}", v, instruction);
 							int loadIndex = method.getLoadFor(local, vs.indexOf(v), vs.size(), index);
-							
+
 							result.addLoad(local, loadIndex);
 						}
 					}
