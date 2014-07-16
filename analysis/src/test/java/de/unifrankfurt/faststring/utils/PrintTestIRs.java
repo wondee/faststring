@@ -65,16 +65,12 @@ public class PrintTestIRs {
 		}
 
 		wp.put(WalaProperties.OUTPUT_DIR, TARGET_IRS);
-
-		System.out.println(ir.getMethod().getDeclaringClass().getName());
 		
 		String pdfFile = wp.getProperty(WalaProperties.OUTPUT_DIR) + 
 						 File.separatorChar + 
 						 TestUtilities.createFileName(ir.getMethod().getDeclaringClass().getName().toString(), 
 								 ir.getMethod().getName().toString()) + 
 								 ".pdf";
-		
-		System.out.println(pdfFile);
 		
 		String dotFile = wp.getProperty(WalaProperties.OUTPUT_DIR)
 				+ File.separatorChar + "ir.dt";
