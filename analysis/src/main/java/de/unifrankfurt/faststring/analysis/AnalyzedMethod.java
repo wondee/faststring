@@ -74,7 +74,7 @@ public class AnalyzedMethod {
 
 		Set<Integer> locals = Sets.newHashSet();
 
-		for (int i = bcIndex + 1; i < lastIndex; i++) {
+		for (int i = bcIndex; i < lastIndex; i++) {
 			locals.addAll(IRHelper.findLocalVariableIndex(ir, i, valueNumber));
 		}
 
@@ -129,7 +129,8 @@ public class AnalyzedMethod {
 
 		do {
 
-			for (int i = start; i >= block.getLastInstructionIndex(); i++) {
+			int lastInstructionIndex = block.getLastInstructionIndex();
+			for (int i = start; i <= lastInstructionIndex; i++) {
 				IInstruction instruction = getBytecodeInstructions()[i];
 
 				boolean found = locator.processForward(instruction);
@@ -138,10 +139,10 @@ public class AnalyzedMethod {
 					return i;
 				}
 			}
-
-			if (cfg.getPredNodeCount(block) == 2) {
-				block = cfg.getPredNodes(block).next();
-				start = block.getLastInstructionIndex();
+			
+			if (cfg.getSuccNodeCount(block) == 2) {
+				block = cfg.getSuccNodes(block).next();
+				start = block.getFirstInstructionIndex();
 			} else {
 				block = null;
 			}
@@ -150,89 +151,6 @@ public class AnalyzedMethod {
 
 		return -1;
 	}
-	
-
-//	/**
-//	 * assumption: the load of this local is the first one that appears when searching backwards the cfg
-//	 *
-//	 * @param local the local that is loaded
-//	 * @param bcIndex the bytecode index where this local is used
-//	 * @return
-//	 */
-//	public int getLoadFor(int local, int bcIndex) {
-//		SSACFG cfg = ir.getControlFlowGraph();
-//
-//		ISSABasicBlock block = cfg.getBlockForInstruction(bcIndex);
-//
-//		int first = block.getFirstInstructionIndex();
-//
-//		int loadIndex = checkBlockForLoad(local, bcIndex, first);
-//
-//		if (loadIndex == -1) {
-//			CFGTraversingStrategy strategy = new CFGTraversingStrategy(cfg, local);
-//			QueueUtil.processUntilQueueIsEmpty(cfg.getPredNodes(block), strategy);
-//
-//			loadIndex = strategy.getLoadIndex();
-//
-//			if (loadIndex == -1) {
-//				throw new IllegalStateException(String.format("no load found for local %d from bytecode index %d", local, bcIndex));
-//			}
-//		}
-//
-//		return loadIndex;
-//	}
-//
-//	class CFGTraversingStrategy extends BaseQueueProcessingStrategy<ISSABasicBlock> {
-//		private int local;
-//		private int loadIndex = -1;
-//		private SSACFG cfg;
-//
-//		public CFGTraversingStrategy(SSACFG cfg, int local) {
-//			this.cfg = cfg;
-//			this.local = local;
-//		}
-//
-//		@Override
-//		public void process(ISSABasicBlock block, Queue<ISSABasicBlock> queue) {
-//			int found = checkBlockForLoad(local, block.getLastInstructionIndex(), block.getFirstInstructionIndex());
-//			if (found != -1) {
-//				setLoadIndex(found);
-//			}
-//			if (loadIndex == -1) {
-//				queue.addAll(Lists.newArrayList(cfg.getPredNodes(block)));
-//			}
-//
-//		}
-//
-//		private void setLoadIndex(int loadIndex) {
-//			if (this.loadIndex != loadIndex) {
-//				if (this.loadIndex == -1) {
-//					this.loadIndex = loadIndex;
-//				} else {
-//					throw new IllegalStateException(String.format("two loads where found %d and %d ", loadIndex, this.loadIndex));
-//				}
-//			}
-//		}
-//
-//		public int getLoadIndex() {
-//			return loadIndex;
-//		}
-//	}
-//
-//
-//	private int checkBlockForLoad(int local, int bcIndex, int first) {
-//		IInstruction[] bcInstructions = getBytecodeInstructions();
-//		for (int i = bcIndex; i >= first; i--) {
-//			if (bcInstructions[i] instanceof LoadInstruction) {
-//				LoadInstruction load = (LoadInstruction) bcInstructions[i];
-//
-//				if (load.getVarIndex() == local) {
-//					return i;
-//				}
-//			}
-//		}
-//		return -1;
-//	}
 
 	private IInstruction[] getBytecodeInstructions() {
 		if (bytecodeInstructions == null) {
@@ -277,38 +195,10 @@ public class AnalyzedMethod {
 		return -1;
 	}
 
-//	public int getByteCodeIndexFor(Integer index) {
-//		try {
-//			IBytecodeMethod method = (IBytecodeMethod) ir.getMethod();
-//			return method.getBytecodeIndex(index);
-//		} catch (InvalidClassFileException e) {
-//			throw new IllegalStateException("could not read class file", e);
-//		}
-//	}
-
 	public int getMaxLocals() {
 		return ((ShrikeCTMethod)ir.getMethod()).getMaxLocals();
 	}
 
-
-//	public IInstruction[] getLastIndexOfSinglePathReachedBlock(int bcIndex) {
-//		try {
-//
-//			int from = bcIndex + 1;
-//			int to = findLastIndexBeforeBranch(ir.getInstructions()[bcIndex]);
-//
-//			if (from < to) {
-//				return Arrays.copyOfRange(
-//						((IBytecodeMethod)ir.getMethod()).getInstructions(), from, to);
-//			} else {
-//				return new IInstruction[0];
-//			}
-//		} catch (InvalidClassFileException e) {
-//			throw new IllegalStateException(e);
-//		}
-//
-//
-//	}
 
 	private int findLastIndexBeforeBranch(int bcIndex) {
 		SSACFG cfg = ir.getControlFlowGraph();
