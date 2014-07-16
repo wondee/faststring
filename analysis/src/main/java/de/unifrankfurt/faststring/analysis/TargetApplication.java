@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Predicate;
-import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSet.Builder;
 import com.google.common.collect.Iterables;
@@ -15,14 +14,12 @@ import com.ibm.wala.classLoader.IClass;
 import com.ibm.wala.classLoader.IMethod;
 import com.ibm.wala.ipa.callgraph.AnalysisCache;
 import com.ibm.wala.ipa.callgraph.AnalysisOptions;
-import com.ibm.wala.ipa.callgraph.AnalysisOptions.ReflectionOptions;
 import com.ibm.wala.ipa.callgraph.AnalysisScope;
 import com.ibm.wala.ipa.callgraph.CallGraph;
 import com.ibm.wala.ipa.callgraph.Entrypoint;
 import com.ibm.wala.ipa.callgraph.impl.DefaultEntrypoint;
 import com.ibm.wala.ipa.callgraph.impl.Everywhere;
 import com.ibm.wala.ipa.callgraph.propagation.PointerAnalysis;
-import com.ibm.wala.ipa.callgraph.propagation.SSAPropagationCallGraphBuilder;
 import com.ibm.wala.ipa.cha.ClassHierarchy;
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
 import com.ibm.wala.ssa.DefUse;
@@ -70,42 +67,43 @@ public final class TargetApplication {
 //		initCallGraph();
 		
 	}
-	
-	
-	@SuppressWarnings({"unused","deprecation"})
-	private void initCallGraph()  {
-		CFAStrategy strategy = CFAStrategy.ZERO_ONE_CONTAINER;
-		
-		LOG.debug("creating pointer analysis...");
-		
-		AnalysisOptions options = new AnalysisOptions();
-		options.setReflectionOptions(ReflectionOptions.NONE);
-		options.setEntrypoints(getEntrypoints());
-		
-		
-		LOG.debug("creating builder...");
-		ClassHierarchy cha = getClassHierachy();
-		SSAPropagationCallGraphBuilder cfaBuilder = strategy.createBuilder(options, cache, cha, scope);
-		
-		LOG.debug("make callgraph...");
-		
-		Stopwatch stopwatch = Stopwatch.createStarted();
-		
-		try {
-			cfaBuilder.makeCallGraph(options);
-			stopwatch.stop();
-			
-			LOG.debug("took {}", stopwatch);
-			callGraph = cfaBuilder.getCallGraph();
-			
-			pointerAnalysis = cfaBuilder.getPointerAnalysis();
-			
-		} catch (Exception e) {
-			LOG.error("unable to create call graph", e);
-		} 
-		
-		
-	}
+//	
+//	
+//	@SuppressWarnings({"unused"})
+//	private void initCallGraph()  {
+//		@SuppressWarnings("deprecation")
+//		CFAStrategy strategy = CFAStrategy.ZERO_ONE_CONTAINER;
+//		
+//		LOG.debug("creating pointer analysis...");
+//		
+//		AnalysisOptions options = new AnalysisOptions();
+//		options.setReflectionOptions(ReflectionOptions.NONE);
+//		options.setEntrypoints(getEntrypoints());
+//		
+//		
+//		LOG.debug("creating builder...");
+//		ClassHierarchy cha = getClassHierachy();
+//		SSAPropagationCallGraphBuilder cfaBuilder = strategy.createBuilder(options, cache, cha, scope);
+//		
+//		LOG.debug("make callgraph...");
+//		
+//		Stopwatch stopwatch = Stopwatch.createStarted();
+//		
+//		try {
+//			cfaBuilder.makeCallGraph(options);
+//			stopwatch.stop();
+//			
+//			LOG.debug("took {}", stopwatch);
+//			callGraph = cfaBuilder.getCallGraph();
+//			
+//			pointerAnalysis = cfaBuilder.getPointerAnalysis();
+//			
+//		} catch (Exception e) {
+//			LOG.error("unable to create call graph", e);
+//		} 
+//		
+//		
+//	}
 
 	public TargetApplication(String fileName) throws IOException, ClassHierarchyException {
 		this(fileName, null);

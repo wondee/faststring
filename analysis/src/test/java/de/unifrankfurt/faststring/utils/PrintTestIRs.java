@@ -33,11 +33,18 @@ public class PrintTestIRs {
 	 * @throws WalaException 
 	 */
 	public static void main(String[] args) throws IOException, WalaException {
+		String pathname = TARGET_IRS;
+		
+		if (args.length > 0) {
+			pathname = args[0];
+		}
+		
+		
 		TargetApplication targetApplication = TestUtilities.loadTestClasses();
 		
 		for (IClass clazz : targetApplication.getApplicationClasses()) {
 			for (IMethod m : clazz.getDeclaredMethods()) {
-				printToPDF(targetApplication.getClassHierachy(), targetApplication.findIRForMethod(m));
+				printToPDF(pathname, targetApplication.getClassHierachy(), targetApplication.findIRForMethod(m));
 			}
 		}
 	}
@@ -47,12 +54,11 @@ public class PrintTestIRs {
 	private static final String PRINT_PROPERTIES = "/print.properties";
 	private static final String TARGET_IRS = "../analysis-test/target/irs";
 
-	private static void printToPDF(ClassHierarchy cha, IR ir)
-			throws WalaException, IOException {
-
+	private static void printToPDF(String pathname, ClassHierarchy cha, IR ir) throws WalaException, IOException {
+		
 		Properties wp = loadProperties();
 		
-		File file = new File(TARGET_IRS);
+		File file = new File(pathname);
 
 		if (!file.exists()) {
 			file.mkdirs();
@@ -60,13 +66,16 @@ public class PrintTestIRs {
 
 		wp.put(WalaProperties.OUTPUT_DIR, TARGET_IRS);
 
-		String signature = ir.getMethod().getSignature().replace(';', '#')
-				.replace('/', '.');
-
-		String pdfFile = TestUtilities.replaceInitChars(
-					wp.getProperty(WalaProperties.OUTPUT_DIR)
-						+ File.separatorChar + signature + ".pdf"
-				);
+		System.out.println(ir.getMethod().getDeclaringClass().getName());
+		
+		String pdfFile = wp.getProperty(WalaProperties.OUTPUT_DIR) + 
+						 File.separatorChar + 
+						 TestUtilities.createFileName(ir.getMethod().getDeclaringClass().getName().toString(), 
+								 ir.getMethod().getName().toString()) + 
+								 ".pdf";
+		
+		System.out.println(pdfFile);
+		
 		String dotFile = wp.getProperty(WalaProperties.OUTPUT_DIR)
 				+ File.separatorChar + "ir.dt";
 		if (new File(pdfFile).exists()) {

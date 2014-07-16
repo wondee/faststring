@@ -10,6 +10,7 @@ import java.util.List;
 import org.hamcrest.collection.IsEmptyIterable;
 import org.hamcrest.collection.IsIterableContainingInOrder;
 
+import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
 
@@ -22,6 +23,8 @@ public final class TestUtilities {
 	private static final String TEST_CLASSES_SCOPE_FILE = TEST_RES + "testClassesScope.txt";
 	private static final String TEST_JAR_SCOPE_FILE = TEST_RES + "testJarScope.txt";
 	private static final String TEST_EXCLUSION_FILE = TEST_RES + "testExclusion.txt";	
+	
+	
 	
 	private TestUtilities() {
 		// empty
@@ -68,5 +71,12 @@ public final class TestUtilities {
 	
 	public static String replaceInitChars(String methodName) {
 		return methodName.replace('<', '{').replace('>', '}');
+	}
+	
+	public static String createFileName(String className, String method) {
+		List<String> list = Splitter.on("/").splitToList(className);			
+		String name = list.get(list.size() - 1);
+		
+		return name + "." + replaceInitChars(method);
 	}
 }

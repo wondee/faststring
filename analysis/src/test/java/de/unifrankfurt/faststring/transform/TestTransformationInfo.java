@@ -19,10 +19,10 @@ public class TestTransformationInfo extends BaseAnalysisTest  {
 	public void testConstantDef() {
 		TransformationInfo result = getTransformationInfo("phiDef");
 
-		assertList(result.getEffectedVars(), 2, 3, 4);
+		assertList(result.getEffectedVars(), 4);
 		
-		assertThat(result.getLocalForLabel(null, BuiltInTypes.SUBSTRING, 2), not(isIn(result.getEffectedVars())));
-		assertThat(result.getLocalForLabel(null, BuiltInTypes.SUBSTRING, 3), not(isIn(result.getEffectedVars())));
+//		assertThat(result.getLocalForLabel(null, BuiltInTypes.SUBSTRING, 2), not(isIn(result.getEffectedVars())));
+//		assertThat(result.getLocalForLabel(null, BuiltInTypes.SUBSTRING, 3), not(isIn(result.getEffectedVars())));
 		assertThat(result.getLocalForLabel(null, BuiltInTypes.SUBSTRING, 4), not(isIn(result.getEffectedVars())));
 	
 	}

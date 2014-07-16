@@ -23,7 +23,6 @@ import com.ibm.wala.ssa.SSACFG.BasicBlock;
 import com.ibm.wala.ssa.SSAInstruction;
 import com.ibm.wala.ssa.SSAPhiInstruction;
 
-import de.unifrankfurt.faststring.analysis.graph.LoadLocator;
 import de.unifrankfurt.faststring.analysis.util.IRUtil;
 
 public class AnalyzedMethod {
@@ -86,7 +85,7 @@ public class AnalyzedMethod {
 	public int getLoadFor(int local, int index, int stackSize, int bcIndex) {
 		LOG.trace("getLoad(local={},index={},stackSize={},bytecodeIndex={})", local, index, stackSize, bcIndex);
 
-		LoadLocator locator = new LoadLocator(stackSize, index, local);
+		StackSimulator locator = new StackSimulator(stackSize, index, local);
 
 		SSACFG cfg = ir.getControlFlowGraph();
 		ISSABasicBlock block = cfg.getBlockForInstruction(bcIndex);
@@ -95,10 +94,10 @@ public class AnalyzedMethod {
 
 		do {
 
-			for (int i = start; i > block.getFirstInstructionIndex(); i--) {
+			for (int i = start; i >= block.getFirstInstructionIndex(); i--) {
 				IInstruction instruction = getBytecodeInstructions()[i];
 
-				boolean found = locator.process(instruction);
+				boolean found = locator.processBackward(instruction);
 
 				if (found)  {
 					return i;
@@ -118,6 +117,40 @@ public class AnalyzedMethod {
 
 	}
 
+	public int getStoreFor(int local, int index, int stackSize, int bcIndex) {
+		LOG.trace("getStore(local={},index={},stackSize={},bytecodeIndex={})", local, index, stackSize, bcIndex);
+
+		StackSimulator locator = new StackSimulator(stackSize, index, local);
+		
+		SSACFG cfg = ir.getControlFlowGraph();
+		ISSABasicBlock block = cfg.getBlockForInstruction(bcIndex);
+
+		int start = bcIndex + 1;
+
+		do {
+
+			for (int i = start; i >= block.getLastInstructionIndex(); i++) {
+				IInstruction instruction = getBytecodeInstructions()[i];
+
+				boolean found = locator.processForward(instruction);
+
+				if (found)  {
+					return i;
+				}
+			}
+
+			if (cfg.getPredNodeCount(block) == 2) {
+				block = cfg.getPredNodes(block).next();
+				start = block.getLastInstructionIndex();
+			} else {
+				block = null;
+			}
+
+		} while(block != null);
+
+		return -1;
+	}
+	
 
 //	/**
 //	 * assumption: the load of this local is the first one that appears when searching backwards the cfg

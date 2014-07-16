@@ -3,12 +3,10 @@ package de.unifrankfurt.faststring.utils;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Splitter;
 import com.ibm.wala.shrikeBT.Disassembler;
 import com.ibm.wala.shrikeBT.MethodData;
 import com.ibm.wala.shrikeBT.shrikeCT.ClassInstrumenter;
@@ -19,16 +17,24 @@ public class PrintTestBytecode {
 	private static final Logger LOG = LoggerFactory.getLogger(PrintTestBytecode.class);
 	
 	public static void main(String[] args) throws Exception {
+		String pathname = "target/bytecode/";
+		String inputDir = "../analysis-test/target/classes/";
+		
+		if (args.length > 0) {
+			pathname = args[0];
+			inputDir = args[1];
+		}
+		
 		OfflineInstrumenter instrumenter = new OfflineInstrumenter();
 		
 		
-		instrumenter.addInputDirectory(new File("../analysis-test/target/classes/"), new File("../analysis-test/target/classes/"));
+		instrumenter.addInputDirectory(new File(inputDir), new File(inputDir));
 		
 		instrumenter.beginTraversal();
 //		PrintWriter writer = new PrintWriter(System.out);
 		instrumenter.setPassUnmodifiedClasses(true);
 		
-		String pathname = "target/bytecode/";
+		
 		
 		File path = new File(pathname);
 		
@@ -37,23 +43,17 @@ public class PrintTestBytecode {
 		}
 		
 		ClassInstrumenter ci;
-		while ((ci = instrumenter.nextClass()) != null) {
-			
-			
-			List<String> list = Splitter.on("/").splitToList(ci.getReader().getName());			
-			String className = list.get(list.size() - 1);
-			
-			String classOut = pathname + className;
-			
+		while ((ci = instrumenter.nextClass()) != null) {			
 			
 			for (int i = 0; i < ci.getReader().getMethodCount(); i++) {
 				
 				MethodData methodData = ci.visitMethod(i);				
-				String name = TestUtilities.replaceInitChars(methodData.getName());
 				
-				PrintWriter fileWriter = new PrintWriter(new FileOutputStream(classOut  + "." + name));
+				String name = TestUtilities.createFileName(ci.getReader().getName(), methodData.getName());
 				
-				LOG.info("writing bytecode for {}.{}", className, methodData.getName());
+				PrintWriter fileWriter = new PrintWriter(new FileOutputStream(pathname + File.separatorChar + name));
+				
+				LOG.info("writing bytecode for {}.{}", ci.getReader().getName(), methodData.getName());
 				
 				new Disassembler(methodData).disassembleTo(fileWriter);
 				fileWriter.flush();

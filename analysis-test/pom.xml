@@ -66,6 +66,10 @@
 						</goals>
 						<configuration>
 							<mainClass>de.unifrankfurt.faststring.utils.PrintTestBytecode</mainClass>
+							<arguments>
+								<argument>${project.build.directory}/bytecode</argument>
+								<argument>${project.build.directory}/classes</argument>
+							</arguments>
 						</configuration>
 					</execution>
 					<execution>
@@ -76,6 +80,9 @@
 						</goals>
 						<configuration>
 							<mainClass>de.unifrankfurt.faststring.utils.PrintTestIRs</mainClass>
+							<arguments>
+								<argument>${project.build.directory}/irs</argument>
+							</arguments>
 						</configuration>
 					</execution>
 				</executions>

@@ -25,13 +25,10 @@ public class TestMethodTransformerUseConversations extends BaseTransformerTest {
 	public void testSimpleSubstringWithPhi() throws Exception {
 		TransformationInfo info = analyze("simpleSubstringWithPhi");
 		MethodData data = transform(info);
-	}
 
-	@Test
-	public void testTest() throws Exception {
-		TransformationInfo info = analyze("test");
-	}
+		assertTrue(data.getHasChanged());
 
+	}
 
 	@Override
 	public String getTestClass() {

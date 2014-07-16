@@ -58,33 +58,8 @@ public class InstructionNodeFactory extends Visitor  {
 
 				result.setByteCodeIndex(index);
 
-				List<Integer> vs = IRUtil.getUses(instruction);
-
-				if (vs.size() == Sets.newHashSet(vs).size()) {
-//					int def = instruction.getDef();
-//					if (def != -1) {
-//						vs.add(def);
-//					}
-
-					for (int v : vs) {
-						result.addLocalVariableIndices(v, method.getLocalVariableIndices(index, v));
-						for (int local : result.getLocals(v)) {
-							LOG.debug("determine load instruction for v={} at {}", v, instruction);
-							int loadIndex = method.getLoadFor(local, vs.indexOf(v), vs.size(), index);
-
-							result.addLoad(local, loadIndex);
-						}
-					}
-
-				} else {
-					throw new UnsupportedOperationException("now we need to implement it");
-				}
-
-
-
-//				if (result instanceof MethodCallNode) {
-//					method.getStoreForLocal(index, result.getDef());
-//				}
+				checkLocalsForDef(instruction, result, index);
+				checkLocalsForUses(instruction, result, index);
 
 				cache.put(instruction, result);
 
@@ -94,6 +69,41 @@ public class InstructionNodeFactory extends Visitor  {
 			return cache.get(instruction);
 		}
 
+	}
+
+
+	private void checkLocalsForDef(SSAInstruction instruction, InstructionNode result, Integer index) {
+		int def = instruction.getDef();
+		if (def != -1) {
+			result.addLocalVariableIndices(def, method.getLocalVariableIndices(index, def));
+			for (int local : result.getLocals(def)) {
+				LOG.debug("determine store instruction for v={} at {}", def, instruction);
+				int storeIndex = method.getStoreFor(local, 0, 1, 
+						(instruction instanceof SSAPhiInstruction) ? index - 1 : index);
+
+				result.addStore(local, storeIndex);
+			}
+			
+		}
+	}
+
+
+	private void checkLocalsForUses(SSAInstruction instruction, InstructionNode result, Integer index) {
+		List<Integer> vs = IRUtil.getUses(instruction);
+
+		if (vs.size() == Sets.newHashSet(vs).size()) {
+			for (int v : vs) {
+				result.addLocalVariableIndices(v, method.getLocalVariableIndices(index, v));
+				for (int local : result.getLocals(v)) {
+					LOG.debug("determine load instruction for v={} at {}", v, instruction);
+					int loadIndex = method.getLoadFor(local, vs.indexOf(v), vs.size(), index);
+	
+					result.addLoad(local, loadIndex);
+				}
+			}
+		} else {
+			throw new UnsupportedOperationException("now we need to implement it");
+		}
 	}
 //
 //	private Set<Integer> findPossibleDefLocal(SSAInstruction instruction) {

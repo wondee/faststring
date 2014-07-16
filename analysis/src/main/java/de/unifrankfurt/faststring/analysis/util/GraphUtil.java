@@ -56,18 +56,18 @@ public class GraphUtil {
 		
 	}
 
-	private static final class ReferenceToUsageConversationFromOpt extends BaseLabelFunction 
-		implements Function<Reference, Collection<Integer>> {
-		public ReferenceToUsageConversationFromOpt(TypeLabel label) {
-			super(label);
-		}
-
-		@Override
-		public Collection<Integer> apply(Reference input) {
-			return input.getUseConversionsFromOpt(label);
-		}
-		
-	}
+//	private static final class ReferenceToUsageConversationFromOpt extends BaseLabelFunction 
+//		implements Function<Reference, Collection<Integer>> {
+//		public ReferenceToUsageConversationFromOpt(TypeLabel label) {
+//			super(label);
+//		}
+//
+//		@Override
+//		public Collection<Integer> apply(Reference input) {
+//			return input.getUseConversionsFromOpt(label);
+//		}
+//		
+//	}
 
 	private static final class IsDefinitionConversationToOpt extends BaseLabelFunction implements Predicate<Reference>  {
 		public IsDefinitionConversationToOpt(TypeLabel label) {
@@ -102,16 +102,16 @@ public class GraphUtil {
 		}
 	}
 
-	private static final class IsUseConversationFromOpt extends BaseLabelFunction implements Predicate<Reference>  {
-		public IsUseConversationFromOpt(TypeLabel label) {
-			super(label);
-		}
-
-		@Override
-		public boolean apply(Reference input) {
-			return !input.getUseConversionsFromOpt(label).isEmpty();
-		}
-	}
+//	private static final class IsUseConversationFromOpt extends BaseLabelFunction implements Predicate<Reference>  {
+//		public IsUseConversationFromOpt(TypeLabel label) {
+//			super(label);
+//		}
+//
+//		@Override
+//		public boolean apply(Reference input) {
+//			return !input.getUseConversionsFromOpt(label).isEmpty();
+//		}
+//	}
 
 
 	public static Collection<Integer> extractIntsFromStringReferences(Collection<Reference> refs) {

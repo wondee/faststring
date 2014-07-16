@@ -15,6 +15,7 @@ public abstract class InstructionNode implements Labelable {
 
 	Map<Integer, Collection<Integer>> localMap = Maps.newHashMap();
 	Map<Integer, Integer> loadMap = Maps.newHashMap();
+	Map<Integer, Integer> storeMap = Maps.newHashMap();
 
 	public List<Integer> getConnectedRefs(TypeLabel label, int inV) {
 		return ImmutableList.of();
@@ -64,6 +65,22 @@ public abstract class InstructionNode implements Labelable {
 			localMap.get(v).addAll(locals);
 		}
 
+	}
+
+	public Integer getLoad(int i) {
+		return loadMap.get(i);
+	}
+
+	public Integer getStore(int i) {
+		return storeMap.get(i);
+	}
+
+	public void addStore(int local, int store) {
+		Integer old = storeMap.put(local, store);
+		
+		if (old != null && old != store) {
+			throw new IllegalStateException(String.format("old value was removed from storeMap local %d old %d new %d", local, old, store));
+		}
 	}
 
 	public void addLoad(Integer local, int load) {
@@ -128,10 +145,6 @@ public abstract class InstructionNode implements Labelable {
 
 		public void visitReturn(ReturnNode node) {}
 
-	}
-
-	public Integer getLoad(int i) {
-		return loadMap.get(i);
 	}
 
 }

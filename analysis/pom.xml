@@ -105,5 +105,6 @@
 			<artifactId>faststring-core</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+
 	</dependencies>
 </project>
