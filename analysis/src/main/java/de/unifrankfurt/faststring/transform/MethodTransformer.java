@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import com.ibm.wala.shrikeBT.IInvokeInstruction.Dispatch;
 import com.ibm.wala.shrikeBT.InvokeInstruction;
+import com.ibm.wala.shrikeBT.LoadInstruction;
 import com.ibm.wala.shrikeBT.MethodData;
 import com.ibm.wala.shrikeBT.MethodEditor;
 import com.ibm.wala.shrikeBT.MethodEditor.Output;
@@ -66,7 +67,7 @@ public class MethodTransformer {
 
 			for (InstructionNode use : ref.getUses()) {
 				createUseOptimization(ref, use);
-				createUseConversations(ref, use);
+//				createUseConversations(ref, use);
 			}
 
 		}
@@ -87,7 +88,7 @@ public class MethodTransformer {
 				for (Integer local : locals) {
 					converter.setLocal(local);
 					instructionNode.visit(converter);
-
+					
 				}
 			} else {
 				converter.setLocal(-1);
@@ -97,48 +98,48 @@ public class MethodTransformer {
 
 	}
 
-	private void createUseConversations(Reference ref, InstructionNode instructionNode) {
-//		Converter converter = new UseConverter(ref.getLabel(), instructionNode.getLabel());
-//
-//		if
-//
-//		instructionNode.visit(visitor);
-//
-//		Collection<Integer> locals = instructionNode.getLocals(ref.valueNumber());
-//		if (!locals.isEmpty()) {
-//			for (Integer local : locals) {
-//				converter.setLocal(local);
-//				instructionNode.visit(converter);
-//
-//			}
-//		} else {
-//			converter.setLocal(-1);
-//			instructionNode.visit(converter);
-//		}
-
-
-	}
-
 	private class Optimizer extends Visitor {
 
 		private int v;
 		private TypeLabel label;
 
+		private final String optimizedType;
+		
 		public Optimizer(TypeLabel label, int v) {
 			this.v = v;
 			this.label = label;
+			optimizedType = Util.makeType(label.getOptimizedType());
 		}
 
 		@Override
 		public void visitMethodCall(MethodCallNode node) {
 
 			if (node.isReceiver(v)) {
+				
+				
+				for (int local : node.getLocals(v)) {
+					Integer loadIndex = node.getLoad(local);
+					if (loadIndex != null) {
+						final int optLocal = transformationInfo.getLocalForLabel(null, label, local);
+						
+						editor.replaceWith(loadIndex, new Patch() {
+							@Override
+							public void emitTo(Output w) {
+								w.emit(LoadInstruction.make(optimizedType, optLocal));
+								
+							}
+						});
+					}
+				}
+				
+				
 				int bcIndex = node.getByteCodeIndex();
 
 				final InvokeInstruction invoke = (InvokeInstruction) editor.getInstructions()[bcIndex];
 
+				
 				final InvokeInstruction invokeOpt = InvokeInstruction.make(invoke.getMethodSignature(),
-						Util.makeType(label.getOptimizedType()), invoke.getMethodName(), Dispatch.VIRTUAL);
+						optimizedType, invoke.getMethodName(), Dispatch.VIRTUAL);
 
 				editor.replaceWith(node.getByteCodeIndex(), new Patch() {
 					@Override
@@ -164,48 +165,12 @@ public class MethodTransformer {
 			this.local = local;
 		}
 	}
-
-//	private class UseConverter extends Converter {
-//
-//		public UseConverter(TypeLabel from, TypeLabel to) {
-//			super(from, to);
-//		}
-//
-//		@Override
-//		public void visitConstant(ConstantNode node) {
-//			throw new UnsupportedOperationException("a constant can not be a use");
-//		}
-//
-//		@Override
-//		public void visitMethodCall(MethodCallInstruction node) {
-//			// TODO Auto-generated method stub
-//
-//		}
-//
-//		@Override
-//		public void visitParameter(ParameterNode node) {
-//			throw new UnsupportedOperationException("a parameter can not be a use");
-//		}
-//
-//		@Override
-//		public void visitPhi(PhiNode node) {
-//			// TODO Auto-generated method stub
-//
-//		}
-//
-//		@Override
-//		public void visitReturn(ReturnNode node) {
-//
-//		}
-//
-//	}
-
+	
 	private class DefinitionConverter extends Converter {
 
 		public DefinitionConverter(TypeLabel from, TypeLabel to) {
 			super(from, to);
 		}
-
 
 		@Override
 		public void visitConstant(ConstantNode node) {
@@ -232,19 +197,7 @@ public class MethodTransformer {
 			// first try: just convert on stack. Should be right when no store appears afterwards
 			//
 
-
 			patchFactory.createConversationBefore(local, node.getByteCodeIndex());
-
-//			Collection<Integer> defLocals = node.getLocals(node.getDef());
-//			Collection<Integer> useLocals = Sets.newHashSet();
-//			for (Integer use : node.getUses()) {
-//				useLocals.addAll(node.getLocals(use));
-//			}
-//
-//			if (defLocals.equals(useLocals)) {
-//				patchFactory.createConversationBefore(node.getByteCodeIndex());
-//			}
-
 		}
 
 		@Override

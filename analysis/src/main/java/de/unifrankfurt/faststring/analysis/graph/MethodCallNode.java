@@ -18,8 +18,6 @@ public class MethodCallNode extends InstructionNode {
 	private List<Integer> uses;
 	private MethodReference target;
 	private boolean isStatic;
-
-	private int storeIndex;
 	
 	public MethodCallNode(SSAInvokeInstruction instruction) {
 		this(
@@ -164,11 +162,8 @@ public class MethodCallNode extends InstructionNode {
 		return determineMethodCallType(v) instanceof Receiver;
 	}
 
-	public void setStore(int storeIndex) {
-		this.storeIndex = storeIndex;
+	public int getStore() {
+		return getStore(def);
 	}
 	
-	public int getStore() {
-		return storeIndex;
-	}
 }
