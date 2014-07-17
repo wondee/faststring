@@ -9,8 +9,14 @@ import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 
 /**
  * Represents a result of a analysis
- *
- * @author markus
+ * <p>
+ * The following information is contained:
+ * <ul>
+ * <li>All {@link Reference}s which are labeled during the analysis</li>
+ * <li>The analyzed method's name</li>
+ * <li>The label of this analysis</li>
+ * <li>The maximum used local of this method</li>
+ * </ul>
  *
  */
 public class AnalysisResult  {

@@ -2,12 +2,14 @@ package de.unifrankfurt.faststring.analysis;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.primitives.Ints;
@@ -25,6 +27,13 @@ import com.ibm.wala.ssa.SSAPhiInstruction;
 
 import de.unifrankfurt.faststring.analysis.util.IRUtil;
 
+/**
+ * Represents a method from bytecode which is about to be analyzed
+ * <p>
+ * This class provides access to the methods bytecode instructions and offers functionality to 
+ * determine locals with their <code>load</code> and <code>store</code> instructions for value numbers.
+ *
+ */
 public class AnalyzedMethod {
 
 	private static final Logger LOG = LoggerFactory.getLogger(AnalyzedMethod.class);
@@ -43,10 +52,14 @@ public class AnalyzedMethod {
 		this.defUse = defUse;
 	}
 
+	/**
+	 * @param instruction
+	 * @return the bytecode index in the WALA parsed method body
+	 */
 	public Integer getIndexFor(SSAInstruction instruction) {
 
 		if (instruction instanceof SSAPhiInstruction) {
-			return getIndexForPhi(instruction);
+			return getIndexForPhi((SSAPhiInstruction) instruction);
 		} else {
 			if (instructionToIndexMap == null) {
 				instructionToIndexMap = IRUtil.createInstructionToIndexMap(ir);
@@ -60,15 +73,30 @@ public class AnalyzedMethod {
 		return ir.getMethod().getName().toString();
 	}
 
+	/**
+	 * @param v
+	 * @return the {@link SSAInstruction} which introduces the given value number
+	 */
 	public SSAInstruction getDef(int v) {
 		return defUse.getDef(v);
 	}
 
-	public Iterator<SSAInstruction> getUses(int v) {
-		return defUse.getUses(v);
+	/**
+	 * @param v
+	 * @return a list of all {@link SSAInstruction}s that use the given value number
+	 */
+	public List<SSAInstruction> getUses(int v) {
+		return Lists.newArrayList(defUse.getUses(v));
 	}
 
-	public Collection<Integer> getLocalVariableIndicesForDef(int bcIndex, int valueNumber) {
+	/**
+	 * Tries to determine the local for a value number when it is defined
+	 * 
+	 * @param bcIndex the bytecode index where the value number is defined
+	 * @param valueNumber the value number too check 
+	 * @return all possible locals for that value number 
+	 */
+	public Collection<Integer> getLocalForDef(int bcIndex, int valueNumber) {
 
 		int lastIndex = findLastIndexBeforeBranch(bcIndex);
 
@@ -81,7 +109,14 @@ public class AnalyzedMethod {
 		return locals;
 	}
 
-	public Collection<Integer> getLocalVariableIndicesForUse(int bcIndex, int valueNumber) {
+	/**
+	 * Tries to determine the local for a value number when it is used
+	 * 
+	 * @param bcIndex the bytecode index where the value number is used
+	 * @param valueNumber the value number too check 
+	 * @return all possible locals for that value number 
+	 */
+	public Collection<Integer> getLocalForUse(int bcIndex, int valueNumber) {
 
 		int firstIndex = findFirstIndexBeforeBranch(bcIndex);
 
@@ -94,6 +129,18 @@ public class AnalyzedMethod {
 		return locals;
 	}
 	
+	/**
+	 * Tries to determine the position of the <code>load</code> instruction where the
+	 * that loads the given local on to the stack, depending on the position of the local
+	 * at the current stack. 
+	 *  
+	 * @param local the local to find the load for
+	 * @param index the position of local at the stack  
+	 * @param stackSize the initial stack size
+	 * @param bcIndex the bytecode index 
+	 * 
+	 * @return the bytecode index of the load instruction, or -1 if none was found
+	 */
 	public int getLoadFor(int local, int index, int stackSize, int bcIndex) {
 		LOG.trace("getLoad(local={},index={},stackSize={},bytecodeIndex={})", local, index, stackSize, bcIndex);
 
@@ -129,6 +176,18 @@ public class AnalyzedMethod {
 
 	}
 
+	/**
+	 * Tries to determine the position of the <code>store</code> instruction where the
+	 * that loads the given local on to the stack, depending on the position of the local
+	 * at the current stack. 
+	 *  
+	 * @param local the local to find the load for
+	 * @param index the position of local at the stack  
+	 * @param stackSize the initial stack size
+	 * @param bcIndex the bytecode index 
+	 * 
+	 * @return the bytecode index of the load instruction, or -1 if none was found
+	 */
 	public int getStoreFor(int local, int index, int stackSize, int bcIndex) {
 		LOG.trace("getStore(local={},index={},stackSize={},bytecodeIndex={})", local, index, stackSize, bcIndex);
 
@@ -177,6 +236,9 @@ public class AnalyzedMethod {
 		return bytecodeInstructions;
 	}
 
+	/**
+	 * @return the value numbers of the param
+	 */
 	public Set<Integer> getParams() {
 		return Sets.newHashSet(Ints.asList(ir.getParameterValueNumbers()));
 	}
@@ -193,6 +255,10 @@ public class AnalyzedMethod {
 		return ir.getSymbolTable().getConstantValue(v);
 	}
 
+	/**
+	 * @param v the value number to check
+	 * @return the index in the parameter list of the given value number
+	 */
 	public int getParamIndexFor(int v) {
 		int[] params = ir.getSymbolTable().getParameterValueNumbers();
 
@@ -207,6 +273,9 @@ public class AnalyzedMethod {
 		return -1;
 	}
 
+	/**
+	 * @return the maximum number of locals used by the method
+	 */
 	public int getMaxLocals() {
 		return ((ShrikeCTMethod)ir.getMethod()).getMaxLocals();
 	}
@@ -236,8 +305,12 @@ public class AnalyzedMethod {
 		return block.getFirstInstructionIndex();
 	}
 
-	
-	public Integer getIndexForPhi(SSAInstruction instruction) {
+	/**
+	 * Tries to determine the bytecode index of the first instruction where a phi definition is created for
+	 * @param instruction the phi instruction to check for
+	 * @return the bytecode index found 
+	 */
+	public Integer getIndexForPhi(SSAPhiInstruction instruction) {
 		if (phi2BlockMap == null) {
 			initializePhiMap();
 		}

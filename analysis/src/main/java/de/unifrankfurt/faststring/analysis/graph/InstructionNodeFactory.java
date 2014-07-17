@@ -37,7 +37,7 @@ public class InstructionNodeFactory extends Visitor  {
 	public InstructionNode createConstant(int v) {
 
 		ConstantNode constant = new ConstantNode(method.getConstantValue(v), method.getConstantIndex(v));
-		Collection<Integer> locals = method.getLocalVariableIndicesForDef(0, v);
+		Collection<Integer> locals = method.getLocalForDef(0, v);
 		constant.addLocalVariableIndices(v, locals);
 
 		return constant;
@@ -75,7 +75,7 @@ public class InstructionNodeFactory extends Visitor  {
 	private void checkLocalsForDef(SSAInstruction instruction, InstructionNode result, Integer index) {
 		int def = instruction.getDef();
 		if (def != -1) {
-			result.addLocalVariableIndices(def, method.getLocalVariableIndicesForDef(index, def));
+			result.addLocalVariableIndices(def, method.getLocalForDef(index, def));
 			for (int local : result.getLocals(def)) {
 				LOG.debug("determine store instruction for v={} at {}", def, instruction);
 				int storeIndex = method.getStoreFor(local, 0, 1, 
@@ -93,7 +93,7 @@ public class InstructionNodeFactory extends Visitor  {
 
 		if (vs.size() == Sets.newHashSet(vs).size()) {
 			for (int v : vs) {
-				result.addLocalVariableIndices(v, method.getLocalVariableIndicesForUse(index, v));
+				result.addLocalVariableIndices(v, method.getLocalForUse(index, v));
 				for (int local : result.getLocals(v)) {
 					LOG.debug("determine load instruction for v={} at {}", v, instruction);
 					int loadIndex = method.getLoadFor(local, vs.indexOf(v), vs.size(), index);

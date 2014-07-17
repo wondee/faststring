@@ -18,7 +18,6 @@ import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.ibm.wala.ssa.SSAInstruction;
@@ -42,15 +41,6 @@ public class DataFlowGraphBuilder {
 			return new Reference(ref);
 		}
 	};
-
-
-//	private Function<InstructionNode, Iterable<Integer>> extractNewRefs = new Function<InstructionNode, Iterable<Integer>>() {
-//		@Override
-//		public Iterable<Integer> apply(InstructionNode use) {
-//			return use.getConnectedRefs(label);
-//		}
-//	};
-
 
 	public DataFlowGraphBuilder(TypeLabel label, AnalyzedMethod ir) {
 		this.method = ir;
@@ -96,19 +86,12 @@ public class DataFlowGraphBuilder {
 	}
 
 	private void checkUses(Reference ref) {
-		List<SSAInstruction> uses = Lists.newArrayList(method.getUses(ref.valueNumber()));
+		List<SSAInstruction> uses = method.getUses(ref.valueNumber());
 
 		Builder<InstructionNode> builder = new ImmutableList.Builder<InstructionNode>();
 
 		for (SSAInstruction ins : uses) {
 			InstructionNode use = instructionFactory.create(ins);
-
-//			for (Integer local : use.getLocals(ref.valueNumber())) {
-//				int load = method.getLoadFor(local, use.getByteCodeIndex());
-//
-//				use.addLoad(local, load);
-//			}
-
 			builder.add(use);
 
 		}

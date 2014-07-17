@@ -15,8 +15,6 @@ import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 
 
 public class TransformationInfo {
-
-	private TypeLabel label;
 	
 	private Collection<Reference> references;
 
@@ -29,7 +27,6 @@ public class TransformationInfo {
 //	private Multimap<Integer, Use> bc2Use;
 
 	public TransformationInfo(AnalysisResult result) {
-		label = result.getLabel();
 		methodName = result.getMethodName();
 		references = result.getRefs();
 		
@@ -69,10 +66,6 @@ public class TransformationInfo {
 
 	public Set<Integer> getEffectedVars() {
 		return effectedVars;
-	}
-
-	public TypeLabel getLabel() {
-		return label;
 	}
 
 	public String getMethodName() {
