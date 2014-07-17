@@ -10,8 +10,8 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import de.unifrankfurt.faststring.analysis.label.BuiltInTypes;
-import de.unifrankfurt.faststring.analysis.label.SubstringStringType;
+import de.unifrankfurt.faststring.core.label.BuiltInTypes;
+import de.unifrankfurt.faststring.core.label.SubstringStringType;
 
 public class DataFlowTestBuilder {
 	

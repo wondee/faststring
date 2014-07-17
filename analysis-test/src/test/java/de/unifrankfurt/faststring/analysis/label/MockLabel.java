@@ -6,6 +6,7 @@ import com.google.common.collect.ImmutableList;
 import com.ibm.wala.types.MethodReference;
 
 import de.unifrankfurt.faststring.core.SubstringString;
+import de.unifrankfurt.faststring.core.label.SubstringStringType;
 
 public class MockLabel extends BaseTypeLabel {
 

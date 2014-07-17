@@ -1,4 +1,6 @@
-package de.unifrankfurt.faststring.analysis.label;
+package de.unifrankfurt.faststring.core.label;
+
+import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 
 
 public final class BuiltInTypes {

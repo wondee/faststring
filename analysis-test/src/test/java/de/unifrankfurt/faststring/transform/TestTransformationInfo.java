@@ -9,7 +9,7 @@ import org.junit.Test;
 
 import de.unifrankfurt.faststring.analysis.AnalysisResult;
 import de.unifrankfurt.faststring.analysis.MethodAnalyzer;
-import de.unifrankfurt.faststring.analysis.label.BuiltInTypes;
+import de.unifrankfurt.faststring.core.label.BuiltInTypes;
 import de.unifrankfurt.faststring.utils.BaseAnalysisTest;
  
 public class TestTransformationInfo extends BaseAnalysisTest  {

@@ -100,11 +100,6 @@
 			<version>${groovy.version}</version>
 		</dependency>
 
-		<dependency>
-			<groupId>de.unifrankfurt.faststring</groupId>
-			<artifactId>faststring-core</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 
 	</dependencies>
 </project>

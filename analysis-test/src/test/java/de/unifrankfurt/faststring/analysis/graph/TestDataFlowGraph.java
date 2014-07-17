@@ -14,8 +14,8 @@ import com.ibm.wala.ssa.DefUse;
 import com.ibm.wala.ssa.IR;
 
 import de.unifrankfurt.faststring.analysis.AnalyzedMethod;
-import de.unifrankfurt.faststring.analysis.label.BuiltInTypes;
 import de.unifrankfurt.faststring.analysis.util.GraphUtil;
+import de.unifrankfurt.faststring.core.label.BuiltInTypes;
 import de.unifrankfurt.faststring.utils.BaseAnalysisTest;
 
 public class TestDataFlowGraph extends BaseAnalysisTest {

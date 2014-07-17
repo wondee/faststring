@@ -8,7 +8,6 @@ import com.ibm.wala.types.MethodReference;
 import de.unifrankfurt.faststring.analysis.AnalyzedMethod;
 import de.unifrankfurt.faststring.analysis.graph.DataFlowGraphBuilder;
 import de.unifrankfurt.faststring.analysis.graph.Reference;
-
 /**
  * defines a label for a type containing optimizable methods. This interface is implemented by
  * concrete optimizable type definition to be used by the analysis.

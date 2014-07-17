@@ -9,8 +9,8 @@ import com.ibm.wala.classLoader.IMethod;
 import de.unifrankfurt.faststring.analysis.AnalysisResult;
 import de.unifrankfurt.faststring.analysis.MethodAnalyzer;
 import de.unifrankfurt.faststring.analysis.TargetApplication;
-import de.unifrankfurt.faststring.analysis.label.BuiltInTypes;
 import de.unifrankfurt.faststring.analysis.util.StringUtil;
+import de.unifrankfurt.faststring.core.label.BuiltInTypes;
 import de.unifrankfurt.faststring.transform.JarManager;
 import de.unifrankfurt.faststring.utils.TestUtilities;
 

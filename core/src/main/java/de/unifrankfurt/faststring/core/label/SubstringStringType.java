@@ -1,4 +1,4 @@
-package de.unifrankfurt.faststring.analysis.label;
+package de.unifrankfurt.faststring.core.label;
 
 import java.util.Collection;
 import java.util.Set;
@@ -9,6 +9,9 @@ import com.ibm.wala.types.ClassLoaderReference;
 import com.ibm.wala.types.MethodReference;
 import com.ibm.wala.types.TypeReference;
 
+import de.unifrankfurt.faststring.analysis.label.BaseTypeLabel;
+import de.unifrankfurt.faststring.analysis.label.ReceiverInfo;
+import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 import de.unifrankfurt.faststring.core.SubstringString;
 
 public class SubstringStringType extends BaseTypeLabel {

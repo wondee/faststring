@@ -14,7 +14,7 @@ import com.ibm.wala.shrikeBT.MethodData;
 import com.ibm.wala.shrikeBT.ReturnInstruction;
 import com.ibm.wala.shrikeBT.StoreInstruction;
 
-import de.unifrankfurt.faststring.analysis.label.BuiltInTypes;
+import de.unifrankfurt.faststring.core.label.BuiltInTypes;
 import de.unifrankfurt.faststring.utils.BaseTransformerTest;
 
 public class TestMethodTransformerUseConversations extends BaseTransformerTest {
