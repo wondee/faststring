@@ -1,5 +1,6 @@
 package de.unifrankfurt.faststring.analysis.graph;
 
+import java.util.Collection;
 import java.util.List;
 
 import com.google.common.collect.ImmutableList;
@@ -162,8 +163,7 @@ public class MethodCallNode extends InstructionNode {
 		return determineMethodCallType(v) instanceof Receiver;
 	}
 
-	public int getStore() {
-		return getStore(def);
+	public Collection<Integer> getDefLocals() {
+		return getLocals(def);
 	}
-	
 }

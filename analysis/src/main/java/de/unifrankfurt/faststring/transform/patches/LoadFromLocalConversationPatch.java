@@ -9,8 +9,8 @@ public class LoadFromLocalConversationPatch extends PushCreateAndStoreToLocalCon
 
 	private LoadInstruction loadOriginalToStack;
 
-	public LoadFromLocalConversationPatch(TypeLabel label, int orgLocal, int optLocal) {
-		super(label, optLocal);
+	public LoadFromLocalConversationPatch(TypeLabel from, TypeLabel label, int orgLocal, int optLocal) {
+		super(from, label, optLocal);
 		loadOriginalToStack = LoadInstruction.make(Util.makeType(originalType), orgLocal);
 	}
 

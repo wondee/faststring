@@ -8,8 +8,8 @@ public class OnStackConversationPatch extends PushCreateAndStoreToLocalConversio
 
 	private DupInstruction dup;
 
-	public OnStackConversationPatch(TypeLabel label, int optLocal) {
-		super(label, optLocal);
+	public OnStackConversationPatch(TypeLabel from, TypeLabel label, int optLocal) {
+		super(from, label, optLocal);
 		dup = DupInstruction.make(0);
 	}
 

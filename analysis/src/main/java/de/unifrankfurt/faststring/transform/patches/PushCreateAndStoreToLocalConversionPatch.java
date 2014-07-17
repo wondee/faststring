@@ -10,8 +10,8 @@ public abstract class PushCreateAndStoreToLocalConversionPatch extends Conversat
 	
 	private final StoreInstruction storeToOptLocal;
 
-	public PushCreateAndStoreToLocalConversionPatch(TypeLabel label, int optLocal) {
-		super(label);
+	public PushCreateAndStoreToLocalConversionPatch(TypeLabel from, TypeLabel to, int optLocal) {
+		super(from, to);
 		
 		storeToOptLocal = StoreInstruction.make(Util.makeType(optimizedType), optLocal);
 	}

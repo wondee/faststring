@@ -85,12 +85,7 @@ public class SubstringStringType extends BaseTypeLabel {
 	public Class<?> getOptimizedType() {
 		return SubstringString.class;
 	}
-
-	@Override
-	public Class<?> getOriginalType() {
-		return String.class;
-	}
-
+	
 	@Override
 	public String getCreationMethodName() {
 		return "valueOf";
@@ -104,5 +99,15 @@ public class SubstringStringType extends BaseTypeLabel {
 	@Override
 	public boolean compatibleWith(TypeLabel label) {
 		return this.equals(label);
+	}
+
+	@Override
+	public Class<?> getOriginalType() {
+		return String.class;
+	}
+
+	@Override
+	public String getToOriginalMethodName() {
+		return "toString";
 	}
 }

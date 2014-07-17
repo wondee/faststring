@@ -13,12 +13,18 @@ public class ConversationToLabelPatch extends BasePatch {
 	final InvokeInstruction invokeStaticFactory;
 
 	
-	public ConversationToLabelPatch(TypeLabel label) {
-		
-		originalType = label.getOriginalType();
-		optimizedType = label.getOptimizedType();
-		
-		invokeStaticFactory = Util.makeInvoke(optimizedType, label.getCreationMethodName(), new Class<?>[]{originalType});
+	public ConversationToLabelPatch(TypeLabel from, TypeLabel to) {
+		if (to != null) {
+			originalType = to.getOriginalType();
+			optimizedType = to.getOptimizedType();
+			
+			invokeStaticFactory = Util.makeInvoke(optimizedType, to.getCreationMethodName(), new Class<?>[]{originalType});			
+		} else {
+			originalType = from.getOriginalType();
+			optimizedType = from.getOptimizedType();
+			
+			invokeStaticFactory = Util.makeInvoke(optimizedType, from.getToOriginalMethodName(), new Class<?>[0]);
+		}
 	}
 
 	@Override

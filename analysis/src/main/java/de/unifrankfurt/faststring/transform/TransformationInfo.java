@@ -85,17 +85,20 @@ public class TransformationInfo {
 
 	public int getLocalForLabel(TypeLabel from, TypeLabel to, int local) {
 		
-		int orgLocal = (from != null) ? 
-				locals.inverse().get(local).snd : 
-				local;
-				
-		Integer integer = locals.get(Pair.make(to, orgLocal));
-		
-		if (integer == null) {
-			throw new IllegalStateException(String.format("no local found for: local %d from %s to %s in %s", 
-					local, from, to, locals));
+		if (from == null) {
+			return locals.get(Pair.make(to, local));
+		} else {
+			int orgLocal = locals.inverse().get(local).snd;
+			
+			if (to != null) {
+				return locals.get(Pair.make(to, orgLocal));
+			} else {
+				return orgLocal;
+			}
 		}
-		
-		return integer;
+	}
+
+	public int getOrgLocalForLabel(TypeLabel label, int local) {
+		return getLocalForLabel(label, null, local);
 	}
 }

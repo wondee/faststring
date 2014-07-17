@@ -84,10 +84,12 @@ public interface TypeLabel {
 
 	Class<?> getOptimizedType();
 
-	Class<?> getOriginalType();
-
 	String getCreationMethodName();
 
 	boolean compatibleWith(TypeLabel label);
+
+	Class<?> getOriginalType();
+
+	String getToOriginalMethodName();
 
 }

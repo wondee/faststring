@@ -68,7 +68,7 @@ public class AnalyzedMethod {
 		return defUse.getUses(v);
 	}
 
-	public Collection<Integer> getLocalVariableIndices(int bcIndex, int valueNumber) {
+	public Collection<Integer> getLocalVariableIndicesForDef(int bcIndex, int valueNumber) {
 
 		int lastIndex = findLastIndexBeforeBranch(bcIndex);
 
@@ -79,9 +79,21 @@ public class AnalyzedMethod {
 		}
 
 		return locals;
-
 	}
 
+	public Collection<Integer> getLocalVariableIndicesForUse(int bcIndex, int valueNumber) {
+
+		int firstIndex = findFirstIndexBeforeBranch(bcIndex);
+
+		Set<Integer> locals = Sets.newHashSet();
+
+		for (int i = bcIndex; i >= firstIndex && i > -1 ; i--) {
+			locals.addAll(IRHelper.findLocalVariableIndex(ir, i, valueNumber));
+		}
+
+		return locals;
+	}
+	
 	public int getLoadFor(int local, int index, int stackSize, int bcIndex) {
 		LOG.trace("getLoad(local={},index={},stackSize={},bytecodeIndex={})", local, index, stackSize, bcIndex);
 
@@ -211,7 +223,20 @@ public class AnalyzedMethod {
 
 		return block.getLastInstructionIndex();
 	}
+	
+	private int findFirstIndexBeforeBranch(int bcIndex) {
+		SSACFG cfg = ir.getControlFlowGraph();
 
+		ISSABasicBlock block = cfg.getBlockForInstruction(bcIndex);
+
+		while (cfg.getPredNodeCount(block) == 1) {
+			block = cfg.getPredNodes(block).next();
+		}
+
+		return block.getFirstInstructionIndex();
+	}
+
+	
 	public Integer getIndexForPhi(SSAInstruction instruction) {
 		if (phi2BlockMap == null) {
 			initializePhiMap();
@@ -239,32 +264,6 @@ public class AnalyzedMethod {
 		}
 	}
 
-//	public int findConstantBytecodeIndex(int v, SSAInstruction instruction) {
-//		try {
-//
-//			List<Integer> uses = Lists.reverse(IRUtil.getUses(instruction));
-//
-//			int constant = IRUtil.findUseIndex(v, uses);
-//
-//			int last = getIndexFor(instruction);
-//			int first = findFirstIndexBeforeBranch(last);
-//
-//			IInstruction[] instructions = ((IBytecodeMethod)ir.getMethod()).getInstructions();
-//
-//			new LocalVariableSolver(uses, constant);
-//
-//			for (int i = last; i >= first; i--) {
-//				IInstruction iInstruction = instructions[i];
-////				iInstruction.visit(v);
-//			}
-//
-//
-//			return 0;
-//		} catch (InvalidClassFileException e) {
-//			throw new IllegalStateException(e);
-//		}
-//
-//	}
 
 	public Integer getConstantIndex(int v) {
 		return ir.getSymbolTable().getIndex(v);

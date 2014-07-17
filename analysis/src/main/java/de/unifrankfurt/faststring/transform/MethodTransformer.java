@@ -5,14 +5,8 @@ import java.util.Collection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ibm.wala.shrikeBT.IInvokeInstruction.Dispatch;
-import com.ibm.wala.shrikeBT.InvokeInstruction;
-import com.ibm.wala.shrikeBT.LoadInstruction;
 import com.ibm.wala.shrikeBT.MethodData;
 import com.ibm.wala.shrikeBT.MethodEditor;
-import com.ibm.wala.shrikeBT.MethodEditor.Output;
-import com.ibm.wala.shrikeBT.MethodEditor.Patch;
-import com.ibm.wala.shrikeBT.Util;
 import com.ibm.wala.shrikeBT.analysis.Analyzer.FailureException;
 import com.ibm.wala.shrikeBT.analysis.Verifier;
 
@@ -33,8 +27,8 @@ public class MethodTransformer {
 	private static final Logger LOG = LoggerFactory.getLogger(MethodTransformer.class);
 
 	private MethodData methodData;
-	private MethodEditor editor;
-	private TransformationInfo transformationInfo;
+	MethodEditor editor;
+	TransformationInfo transformationInfo;
 
 	public MethodTransformer(MethodData methodData, TransformationInfo transformationInfo) {
 		this.methodData = methodData;
@@ -47,7 +41,16 @@ public class MethodTransformer {
 
 		editor.beginPass();
 
-		createConversations();
+		for (Reference ref : transformationInfo.getReferences()) {
+		
+			createDefinitionConversations(ref.getDefinition(), ref);
+		
+			for (InstructionNode use : ref.getUses()) {
+				createUseOptimization(ref, use);
+				createUseConversations(ref, use);
+			}
+		
+		}
 
 		try {
 			new Verifier(methodData).verify();
@@ -59,30 +62,35 @@ public class MethodTransformer {
 		}
 	}
 
-	private void createConversations() {
-
-		for (Reference ref : transformationInfo.getReferences()) {
-
-			createDefinitionConversations(ref.getDefinition(), ref);
-
-			for (InstructionNode use : ref.getUses()) {
-				createUseOptimization(ref, use);
-//				createUseConversations(ref, use);
+	private void createUseConversations(Reference ref, InstructionNode use) {
+		if (!use.isSameLabel(ref)) {
+			Converter converter = new UseConverter(ref.getLabel(), use.getLabel());
+			Collection<Integer> locals = use.getLocals(ref.valueNumber());
+			if (!locals.isEmpty()) {
+				for (Integer local : locals) {
+					converter.setLocal(transformationInfo.getLocalForLabel(null, ref.getLabel(), local));
+//					converter.setLocal(local);
+					use.visit(converter);
+					
+				}
+			} else {
+				converter.setLocal(-1);
+				use.visit(converter);
 			}
-
 		}
-
+		
 	}
+
 	private void createUseOptimization(Reference ref, InstructionNode use) {
 		if (use.getLabel()!= null) {
-			use.visit(new Optimizer(use.getLabel(), ref.valueNumber()));
+			use.visit(new Optimizer(ref.valueNumber(), 
+					new ConversationPatchFactory(transformationInfo, editor, use.getLabel())));
 		}
 	}
 
 	private void createDefinitionConversations(InstructionNode instructionNode, Reference ref) {
-		if (!instructionNode.isLabel(ref.getLabel())) {
+		if (!instructionNode.isSameLabel(ref)) {
 			Converter converter = new DefinitionConverter(instructionNode.getLabel(), ref.getLabel());
-
 			Collection<Integer> locals = instructionNode.getLocals(ref.valueNumber());
 			if (!locals.isEmpty()) {
 				for (Integer local : locals) {
@@ -93,61 +101,6 @@ public class MethodTransformer {
 			} else {
 				converter.setLocal(-1);
 				instructionNode.visit(converter);
-			}
-		}
-
-	}
-
-	private class Optimizer extends Visitor {
-
-		private int v;
-		private TypeLabel label;
-
-		private final String optimizedType;
-		
-		public Optimizer(TypeLabel label, int v) {
-			this.v = v;
-			this.label = label;
-			optimizedType = Util.makeType(label.getOptimizedType());
-		}
-
-		@Override
-		public void visitMethodCall(MethodCallNode node) {
-
-			if (node.isReceiver(v)) {
-				
-				
-				for (int local : node.getLocals(v)) {
-					Integer loadIndex = node.getLoad(local);
-					if (loadIndex != null) {
-						final int optLocal = transformationInfo.getLocalForLabel(null, label, local);
-						
-						editor.replaceWith(loadIndex, new Patch() {
-							@Override
-							public void emitTo(Output w) {
-								w.emit(LoadInstruction.make(optimizedType, optLocal));
-								
-							}
-						});
-					}
-				}
-				
-				
-				int bcIndex = node.getByteCodeIndex();
-
-				final InvokeInstruction invoke = (InvokeInstruction) editor.getInstructions()[bcIndex];
-
-				
-				final InvokeInstruction invokeOpt = InvokeInstruction.make(invoke.getMethodSignature(),
-						optimizedType, invoke.getMethodName(), Dispatch.VIRTUAL);
-
-				editor.replaceWith(node.getByteCodeIndex(), new Patch() {
-					@Override
-					public void emitTo(Output w) {
-						w.emit(invokeOpt);
-					}
-				});
-
 			}
 		}
 
@@ -207,4 +160,35 @@ public class MethodTransformer {
 
 	}
 
+	private class UseConverter extends Converter {
+
+		TypeLabel from;
+		
+		public UseConverter(TypeLabel from, TypeLabel to) {
+			super(from, to);
+			this.from = from;
+		}
+		
+		@Override
+		public void visitReturn(ReturnNode node) {
+			createConversation(node);
+			
+		}
+
+		@Override
+		public void visitMethodCall(MethodCallNode node) {
+			createConversation(node);
+		}
+		
+
+		private void createConversation(InstructionNode node) {
+			if (local != -1) {
+				int orgLocal = transformationInfo.getOrgLocalForLabel(from, local);
+				patchFactory.replaceLoad(orgLocal, node.getLoad(orgLocal), from);
+			}
+			patchFactory.createConversationBefore(node.getByteCodeIndex());
+		}
+		
+	}
+	
 }

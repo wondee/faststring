@@ -45,11 +45,6 @@ public class MockLabel extends BaseTypeLabel {
 	}
 
 	@Override
-	public Class<?> getOriginalType() {
-		return String.class;
-	}
-
-	@Override
 	public String getCreationMethodName() {
 		return "valueOf";
 	}
@@ -58,6 +53,16 @@ public class MockLabel extends BaseTypeLabel {
 	public boolean compatibleWith(TypeLabel label) {
 
 		return this.equals(label);
+	}
+
+	@Override
+	public Class<?> getOriginalType() {
+		return String.class;
+	}
+
+	@Override
+	public String getToOriginalMethodName() {
+		return "toString";
 	}
 
 }
