@@ -9,50 +9,34 @@
 	<artifactId>faststring-analysis-test</artifactId>
 	<description>This module contains test classes that are used in the unit and integration tests in the analysis module</description>
 
-	<properties>
-		<maven.compiler.source>1.7</maven.compiler.source>
-		<maven.compiler.target>1.7</maven.compiler.target>
-	</properties>
-
 	<build>
 		<plugins>
-
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<version>1.7</version>
+				<artifactId>maven-dependency-plugin</artifactId>
 				<executions>
 					<execution>
-						<phase>package</phase>
-
-						<configuration>
-							<target>
-								<copy file="target/${project.build.finalName}.jar" tofile="target/test.jar" />
-							</target>
-						</configuration>
+						<id>copyTestJar</id>
+						<phase>process-test-classes</phase>
 						<goals>
-							<goal>run</goal>
+							<goal>copy</goal>
 						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>de.unifrankfurt.faststring</groupId>
+									<artifactId>faststring-test-classes</artifactId>
+									<version>${project.version}</version>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}</outputDirectory>
+									<destFileName>test.jar</destFileName>
+								</artifactItem>
+							</artifactItems>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.3.2</version>
-				<configuration>
-					<compilerId>eclipse</compilerId>
-					<source>1.7</source>
-					<target>1.7</target>
-				</configuration>
-				<dependencies>
-					<dependency>
-						<groupId>org.codehaus.plexus</groupId>
-						<artifactId>plexus-compiler-eclipse</artifactId>
-						<version>1.8.2</version>
-					</dependency>
-				</dependencies>
-			</plugin>
+<!-- 
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>
@@ -65,7 +49,7 @@
 							<goal>java</goal>
 						</goals>
 						<configuration>
-							<mainClass>de.unifrankfurt.faststring.utils.PrintTestBytecode</mainClass>
+							<mainClass>de.unifrankfurt.faststring.analysis.test.util.PrintTestBytecode</mainClass>
 							<arguments>
 								<argument>${project.build.directory}/bytecode</argument>
 								<argument>${project.build.directory}/classes</argument>
@@ -79,7 +63,7 @@
 							<goal>java</goal>
 						</goals>
 						<configuration>
-							<mainClass>de.unifrankfurt.faststring.utils.PrintTestIRs</mainClass>
+							<mainClass>de.unifrankfurt.faststring.analysis.test.util.PrintTestIRs</mainClass>
 							<arguments>
 								<argument>${project.build.directory}/irs</argument>
 							</arguments>
@@ -87,6 +71,7 @@
 					</execution>
 				</executions>
 			</plugin>
+			 -->
 		</plugins>
 	</build>
 
@@ -97,17 +82,26 @@
 			<artifactId>faststring-core</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		
 		<dependency>
 			<groupId>de.unifrankfurt.faststring</groupId>
 			<artifactId>faststring-analysis</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+
 		<dependency>
-			<groupId>de.unifrankfurt.faststring</groupId>
-			<artifactId>faststring-analysis</artifactId>
-			<version>${project.version}</version>
-			<classifier>tests</classifier>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-all</artifactId>
+			<version>1.3</version>
 		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.11</version>
+		</dependency>
+
 	</dependencies>
+
+
 
 </project>

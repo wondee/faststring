@@ -1,6 +1,6 @@
 package de.unifrankfurt.faststring.transform;
 
-import static de.unifrankfurt.faststring.utils.TestUtilities.assertList;
+import static de.unifrankfurt.faststring.analysis.test.util.TestUtilities.assertList;
 import static org.hamcrest.collection.IsIn.isIn;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;

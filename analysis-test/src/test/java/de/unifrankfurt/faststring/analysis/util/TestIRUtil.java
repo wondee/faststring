@@ -1,6 +1,6 @@
 package de.unifrankfurt.faststring.analysis.util;
 
-import static de.unifrankfurt.faststring.utils.TestUtilities.assertList;
+import static de.unifrankfurt.faststring.analysis.test.util.TestUtilities.assertList;
 
 import java.util.Collection;
 

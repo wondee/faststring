@@ -22,6 +22,7 @@ import com.ibm.wala.ssa.IR;
 
 import de.unifrankfurt.faststring.analysis.AnalyzedMethod;
 import de.unifrankfurt.faststring.analysis.TargetApplication;
+import de.unifrankfurt.faststring.analysis.test.util.TestUtilities;
 
 /**
  * base test class for all analysis test cases. Takes care creating the {@link ClassHierarchy} and

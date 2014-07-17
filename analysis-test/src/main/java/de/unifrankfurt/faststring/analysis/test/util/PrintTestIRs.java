@@ -1,4 +1,4 @@
-package de.unifrankfurt.faststring.utils;
+package de.unifrankfurt.faststring.analysis.test.util;
 
 import java.io.File;
 import java.io.FileNotFoundException;

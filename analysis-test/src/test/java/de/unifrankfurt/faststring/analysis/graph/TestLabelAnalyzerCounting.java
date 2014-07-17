@@ -1,7 +1,7 @@
 package de.unifrankfurt.faststring.analysis.graph;
 
 import static org.junit.Assert.*;
-import static de.unifrankfurt.faststring.utils.TestUtilities.*;
+import static de.unifrankfurt.faststring.analysis.test.util.TestUtilities.*;
 
 import org.junit.Test;
 

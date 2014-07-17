@@ -1,6 +1,6 @@
 package de.unifrankfurt.faststring.analysis.graph;
 
-import static de.unifrankfurt.faststring.utils.TestUtilities.assertList;
+import static de.unifrankfurt.faststring.analysis.test.util.TestUtilities.assertList;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
