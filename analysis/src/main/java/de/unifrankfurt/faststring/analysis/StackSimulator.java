@@ -14,18 +14,19 @@ public class StackSimulator {
 
 	private int size;
 	private int offset;
-	private int local;
+	private int local = -1;
 	
 	private boolean found = false;
 	
-	public StackSimulator(int size, int index, int local) {
+	private boolean finished = false;
+	
+	public StackSimulator(int size, int index) {
 		Preconditions.checkArgument(index > -1);
 		Preconditions.checkArgument(size > 0);
 		Preconditions.checkArgument(index < size);
 
 		this.offset = index;
 		this.size = size;
-		this.local = local;
 	}
 
 	public boolean processBackward(IInstruction instruction) {
@@ -36,14 +37,10 @@ public class StackSimulator {
 				if (offset == size) {
 					if (instruction instanceof LoadInstruction) {
 						LoadInstruction load = (LoadInstruction) instruction;
-
-						if (load.getVarIndex() == local) {
-							return true;
-						} else {
-							throw new IllegalStateException("excpected local was " + local + ", but was " + load.getVarIndex());
-						}
+						local = load.getVarIndex(); 
+						return true;
 					} else {
-						throw new IllegalStateException("instruction is no load: " + instruction);
+						finished = true;
 					}
 				}
 			}
@@ -65,19 +62,13 @@ public class StackSimulator {
 				if (instruction instanceof StoreInstruction) {
 					StoreInstruction store = (StoreInstruction) instruction;
 					
-					if (store.getVarIndex() == local) {
-						return true;
-					} else {
-						throw new IllegalStateException("excpected local was " + local + ", but was " + store.getVarIndex());
-					}
+					local = store.getVarIndex();
+					return true;
 				} else {
-					throw new IllegalStateException("instruction is no store: " + instruction);
+					finished = true;
 				}
 			}
-			
-			if (size < 0 || offset >= size) {
-				throw new IllegalStateException("instruction is no store: " + instruction);
-			}
+
 		}
 		
 		if (instruction.getPushedWordSize() > 0) {
@@ -85,6 +76,14 @@ public class StackSimulator {
 		}
 
 		return found;
+	}
+
+	public int getLocal() {
+		return local;
+	}
+	
+	public boolean isFinished() {
+		return finished;
 	}
 
 }

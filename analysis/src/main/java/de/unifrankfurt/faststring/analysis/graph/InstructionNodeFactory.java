@@ -1,5 +1,6 @@
 package de.unifrankfurt.faststring.analysis.graph;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,7 @@ import com.ibm.wala.ssa.SSAPutInstruction;
 import com.ibm.wala.ssa.SSAReturnInstruction;
 
 import de.unifrankfurt.faststring.analysis.AnalyzedMethod;
+import de.unifrankfurt.faststring.analysis.AnalyzedMethod.LocalInfo;
 import de.unifrankfurt.faststring.analysis.util.IRUtil;
 
 public class InstructionNodeFactory extends Visitor  {
@@ -76,12 +78,13 @@ public class InstructionNodeFactory extends Visitor  {
 		int def = instruction.getDef();
 		if (def != -1) {
 			result.addLocalVariableIndices(def, method.getLocalForDef(index, def));
-			for (int local : result.getLocals(def)) {
-				LOG.debug("determine store instruction for v={} at {}", def, instruction);
-				int storeIndex = method.getStoreFor(local, 0, 1, 
-						(instruction instanceof SSAPhiInstruction) ? index - 1 : index);
-
-				result.addStore(local, storeIndex);
+			
+			LOG.debug("determine store instruction for v={} at {}", def, instruction);
+			
+			LocalInfo store = method.getStoreFor(0, 1, (instruction instanceof SSAPhiInstruction) ? index - 1 : index);
+			if (store != null) {
+				result.addLocalVariableIndices(def, Arrays.asList(store.local()));
+				result.addStore(store.local(), store.bcIndex());
 			}
 			
 		}
@@ -94,11 +97,12 @@ public class InstructionNodeFactory extends Visitor  {
 		if (vs.size() == Sets.newHashSet(vs).size()) {
 			for (int v : vs) {
 				result.addLocalVariableIndices(v, method.getLocalForUse(index, v));
-				for (int local : result.getLocals(v)) {
-					LOG.debug("determine load instruction for v={} at {}", v, instruction);
-					int loadIndex = method.getLoadFor(local, vs.indexOf(v), vs.size(), index);
-	
-					result.addLoad(local, loadIndex);
+				LOG.debug("determine load instruction for v={} at {}", v, instruction);
+				LocalInfo load = method.getLoadFor(vs.indexOf(v), vs.size(), index);
+				if (load != null) {
+					result.addLocalVariableIndices(v, Arrays.asList(load.local()));
+					
+					result.addLoad(load.local(), load.bcIndex());
 				}
 			}
 		} else {

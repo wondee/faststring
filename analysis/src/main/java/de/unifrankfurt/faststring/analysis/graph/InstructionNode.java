@@ -84,6 +84,7 @@ public abstract class InstructionNode implements Labelable {
 	}
 
 	public void addLoad(Integer local, int load) {
+		
 		Integer old = loadMap.put(local, load);
 
 		if (old != null && old != load) {

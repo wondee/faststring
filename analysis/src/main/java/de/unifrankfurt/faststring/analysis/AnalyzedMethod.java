@@ -24,6 +24,7 @@ import com.ibm.wala.ssa.SSACFG;
 import com.ibm.wala.ssa.SSACFG.BasicBlock;
 import com.ibm.wala.ssa.SSAInstruction;
 import com.ibm.wala.ssa.SSAPhiInstruction;
+import com.ibm.wala.util.collections.Pair;
 
 import de.unifrankfurt.faststring.analysis.util.IRUtil;
 
@@ -139,12 +140,12 @@ public class AnalyzedMethod {
 	 * @param stackSize the initial stack size
 	 * @param bcIndex the bytecode index 
 	 * 
-	 * @return the bytecode index of the load instruction, or -1 if none was found
+	 * @return a pair (local, bytecode index), or <code>null</code> if no load was found
 	 */
-	public int getLoadFor(int local, int index, int stackSize, int bcIndex) {
-		LOG.trace("getLoad(local={},index={},stackSize={},bytecodeIndex={})", local, index, stackSize, bcIndex);
+	public LocalInfo getLoadFor(int index, int stackSize, int bcIndex) {
+		LOG.trace("getLoad(index={},stackSize={},bytecodeIndex={})", index, stackSize, bcIndex);
 
-		StackSimulator locator = new StackSimulator(stackSize, index, local);
+		StackSimulator locator = new StackSimulator(stackSize, index);
 
 		SSACFG cfg = ir.getControlFlowGraph();
 		ISSABasicBlock block = cfg.getBlockForInstruction(bcIndex);
@@ -153,13 +154,13 @@ public class AnalyzedMethod {
 
 		do {
 
-			for (int i = start; i >= block.getFirstInstructionIndex(); i--) {
+			for (int i = start; i >= block.getFirstInstructionIndex() && !locator.isFinished(); i--) {
 				IInstruction instruction = getBytecodeInstructions()[i];
 
 				boolean found = locator.processBackward(instruction);
 
 				if (found)  {
-					return i;
+					return new LocalInfo(locator.getLocal(), i);
 				}
 			}
 
@@ -172,7 +173,7 @@ public class AnalyzedMethod {
 
 		} while(block != null);
 
-		return -1;
+		return null;
 
 	}
 
@@ -188,10 +189,10 @@ public class AnalyzedMethod {
 	 * 
 	 * @return the bytecode index of the load instruction, or -1 if none was found
 	 */
-	public int getStoreFor(int local, int index, int stackSize, int bcIndex) {
-		LOG.trace("getStore(local={},index={},stackSize={},bytecodeIndex={})", local, index, stackSize, bcIndex);
+	public LocalInfo getStoreFor(int index, int stackSize, int bcIndex) {
+		LOG.trace("getStore(index={},stackSize={},bytecodeIndex={})",index, stackSize, bcIndex);
 
-		StackSimulator locator = new StackSimulator(stackSize, index, local);
+		StackSimulator locator = new StackSimulator(stackSize, index);
 		
 		SSACFG cfg = ir.getControlFlowGraph();
 		ISSABasicBlock block = cfg.getBlockForInstruction(bcIndex);
@@ -201,13 +202,13 @@ public class AnalyzedMethod {
 		do {
 
 			int lastInstructionIndex = block.getLastInstructionIndex();
-			for (int i = start; i <= lastInstructionIndex; i++) {
+			for (int i = start; i <= lastInstructionIndex && !locator.isFinished(); i++) {
 				IInstruction instruction = getBytecodeInstructions()[i];
 
 				boolean found = locator.processForward(instruction);
 
 				if (found)  {
-					return i;
+					return new LocalInfo(locator.getLocal(), i);
 				}
 			}
 			
@@ -220,9 +221,22 @@ public class AnalyzedMethod {
 
 		} while(block != null);
 
-		return -1;
+		return null;
 	}
 
+	public class LocalInfo extends Pair<Integer, Integer> {
+		protected LocalInfo(Integer fst, Integer snd) {
+			super(fst, snd);
+		}
+		
+		public int local() {
+			return fst;
+		}
+		public int bcIndex() {
+			return snd;
+		}
+	}
+	
 	private IInstruction[] getBytecodeInstructions() {
 		if (bytecodeInstructions == null) {
 
