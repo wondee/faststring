@@ -58,19 +58,30 @@ public abstract class BaseTransformerTest extends BaseAnalysisTest {
 		return analyzer.analyze();
 	}
 
-	protected MethodData transform(TransformationInfo info)	throws InvalidClassFileException, IOException {
+	protected MethodData transform(TransformationInfo info) throws InvalidClassFileException, IOException {
+		return transform(info, false);
+	}
+
+	protected MethodData transform(TransformationInfo info, boolean printBefore)	throws InvalidClassFileException, IOException {
 
 		MethodData methodData = getClassInstrumenter(getTestClass()).visitMethod(methodMap.get(info.getMethodName()));
-		new MethodTransformer(methodData, info).transformMethod();
 
-		if (LOG.isDebugEnabled()) {
-			StringWriter writer = new StringWriter();
-			new Disassembler(methodData).disassembleTo("  ", writer);
-
-			LOG.debug("transformed code: \n{}", writer.toString());
+		if (printBefore) {
+			LOG.debug("code before transformation: \n{}", printBytecode(methodData));
 		}
 
+		new MethodTransformer(methodData, info).transformMethod();
+
+		LOG.debug("transformed code: \n{}", printBytecode(methodData));
+
 		return methodData;
+	}
+
+	private String printBytecode(MethodData methodData) throws IOException {
+		StringWriter writer = new StringWriter();
+		new Disassembler(methodData).disassembleTo("  ", writer);
+
+		return writer.toString();
 	}
 
 }

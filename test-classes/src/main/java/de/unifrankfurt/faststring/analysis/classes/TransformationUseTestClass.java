@@ -19,24 +19,32 @@ public class TransformationUseTestClass {
 		String c = ((is)?a : b);
 		c.substring(3);
 	}
-	
+
 	public String substringReturned() {
 		String a = "test";
 		return a.substring(3);
 	}
-	
+
 	public String substringReturnedWithLocal() {
 		String a = "".substring(3);
 		return a;
 	}
-	
+
 	public String substringUsed() {
 		return "".substring(3).intern();
 	}
-	
+
 	public String substringUsedWithLocal() {
 		String a = "".substring(3);
 		return a.intern();
 	}
-	
+
+	public String substringWithBinaryOp() {
+		String abd = "";
+
+		int i = 5;
+		String a = abd.substring(i, i + 2);
+		return a.intern();
+	}
+
 }
