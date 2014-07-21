@@ -8,6 +8,8 @@
 \usepackage{zi4}
 \usepackage{tikz}
 
+\usetikzlibrary{positioning, arrows}
+
 \usetheme{Frankfurt}
 
 \lstset{basicstyle=\ttfamily,breaklines=true}
@@ -33,7 +35,7 @@ showstringspaces=false}
 
 
 \lstdefinelanguage{Bytecode}{
-  keywords={GETSTATIC, INVOKEVIRTUAL, LDC, RETURN},
+  keywords={GETSTATIC, INVOKEVIRTUAL, LDC, RETURN, ICONST, ALOAD, ASTORE},
   keywordstyle=\color{black}\bfseries,
   identifierstyle=\color{black},
   sensitive=false,
@@ -65,6 +67,8 @@ showstringspaces=false}
 \end{frame}
 
 \section{Motivation}  
+
+\frame{\sectionpage}
 
 \begin{frame}[fragile]
 
@@ -100,9 +104,24 @@ return builder.toString();
 \end{frame}
 
 \begin{frame}
+  \frametitle{What is the difference?}
+	\begin{itemize}
+	  \item Java strings are immutable $\rightarrow$ manipulation causes \texttt{char[]} copy
+	  \item '\texttt{+}' operator is compiled to a \texttt{StringBuilder}, {\bf but} the loop is not recognized
+	  \item \texttt{StringBuilder} also array-based 
 
-   \frametitle{What is the difference}
+	  \item optimized types avoid this behavior 
+	\end{itemize}
+\end{frame}
 
+
+\begin{frame}
+  \frametitle{What is the difference?}
+	\begin{itemize}
+	  \item optimized types avoid this behavior 
+	  \item \texttt{SubstringString} returns only a new object pointing to the new boundaries
+	  \item \texttt{StringListBuilder} is a linked list
+	\end{itemize} 
 \end{frame}
 
 \begin{frame}
@@ -111,14 +130,26 @@ return builder.toString();
 \end{frame}
 
 \begin{frame}
-  \frametitle{Additional goals}
-  \begin{itemize}
-    \item Should be applicable to to already compiled programs aswell
+  \begin{center}
+  \huge Wouldn't it be nice to have the performance of the optimized one with the readability of the normal one?
+  \end{center}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Requirements}  
+  Given a method optimization definition, the system should \dots
   
+  \begin{itemize}
+    \item \dots be applicable to to already compiled programs
+    \item \dots identify method calls in the Java bytecode
+    \item \dots replace these method calls by the optimized ones
   \end{itemize}
 \end{frame}
 
 \section{Bytecode}
+
+\frame{\sectionpage}
 
 \begin{frame}
    \frametitle{Bytecode}
@@ -131,57 +162,298 @@ return builder.toString();
 
 
 \begin{frame}[fragile]
-   \frametitle{Bytecode}
-   Java:
-   \begin{lstlisting}[language=Java]
-System.out.println("Hallo World!");
+  \frametitle{Bytecode}
+  Java:
+  \begin{lstlisting}[language=Java]
+String x = "Hallo Welt";
+String y = x.substring(5);
   \end{lstlisting}%
   Bytecode:
   \begin{lstlisting}[language=Bytecode]
-GETSTATIC java/lang/System.out : Ljava/io/PrintStream;
 LDC "Hallo World!"
-INVOKEVIRTUAL java/io/PrintStream.println (Ljava/lang/String;)V
-RETURN
+ASTORE 1
+ALOAD 1
+ICONST 5
+INVOKEVIRTUAL java/lang/String.substring(I)Ljava/lang/String;
+ASTORE 2
   \end{lstlisting}  
 \end{frame}
 
 \section{WALA}
 
 \begin{frame}
-   \frametitle{WALA}
-   \begin{itemize}
-      \item Watson Library of Analysis (IBM)
-      
-   \end{itemize}
+  \frametitle{WALA}
+  \begin{itemize}
+    \item T.J. Watson Library of Analysis (IBM)
+    \item static analysis for Java bytecode and Javascript
+    \item open sourced at \texttt{http://github.com/wala/WALA} since 2006
+  \end{itemize}
 
 \end{frame}
 
+
 \begin{frame}
-   \frametitle{Intermediate Representation}
+  \frametitle{Features}
+  
+  \begin{itemize}
+    \item Java type system and class hierarchy analysis
+    \item supports frontends for Java and JavaScript
+    \item SSA-based Intermediate Representation
+    \item bytecode manipulation 
+  \end{itemize}
+  
+\end{frame}
+
+\begin{frame}
+  \frametitle{Intermediate Representation}
+  
+  \begin{itemize}
+    \item central data structure that represents the analyzed method
+    \item abstracts the actual bytecode 
+    \item is in static single assignment form
+    \item consists of a control-flow graph 
+    \item $\phi$-nodes represent a merge of variables 
+  \end{itemize}     
    
-   
+\end{frame}
+
+\begin{frame}[fragile]
+  \begin{columns}
+    \column{.45\textwidth}
+    \begin{lstlisting}[language=Java]
+String a = "test";
+String b = "test2";		
+String c = ((is) ? a:b);
+		
+return c.substring(9);
+    \end{lstlisting}
+    \column{.55\textwidth}
+    \begin{figure}
+      \includegraphics[scale=0.5]{irExample.pdf}
+    \end{figure}
+  \end{columns}
 \end{frame}
 
 \section{Analysis}
 
+\frame{\sectionpage}
+
 \begin{frame}
    \frametitle{Naming}
-   a variable in the IR, has exactly one definition and n uses
+   \begin{block}{value number}
+	   a variable in the IR
+   \end{block}
+
+	\begin{block}{local}
+		a local variable in the bytecode
+	\end{block}
+
+	\begin{block}{label}
+    a definition how certain method calls are identified and can be replaced
+	\end{block}
+
 \end{frame}
 
 \begin{frame}
-   \frametitle{example graph}
-   \begin{center}
+  \frametitle{Basic idea}
+  \begin{itemize}
+      \item Create a dataflow graph of the value numbers in the IR
+      \item determine a bubble in that graph by
+      \begin{itemize}
+        \item label all affected method call instructions
+        \item inherit the labels to all connected value numbers and instructions, if possible
+      \end{itemize}
+  \end{itemize}
+\end{frame}
 
-   \begin{tikzpicture} 
-    \node[draw,rectangle] (defv1) {Method Parameter};
-    \node[draw,circle, below of=defv1] (v1) {$v_1$};
-    \node[draw,rectangle, below of=v1] (invoke) {\texttt{invoke com/example/SomeClass/f()I}, $v_1$, $v_2$};
+\begin{frame}
+  \frametitle{How does the dataflow graph look like?}
+  \begin{itemize}
+    \item directed graph based on the IR
+    \item is composed of 2 kinds of nodes
+      \begin{itemize}
+        \item \texttt{Reference} merely the value number ($R$)
+        \item \texttt{InstructionNode} can be seen as a instruction  ($I$)
+      \end{itemize}
+    \item for $r\in R$, $i \in I$, 
+    \begin{itemize}
+      \item $(i,r)$ is called the definition of $r$     
+      \item $(r,i)$ is called a use of $r$
+    \end{itemize}
+    \item $\forall r \in R, in(r) = 1$, so every $r$ has exactly 1 definition, but $n$ uses (SSA)
+    \item $\forall i \in I, out(i) \leq 1$, so every $i$ can at most define one $r$
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{InstructionNodes}
+  
+  \begin{itemize}
+    \item \texttt{ConstantNode} a constant definition (e.g. \texttt{"Hallo World"})
+    \item \texttt{ParameterNode} a parameter of the method
+    \item \texttt{MethodCallNode} a method call (e.g. \texttt{x.f(y)})
+    \item \texttt{ReturnNode} a return instruction of the method
+    \item \texttt{PhiNode} a $\phi$ node in the IR
+  \end{itemize}
+
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{example graph}
+  \begin{center}
+
+  \begin{tikzpicture} [auto, node distance=0.5cm]
+    \tikzstyle{every node}=[font=\small]
+    \tikzset{
+      inst/.style={draw=black, rectangle},
+      ref/.style={draw=black, circle}
+    }
+    \node[inst]                       (constant1) {ConstantNode \texttt{"test"}};
+    \node[right = of constant1]         (dummy1) {};
+    \node[inst, right = of dummy1]       (constant2) {ConstantNode \texttt{"test2"}};
     
-    \draw[->] (defv1) to (v1);
-    \draw[->] (v1) to (invoke);
-   \end{tikzpicture}
-   \end{center}
+    \node[ref, below = of constant1]    (v1) {$v_1$};
+    \node[below = of dummy1]            (dummy2) {};
+    \node[ref, below = of constant2]    (v2) {$v_2$};
+
+    \node[inst, below = of dummy2]       (phi) {$v_3 = \phi(v_1, v_2)$};
+    \node[ref, below = of phi]          (v3) {$v_3$};    
+    \node[inst, below = of v3]          (invoke) {MethodCallNode: $v_5$ = \texttt{java/lang/String.substring(I)}, $v_3$, $v_4$};
+    \node[ref, below = of invoke] (v5) {$v_5$};    
+    \node[inst, below = of v5] (return) {ReturnNode $v_5$};
+    
+    \draw[->] (constant1) to (v1);
+    \draw[->] (constant2) to (v2);
+    \draw[->] (v1) to (phi);
+    \draw[->] (v2) to (phi);    
+    \draw[->] (phi) to (v3);    
+    \draw[->] (v3) to (invoke);    
+    \draw[->] (invoke) to (v5);    
+    \draw[->] (v5) to (return);    
+    
+  \end{tikzpicture}
+  \end{center}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{How to define a label?}
+  From the interface \texttt{TypeLabel}:
+  \begin{lstlisting}
+boolean canBeUsedAsParamFor(MethodReference,int)
+boolean canBeUsedAsReceiverFor(MethodReference)
+boolean canBeDefinedAsResultOf(MethodReference)
+boolean canReturnedValueBeLabeled(MethodReference)
+boolean compatibleWith(TypeLabel)
+ReceiverInfo getReceiverUseInfo(MethodReference)
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}
+  \frametitle{How to deal with phis?}
+  \begin{itemize}
+    \item $\phi$-nodes just represent the merge of value numbers  
+    \item any label could be compatible with any $\phi$ instruction
+    \item so they where labeled after the analysis has taken place
+    \item the decision is made by the count of labeled references connected to the particular phi
+  \end{itemize}
+\end{frame}
+
+\section{Transformation}
+
+\frame{\sectionpage}
+
+\begin{frame}
+	\frametitle{What to do?}
+	\begin{itemize}
+    \item Create conversation at the "bubbles" barriers
+    \item replace the original method calls with the optimized ones
+    \item to not overwrite the original values, create appropriate locals for the optimized ones
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{local matrix}
+  
+  maxlocals are 6 and there are 2 labels ($l_1$,$l_2$):
+  
+  \begin{center}
+    \begin{tabular}{c || c | c}
+      original & $l_1$ & $l_2$ \\
+      \hline 
+      1 & 7 & 10 \\
+      \hline
+      2 & 8 & 11 \\
+      \hline
+      5 & 9 & 12 \\
+    \end{tabular}
+  \end{center}    
+\end{frame}
+
+\begin{frame}
+	\frametitle{How to get the locals for a value number?}
+	\begin{itemize}
+    \item IR is an abstraction of the actual bytecode
+    \item simple stack simulation tries to find the position at which the object is pushed onto / popped of the stack
+ 	  \item additionally save the position of the relevant (if any) \texttt{store} / \texttt{load} instruction 
+    \item not possible for branches
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Conversations}  
+  2 different scenarios:
+  \begin{enumerate}
+    \item \textit{The value is stored to a local}: Double the value and store it to the optimized local  
+    \item \textit{The value is kept on the stack}: Convert the value on the stack
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Method call replacement}  
+  \begin{itemize}
+    \item replace the load instruction to load the optimized type
+    \item replace the method call itself to match the expected optimized type
+    \item replace the store instruction to store the result to the optimized type
+  \end{itemize}
+\end{frame}
+
+\section{Benchmarks}
+
+\frame{\sectionpage}
+
+\begin{frame}
+	\frametitle{What are the results?}
+
+\end{frame}
+
+
+\begin{frame}
+	\frametitle{What did go wrong?}
+
+\end{frame}
+
+\section{Conclusion}
+
+\frame{\sectionpage}
+
+\begin{frame}
+	\frametitle{Conclusion}
+	\begin{itemize}
+    \item the system needs just the definition how to replace a certain method
+		\item algorithm to determine the "bubble" is type independent, so not limited to \texttt{String}
+		\item transformation on bytecode level makes the system applicable to already compiled programs (libraries in the classpath) 
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Future Work}
+  \begin{itemize}
+    \item loop sensitive \texttt{StringBuilder} optimization 
+    \item inter procedural optimization would boost performance 
+    \item a more offensive bubble growing strategy would cause a bigger bubble
+    \item sources and slides at \texttt{github.com/wondee/faststring}
+  \end{itemize}
 \end{frame}
 
 
