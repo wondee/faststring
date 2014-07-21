@@ -7,6 +7,7 @@
 \usepackage{listings}
 \usepackage{zi4}
 \usepackage{tikz}
+\usepackage{bchart}
 
 \usetikzlibrary{positioning, arrows}
 
@@ -127,6 +128,17 @@ return builder.toString();
 \begin{frame}
   \frametitle{Measurement}
 
+  \begin{bchart}[step=1000,max=3000]
+    \bcbar[text=normal]{2956}
+      \smallskip
+    \bcbar[text=better*]{1138}
+      \smallskip
+    \bcbar[text=optimized]{1001}
+    \bcxlabel{time in $ns$}
+  \end{bchart}
+  \\
+  \vspace{1cm}
+  \footnotesize (*) with the use of \texttt{StringBuilder} around the loop
 \end{frame}
 
 \begin{frame}
@@ -423,8 +435,13 @@ ReceiverInfo getReceiverUseInfo(MethodReference)
 \frame{\sectionpage}
 
 \begin{frame}
-	\frametitle{What are the results?}
-
+  \frametitle{What are the results?}
+  \begin{bchart}[step=2000,max=6000]
+    \bcbar[text=normal]{2956}
+      \smallskip
+    \bcbar[text=optimized]{5583}
+    \bcxlabel{time in $ns$}
+  \end{bchart}
 \end{frame}
 
 
@@ -453,6 +470,7 @@ ReceiverInfo getReceiverUseInfo(MethodReference)
     \item inter procedural optimization would boost performance 
     \item a more offensive bubble growing strategy would cause a bigger bubble
     \item sources and slides at \texttt{github.com/wondee/faststring}
+    \item because of Shrikes loose bytecode creation optimized classes need to be run with \texttt{-noverify}
   \end{itemize}
 \end{frame}
 
