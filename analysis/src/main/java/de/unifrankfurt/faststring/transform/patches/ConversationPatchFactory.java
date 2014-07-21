@@ -27,7 +27,7 @@ public class ConversationPatchFactory {
 		this.editor = editor;
 		this.from = from;
 		this.to = to;
-		
+
 	}
 
 
@@ -70,15 +70,15 @@ public class ConversationPatchFactory {
 
 	public void replaceLoad(int local, Integer loadIndex, TypeLabel label) {
 		final String type = Util.makeType(label.getOptimizedType());
-		
-		if (loadIndex != null) {			
+
+		if (loadIndex != null) {
 			final int optLocal = info.getLocalForLabel(null, label, local);
-			
+
 			editor.replaceWith(loadIndex, new Patch() {
 				@Override
 				public void emitTo(Output w) {
 					w.emit(LoadInstruction.make(type, optLocal));
-					
+
 				}
 			});
 		}
@@ -87,15 +87,15 @@ public class ConversationPatchFactory {
 
 	public void replaceStore(int local, Integer storeIndex, TypeLabel label) {
 		final String type = Util.makeType(label.getOptimizedType());
-		
+
 		if (storeIndex != null) {
 			final int optLocal = info.getLocalForLabel(from, to, local);
-	
+
 			editor.replaceWith(storeIndex, new Patch() {
 				@Override
 				public void emitTo(Output w) {
 					w.emit(StoreInstruction.make(type, optLocal));
-					
+
 				}
 			});
 		}
@@ -106,10 +106,18 @@ public class ConversationPatchFactory {
 		int bcIndex = node.getByteCodeIndex();
 
 		final String type = Util.makeType(node.getLabel().getOptimizedType());
-		
+
 		final InvokeInstruction invoke = (InvokeInstruction) editor.getInstructions()[bcIndex];
-		
-		final InvokeInstruction invokeOpt = InvokeInstruction.make(invoke.getMethodSignature(),
+
+		String methodSignature = invoke.getMethodSignature();
+
+
+		String params = methodSignature.substring(0, methodSignature.indexOf(')') + 1);
+		String returnType = Util.makeType(to.getOptimizedType());
+
+		String newSignature = params + returnType;
+
+		final InvokeInstruction invokeOpt = InvokeInstruction.make(newSignature,
 				type, invoke.getMethodName(), Dispatch.VIRTUAL);
 
 		editor.replaceWith(node.getByteCodeIndex(), new Patch() {
@@ -118,7 +126,7 @@ public class ConversationPatchFactory {
 				w.emit(invokeOpt);
 			}
 		});
-		
+
 	}
 
 }
