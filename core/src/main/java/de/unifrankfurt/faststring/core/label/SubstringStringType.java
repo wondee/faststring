@@ -25,6 +25,10 @@ public class SubstringStringType extends BaseTypeLabel {
 	public static final MethodReference METHOD_SUBSTRING_DEFAULT_START = MethodReference
 			.findOrCreate(TYPE_STRING, "substring", "(I)Ljava/lang/String;");
 
+	public static final MethodReference METHOD_LENGTH = MethodReference
+			.findOrCreate(TYPE_STRING, "length", "()I");
+
+	
 	public static final MethodReference METHOD_STRING_VALUE_OF = MethodReference
 			.findOrCreate(TYPE_STRING, "valueOf", "(Ljava/lang/Object;)Ljava/lang/String;");
 
@@ -42,6 +46,10 @@ public class SubstringStringType extends BaseTypeLabel {
 
 	private static final Collection<MethodReference> methods = Sets.newHashSet(METHOD_SUBSTRING, METHOD_SUBSTRING_DEFAULT_START);
 
+	private static final Collection<MethodReference> methodsReturnThis = Sets.newHashSet(METHOD_SUBSTRING, METHOD_SUBSTRING_DEFAULT_START);
+	private static final Collection<MethodReference> methodsReturnInt = Sets.newHashSet(METHOD_LENGTH);
+	
+	
 	@Override
 	public Collection<MethodReference> methods() {
 		return methods;
@@ -58,7 +66,10 @@ public class SubstringStringType extends BaseTypeLabel {
 
 	@Override
 	public boolean canBeUsedAsReceiverFor(MethodReference calledMethod) {
-		return compatibleMethods().contains(calledMethod);
+		Collection<MethodReference> compatibleMethods = Sets.newHashSet(compatibleMethods());
+		compatibleMethods.add(METHOD_LENGTH);
+		
+		return compatibleMethods.contains(calledMethod);
 	}
 
 	private Collection<MethodReference> compatibleMethods() {
@@ -72,7 +83,7 @@ public class SubstringStringType extends BaseTypeLabel {
 
 	@Override
 	public ReceiverInfo getReceiverUseInfo(MethodReference method) {
-		if (canBeUsedAsReceiverFor(method)) {
+		if (methods.contains(method)) {
 			return RECEIVER_INFO;
 		} else {
 			return ReceiverInfo.NOT_USABLE_AS_RECEIVER;
@@ -112,5 +123,15 @@ public class SubstringStringType extends BaseTypeLabel {
 	@Override
 	public String getToOriginalMethodName() {
 		return "toString";
+	}
+
+	@Override
+	public Class<?> getReturnType(MethodReference target) {
+		if (methodsReturnInt.contains(target)) {
+			return int.class;
+		} else if (methodsReturnThis.contains(target)){
+			return getOptimizedType();
+		}
+		return null;
 	}
 }

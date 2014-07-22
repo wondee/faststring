@@ -129,7 +129,6 @@ public class InstructionNodeFactory extends Visitor  {
 	@Override
 	public void visitPut(SSAPutInstruction instruction) {
 		res = new ReturnNode(instruction.getUse(0));
-
 	}
 
 	@Override

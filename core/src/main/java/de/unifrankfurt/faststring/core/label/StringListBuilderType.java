@@ -39,6 +39,9 @@ public class StringListBuilderType extends BaseTypeLabel {
 	
 	public static final Set<MethodReference> methods = Sets.newHashSet(METHOD_APPEND, METHOD_TOSTRING, METHOD_DEFAULT_CTOR, METHOD_CTOR_STRING);
 	public static final Set<MethodReference> methodsAsReceiver = Sets.newHashSet(METHOD_APPEND);
+
+	private static final Set<MethodReference> methodsReturnThis = Sets.newHashSet(METHOD_APPEND);
+	private static final Set<MethodReference> methodsReturnString = Sets.newHashSet(METHOD_DEFAULT_CTOR, METHOD_CTOR_STRING,METHOD_TOSTRING);
 	
 	@Override
 	public boolean canBeUsedAsParamFor(MethodReference method, int index) {
@@ -103,6 +106,17 @@ public class StringListBuilderType extends BaseTypeLabel {
 	@Override
 	public String toString() {
 		return "StringListBuilder";
+	}
+
+	@Override
+	public Class<?> getReturnType(MethodReference target) {
+		if (methodsReturnThis.contains(target)) {
+			return getOptimizedType();
+		} else if (methodsReturnString.contains(target)) {
+			return String.class;
+		} 
+		
+		return null;
 	}
 
 }

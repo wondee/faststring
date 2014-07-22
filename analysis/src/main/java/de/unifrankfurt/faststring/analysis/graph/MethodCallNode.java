@@ -44,6 +44,10 @@ public class MethodCallNode extends InstructionNode {
 		this.isStatic = isStatic;
 	}
 
+	public MethodReference getTarget() {
+		return target;
+	}
+	
 	private int getParam(int index) {
 		return uses.get((isStatic) ? index - 1 : index);
 	}

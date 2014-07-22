@@ -114,7 +114,10 @@ public class ConversationPatchFactory {
 
 
 		String params = methodSignature.substring(0, methodSignature.indexOf(')') + 1);
-		String returnType = Util.makeType(to.getOptimizedType());
+		Class<?> returnTypeClass = to.getReturnType(node.getTarget());
+		
+		
+		String returnType = (returnTypeClass == null) ? "V" : Util.makeType(returnTypeClass);
 
 		String newSignature = params + returnType;
 

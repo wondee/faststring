@@ -66,4 +66,9 @@ public class MockLabel extends BaseTypeLabel {
 		return "toString";
 	}
 
+	@Override
+	public Class<?> getReturnType(MethodReference target) {
+		return null;
+	}
+
 }

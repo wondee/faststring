@@ -91,4 +91,7 @@ public interface TypeLabel {
 
 	String getToOriginalMethodName();
 
+	Class<?> getReturnType(MethodReference target);
+
+
 }
