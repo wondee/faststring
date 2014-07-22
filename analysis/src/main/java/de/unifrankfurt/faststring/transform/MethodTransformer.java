@@ -14,6 +14,7 @@ import de.unifrankfurt.faststring.analysis.graph.ConstantNode;
 import de.unifrankfurt.faststring.analysis.graph.InstructionNode;
 import de.unifrankfurt.faststring.analysis.graph.InstructionNode.Visitor;
 import de.unifrankfurt.faststring.analysis.graph.MethodCallNode;
+import de.unifrankfurt.faststring.analysis.graph.NewNode;
 import de.unifrankfurt.faststring.analysis.graph.ParameterNode;
 import de.unifrankfurt.faststring.analysis.graph.PhiNode;
 import de.unifrankfurt.faststring.analysis.graph.Reference;
@@ -63,7 +64,7 @@ public class MethodTransformer {
 	}
 
 	private void createUseConversations(Reference ref, InstructionNode use) {
-		if (!use.isSameLabel(ref)) {
+		if (!use.isCompatibleWith(ref)) {
 			Converter converter = new UseConverter(ref.getLabel(), use.getLabel());
 			Collection<Integer> locals = use.getLocals(ref.valueNumber());
 			if (!locals.isEmpty()) {
@@ -89,7 +90,7 @@ public class MethodTransformer {
 	}
 
 	private void createDefinitionConversations(InstructionNode instructionNode, Reference ref) {
-		if (!instructionNode.isSameLabel(ref)) {
+		if (!instructionNode.isCompatibleWith(ref)) {
 			Converter converter = new DefinitionConverter(instructionNode.getLabel(), ref.getLabel());
 			Collection<Integer> locals = instructionNode.getLocals(ref.valueNumber());
 			if (!locals.isEmpty()) {
@@ -158,6 +159,11 @@ public class MethodTransformer {
 			throw new UnsupportedOperationException("a return does not have a definition");
 		}
 
+		@Override
+		public void visitNew(NewNode newNode) {
+			patchFactory.replaceNew(newNode);
+		}
+		
 	}
 
 	private class UseConverter extends Converter {

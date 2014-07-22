@@ -101,7 +101,7 @@ public class SubstringStringType extends BaseTypeLabel {
 
 	@Override
 	public boolean compatibleWith(TypeLabel label) {
-		return this.equals(label);
+		return this == label || label instanceof StringListBuilderType;
 	}
 
 	@Override

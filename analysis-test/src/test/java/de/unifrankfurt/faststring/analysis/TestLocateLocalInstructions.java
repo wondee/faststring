@@ -2,12 +2,16 @@ package de.unifrankfurt.faststring.analysis;
 
 import static org.junit.Assert.*;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.NoSuchElementException;
 
 import org.junit.Test;
 
 import de.unifrankfurt.faststring.analysis.graph.InstructionNode;
 import de.unifrankfurt.faststring.analysis.graph.Reference;
+import de.unifrankfurt.faststring.analysis.label.TypeLabel;
+import de.unifrankfurt.faststring.core.label.BuiltInTypes;
 import de.unifrankfurt.faststring.utils.BaseTransformerTest;
 
 public class TestLocateLocalInstructions extends BaseTransformerTest {
@@ -56,5 +60,10 @@ public class TestLocateLocalInstructions extends BaseTransformerTest {
 	@Override
 	public String getTestClass() {
 		return "LoadTestClass";
+	}
+	
+	@Override
+	protected Collection<TypeLabel> getTypeLabel() {
+		return Arrays.asList(BuiltInTypes.SUBSTRING);
 	}
 }

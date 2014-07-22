@@ -32,6 +32,8 @@ public class TransformationInfo {
 		
 		effectedVars = Sets.newHashSet();
 		
+		Set<TypeLabel> labels = Sets.newHashSet();
+		
 		for (Reference ref : result.getRefs()) {
 			InstructionNode def = ref.getDefinition();
 			
@@ -45,22 +47,26 @@ public class TransformationInfo {
 				}
 
 			}
+			
+			labels.add(ref.getLabel());
 		}
 
-		locals = createOriginal2Optimized(result.getLabel(), effectedVars, result.getMaxLocals());
+		locals = createOriginal2Optimized(labels, effectedVars, result.getMaxLocals());
 
 	}
 	
-	private BiMap<Pair<TypeLabel, Integer>, Integer> createOriginal2Optimized(TypeLabel label, Set<Integer> keySet, int maxLocals) {
+	private BiMap<Pair<TypeLabel, Integer>, Integer> createOriginal2Optimized(Set<TypeLabel> labels, Set<Integer> keySet, int maxLocals) {
 		BiMap<Pair<TypeLabel, Integer>, Integer> map = HashBiMap.create(keySet.size());
-
+		
 		int optLocal = maxLocals + 1;
-
-		for (Integer originalLocal : keySet) {
-			map.put(Pair.make(label, originalLocal), optLocal);
-			optLocal++;
+		
+		for (TypeLabel label : labels) {
+			
+			for (Integer originalLocal : keySet) {
+				map.put(Pair.make(label, originalLocal), optLocal);
+				optLocal++;
+			}
 		}
-
 		return map;
 	}
 

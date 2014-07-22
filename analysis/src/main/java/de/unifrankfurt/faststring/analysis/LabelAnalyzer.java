@@ -20,7 +20,6 @@ import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 import de.unifrankfurt.faststring.analysis.util.GraphUtil;
 import de.unifrankfurt.faststring.analysis.util.QueueUtil;
 import de.unifrankfurt.faststring.analysis.util.QueueUtil.BaseQueueProcessingStrategy;
-import de.unifrankfurt.faststring.analysis.util.StringUtil;
 
 public class LabelAnalyzer extends BaseQueueProcessingStrategy<Reference>{
 
@@ -61,8 +60,8 @@ public class LabelAnalyzer extends BaseQueueProcessingStrategy<Reference>{
 
 			if (LOG.isDebugEnabled() && finalRefs.size() > 0) {
 				LOG.debug("found possible references: {}", GraphUtil.extractIntsFromStringReferences(finalRefs));
-				LOG.debug("definition conversion to opt is needed for: {}", StringUtil.toStringMap(GraphUtil.extractDefConversionsToOpt(finalRefs, graph.getLabel())));
-				LOG.debug("definition conversion from opt is needed for: {}", StringUtil.toStringMap(GraphUtil.extractDefConversionsFromOpt(finalRefs, graph.getLabel())));
+//				LOG.debug("definition conversion to opt is needed for: {}", StringUtil.toStringMap(GraphUtil.extractDefConversionsToOpt(finalRefs, graph.getLabel())));
+//				LOG.debug("definition conversion from opt is needed for: {}", StringUtil.toStringMap(GraphUtil.extractDefConversionsFromOpt(finalRefs, graph.getLabel())));
 //				LOG.debug("usage conversion needed for: {}", StringUtil.toStringMap(GraphUtil.extractUsageConversionsToOpt(finalRefs)));
 			}
 
@@ -97,7 +96,7 @@ public class LabelAnalyzer extends BaseQueueProcessingStrategy<Reference>{
 					refQueue.addAll(refs);
 				}
 			} else {
-				final TypeLabel label = graph.getLabel();
+				final TypeLabel label = ref.getLabel();
 
 				if (o.isCompatibleWith(label, ref.valueNumber())) {
 					o.setLabel(label);
@@ -119,23 +118,17 @@ public class LabelAnalyzer extends BaseQueueProcessingStrategy<Reference>{
 
 	@Override
 	public void finished() {
-
 		while(!phis.isEmpty()) {
 			PhiNode phi = phis.pop();
-			if (strategy.shouldBeLabeled(graph, phi)) {
-				phi.setLabel(graph.getLabel());
-			}
+			phi.setLabel(strategy.shouldBeLabeled(graph, phi));
+			
 		}
 
-//		for (Reference ref : graph.getReferences()) {
-//			ref.createBarriers();
-//
-//		}
 	}
 
 
 	public interface PhiLabelingStrategy {
-		boolean shouldBeLabeled(DataFlowGraph graph, PhiNode phis);
+		TypeLabel shouldBeLabeled(DataFlowGraph graph, PhiNode phis);
 	}
 
 

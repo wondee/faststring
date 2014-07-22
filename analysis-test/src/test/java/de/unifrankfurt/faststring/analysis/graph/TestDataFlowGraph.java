@@ -113,7 +113,7 @@ public class TestDataFlowGraph extends BaseAnalysisTest {
 		IR ir = getIR(className, methodName);
 		DefUse defUse = new DefUse(ir);
 
-		return new DataFlowGraphBuilder(BuiltInTypes.SUBSTRING, new AnalyzedMethod(ir, defUse)).createDataFlowGraph();
+		return new DataFlowGraphBuilder(new AnalyzedMethod(ir, defUse)).createDataFlowGraph(BuiltInTypes.SUBSTRING);
 	}
 
 }

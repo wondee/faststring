@@ -2,6 +2,7 @@ package de.unifrankfurt.faststring.utils;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.Collection;
 import java.util.Map;
 
 import org.junit.Before;
@@ -17,7 +18,7 @@ import com.ibm.wala.shrikeCT.InvalidClassFileException;
 
 import de.unifrankfurt.faststring.analysis.AnalysisResult;
 import de.unifrankfurt.faststring.analysis.MethodAnalyzer;
-import de.unifrankfurt.faststring.core.label.BuiltInTypes;
+import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 import de.unifrankfurt.faststring.transform.MethodTransformer;
 import de.unifrankfurt.faststring.transform.TransformationInfo;
 
@@ -54,9 +55,11 @@ public abstract class BaseTransformerTest extends BaseAnalysisTest {
 
 	protected AnalysisResult analyzeToResult(final String methodName) {
 		MethodAnalyzer analyzer = new MethodAnalyzer(getIRMethod(getTestClass(),
-				methodName), BuiltInTypes.SUBSTRING);
+				methodName), getTypeLabel());
 		return analyzer.analyze();
 	}
+
+	protected abstract Collection<TypeLabel> getTypeLabel();
 
 	protected MethodData transform(TransformationInfo info) throws InvalidClassFileException, IOException {
 		return transform(info, false);

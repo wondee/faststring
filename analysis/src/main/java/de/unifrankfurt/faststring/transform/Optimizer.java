@@ -2,6 +2,7 @@ package de.unifrankfurt.faststring.transform;
 
 import de.unifrankfurt.faststring.analysis.graph.InstructionNode;
 import de.unifrankfurt.faststring.analysis.graph.MethodCallNode;
+import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 import de.unifrankfurt.faststring.transform.patches.ConversationPatchFactory;
 
 class Optimizer extends InstructionNode.Visitor {
@@ -28,16 +29,30 @@ class Optimizer extends InstructionNode.Visitor {
 		}
 	}
 	private void updateStores(MethodCallNode node) {
-		for (int local : node.getDefLocals()) {
-		
-			Integer storeIndex = node.getStore(local);
-			if (storeIndex != null) {
-				patchFactory.replaceStore(local, storeIndex, node.getLabel());
+		TypeLabel defLabel = node.getDefLabel();
+		if (defLabel != null) {
+			for (int local : node.getDefLocals()) {
+			
+				Integer storeIndex = node.getStore(local);
+				if (storeIndex != null) {
+					patchFactory.replaceStore(local, storeIndex, defLabel);
+				}
 			}
 		}
 	}
 
 	private void updateLoads(MethodCallNode node) {
+		
+		for (Integer v : node.getParams()) {
+			TypeLabel useLabel = node.getLabelForUse(v);
+			if (useLabel != null) {
+				for (int local : node.getLocals(v)) {
+					patchFactory.replaceLoad(local, node.getLoad(local), useLabel);
+					
+				}				
+			}
+		}
+		
 		for (int local : node.getLocals(v)) {
 			
 			Integer loadIndex = node.getLoad(local);

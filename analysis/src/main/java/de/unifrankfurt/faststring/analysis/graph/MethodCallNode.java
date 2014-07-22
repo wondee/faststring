@@ -2,9 +2,11 @@ package de.unifrankfurt.faststring.analysis.graph;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.ibm.wala.ssa.SSAInvokeInstruction;
 import com.ibm.wala.types.MethodReference;
 
@@ -19,6 +21,9 @@ public class MethodCallNode extends InstructionNode {
 	private List<Integer> uses;
 	private MethodReference target;
 	private boolean isStatic;
+	
+	private Map<Integer, TypeLabel> labels = Maps.newHashMap();
+	private TypeLabel defLabel;
 	
 	public MethodCallNode(SSAInvokeInstruction instruction) {
 		this(
@@ -43,7 +48,10 @@ public class MethodCallNode extends InstructionNode {
 		return uses.get((isStatic) ? index - 1 : index);
 	}
 
-
+	public void addLabelToUse(Integer valueNumber, TypeLabel label) {
+		labels.put(valueNumber, label);
+	}
+	
 	@Override
 	public List<Integer> getConnectedRefs(TypeLabel label, int inV) {
 		return determineMethodCallType(inV).getConnectedRefs(label, inV);
@@ -147,12 +155,10 @@ public class MethodCallNode extends InstructionNode {
 
 	@Override
 	public String toString() {
-		return "MethodCallInstruction [def=" + def + ", uses=" + uses
+		return "MethodCallNode [def=" + def + ", uses=" + uses
 				+ ", target=" + target + ", isStatic=" + isStatic + ", bcIndex=" + 
-				getByteCodeIndex() + " localVarIndex=" + localMap + ", loadMap=" + loadMap + " ]";
+				getByteCodeIndex() + " localVarIndex=" + localMap + ", loadMap=" + loadMap + ", storeMap=" + storeMap + " ]";
 	}
-
-
 
 	@Override
 	public void visit(Visitor visitor) {
@@ -166,4 +172,22 @@ public class MethodCallNode extends InstructionNode {
 	public Collection<Integer> getDefLocals() {
 		return getLocals(def);
 	}
+
+	public List<Integer> getParams() {
+		return uses.subList((isStatic) ? 0 : 1, uses.size());
+	}
+	
+	public TypeLabel getLabelForUse(int v) {
+		return labels.get(v);
+	}
+
+	public TypeLabel getDefLabel() {
+		return defLabel;
+	}
+
+	public void setDefLabel(TypeLabel label) {
+		defLabel = label;
+		
+	}
+
 }

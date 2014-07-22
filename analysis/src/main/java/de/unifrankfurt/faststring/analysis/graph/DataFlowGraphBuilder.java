@@ -29,8 +29,7 @@ import de.unifrankfurt.faststring.analysis.util.UniqueQueue;
 public class DataFlowGraphBuilder {
 
 	private static final Logger LOG = LoggerFactory.getLogger(DataFlowGraphBuilder.class);
-
-	private final TypeLabel label;
+	
 	private final AnalyzedMethod method;
 
 	private InstructionNodeFactory instructionFactory;
@@ -42,17 +41,16 @@ public class DataFlowGraphBuilder {
 		}
 	};
 
-	public DataFlowGraphBuilder(TypeLabel label, AnalyzedMethod ir) {
-		this.method = ir;
-		this.label = label;
-		this.instructionFactory = new InstructionNodeFactory(ir);
+	public DataFlowGraphBuilder(AnalyzedMethod method) {
+		this.method = method;
+		this.instructionFactory = new InstructionNodeFactory(method);
 	}
 
-	public DataFlowGraph createDataFlowGraph() {
-		return createDataFlowGraph(label.findTypeUses(method));
+	public DataFlowGraph createDataFlowGraph(TypeLabel label) {
+		return createDataFlowGraph(label.findTypeUses(method), Sets.newHashSet(label));
 	}
 
-	public DataFlowGraph createDataFlowGraph(Collection<Reference> stringRefs) {
+	public DataFlowGraph createDataFlowGraph(Collection<Reference> stringRefs, Collection<TypeLabel> labels) {
 
 		Queue<Reference> refs = new UniqueQueue<Reference>(stringRefs);
 
@@ -69,19 +67,24 @@ public class DataFlowGraphBuilder {
 			checkDefinition(stringRef);
 			checkUses(stringRef);
 
-			refs.addAll(findNewRefs(stringRef, refMap.keySet()));
+			refs.addAll(findNewRefs(stringRef, refMap.keySet(), labels));
 		}
 
-		DataFlowGraph graph = new DataFlowGraph(label, ImmutableMap.copyOf(refMap));
+		DataFlowGraph graph = new DataFlowGraph(ImmutableMap.copyOf(refMap));
 		LOG.debug("created dataflow graph for : {}", graph);
 
 		return graph;
 	}
 
 
-	private Collection<Reference> findNewRefs(Reference ref, Set<Integer> contained) {
-
-		return Sets.newHashSet(transform(filter(ref.getConnectedRefs(label), not(in(contained))), toReferences));
+	private Collection<Reference> findNewRefs(Reference ref, Set<Integer> contained, Collection<TypeLabel> labels) {
+		Set<Reference> newRefs = Sets.newHashSet();
+		
+		for (TypeLabel label : labels) {
+			Set<Reference> refs = Sets.newHashSet(transform(filter(ref.getConnectedRefs(label), not(in(contained))), toReferences));
+			newRefs.addAll(refs);
+		}
+		return newRefs;
 
 	}
 

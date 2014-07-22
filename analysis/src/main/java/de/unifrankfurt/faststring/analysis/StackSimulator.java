@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
+import com.ibm.wala.shrikeBT.DupInstruction;
 import com.ibm.wala.shrikeBT.IInstruction;
 import com.ibm.wala.shrikeBT.LoadInstruction;
 import com.ibm.wala.shrikeBT.StoreInstruction;
@@ -31,7 +32,7 @@ public class StackSimulator {
 
 	public boolean processBackward(IInstruction instruction) {
 		LOG.trace("processing: {}", instruction);
-		if (instruction.getPushedWordSize() > 0) {
+		if (getPushedSize(instruction) > 0) {
 			size--;
 			if (offset == size) {
 				if (offset == size) {
@@ -47,7 +48,7 @@ public class StackSimulator {
 			
 		}
 		
-		size += instruction.getPoppedCount();
+		size += getPoppedCount(instruction);
 		LOG.trace("stack size={}", size);
 
 		return found;
@@ -55,8 +56,8 @@ public class StackSimulator {
 	
 	public boolean processForward(IInstruction instruction) {
 		
-		if (instruction.getPoppedCount() > 0) {
-			size -= instruction.getPoppedCount();
+		if (getPoppedCount(instruction) > 0) {
+			size -= getPoppedCount(instruction);
 			
 			if (size == offset) {
 				if (instruction instanceof StoreInstruction) {
@@ -71,13 +72,23 @@ public class StackSimulator {
 
 		}
 		
-		if (instruction.getPushedWordSize() > 0) {
+		if (getPushedSize(instruction) > 0) {
 			size++;	
 		}
 
 		return found;
 	}
 
+	private byte getPushedSize(IInstruction instruction) {
+		return (instruction instanceof DupInstruction) ? 1 : instruction.getPushedWordSize();
+	}
+
+	private int getPoppedCount(IInstruction instruction) {
+		return (instruction instanceof DupInstruction) ? 0 : instruction.getPoppedCount();
+	}
+
+	
+	
 	public int getLocal() {
 		return local;
 	}

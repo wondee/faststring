@@ -8,9 +8,21 @@ public class StringListBuilder {
 	private int length = 0;
 
 	public StringListBuilder() {
-
 	}
 
+	public StringListBuilder(SubstringString str) {
+		append(str);
+	}
+	
+	public static StringListBuilder valueOf(StringBuilder builder) {
+		StringListBuilder listBuilder = new StringListBuilder();
+		
+		listBuilder.append(new SubstringString(builder.toString()));
+		
+		return listBuilder;
+	}
+	
+	
 	public StringListBuilder append(SubstringString string) {
 		Element newElem = new Element(string);
 		length += string.length();

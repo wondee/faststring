@@ -1,71 +1,70 @@
 package de.unifrankfurt.faststring.analysis;
 
 import java.util.Collection;
+import java.util.List;
+
+import com.google.common.collect.Sets;
 
 import de.unifrankfurt.faststring.analysis.graph.DataFlowGraph;
 import de.unifrankfurt.faststring.analysis.graph.DataFlowGraphBuilder;
+import de.unifrankfurt.faststring.analysis.graph.InstructionNode;
+import de.unifrankfurt.faststring.analysis.graph.MethodCallNode;
 import de.unifrankfurt.faststring.analysis.graph.Reference;
 import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 
 public class MethodAnalyzer {
 
-//	private static final Logger LOG = LoggerFactory
-//			.getLogger(MethodAnalyzer.class);
+//	private static final Logger LOG = LoggerFactory.getLogger(MethodAnalyzer.class);
 
 	private AnalyzedMethod method;
 
-	private TypeLabel label;
+	private Collection<TypeLabel> labels;
 
-	public MethodAnalyzer(AnalyzedMethod m, TypeLabel label) {
+	public MethodAnalyzer(AnalyzedMethod m, Collection<TypeLabel> labels) {
 		this.method = m;
-		this.label = label;
+		this.labels = labels;
+	}
+
+	public MethodAnalyzer(AnalyzedMethod method, TypeLabel label) {
+		this(method, Sets.newHashSet(label));
 	}
 
 	public AnalysisResult analyze() {
-		DataFlowGraph graph = new DataFlowGraphBuilder(label, method).createDataFlowGraph();
-
-
+		Collection<Reference> refs = Sets.newHashSet();
+		
+		for (TypeLabel label : labels) {
+			Collection<Reference> typeUses = label.findTypeUses(method);
+			
+			refs.addAll(typeUses);			
+		}
+		
+		DataFlowGraph graph = new DataFlowGraphBuilder(method).createDataFlowGraph(refs, labels);
+		
 		LabelAnalyzer.analyzeLabel(graph);
 
+		Collection<Reference> finalRefs = graph.getAllLabelMatchingReferences();
 
-		Collection<Reference> refs = graph.getAllLabelMatchingReferences();
+		for (Reference ref : finalRefs) {
+			List<InstructionNode> uses = ref.getUses();
+			
+			if (ref.getLabel() != null) {
+				InstructionNode definition = ref.getDefinition();
+				
+				if (definition instanceof MethodCallNode) {
+					((MethodCallNode)definition).setDefLabel(ref.getLabel());
+				}
+				
+				for (InstructionNode use : uses) {
+					if (use instanceof MethodCallNode) {
+						((MethodCallNode)use).addLabelToUse(ref.valueNumber(), ref.getLabel());
+					}
+				}
+			}
+		}
 
-//		calculateMissingLocals(refs);
-
-		AnalysisResult analysisResult = new AnalysisResult(refs, method.getMaxLocals(), label, method.getMethodName());
+		AnalysisResult analysisResult = new AnalysisResult(finalRefs, method.getMaxLocals(), method.getMethodName());
 
 		return analysisResult;
 	}
-
-//	private void calculateMissingLocals(Collection<Reference> refs) {
-//
-//
-//		for (Reference ref : refs) {
-//
-////			Set<Integer> phiPointer = method.findAllUsesPhiPointer(ref.getRef());
-//
-//			LOG.trace("checking for {} ", ref);
-//
-//			Set<Integer> newLocals = Sets.newHashSet(ref.getDef().getLocalVariableIndex());
-//
-//			for (Use  use : ref.getUses()) {
-//
-//
-//
-//				Collection<Integer> locals = use.getLocalVariableIndex();
-//				LOG.trace("use: {}", locals);
-//
-//				for (Integer local : locals) {
-//					if (!newLocals.contains(local)) {
-//						System.out.println("neuen gefunden! " + local);
-//						newLocals.add(local);
-//					}
-//				};
-//			}
-//
-//			ref.getDef().setLocalVariableIndices(newLocals);
-//		}
-//
-//	}
 
 }

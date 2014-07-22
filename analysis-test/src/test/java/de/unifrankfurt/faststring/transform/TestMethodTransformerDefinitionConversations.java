@@ -5,6 +5,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 import org.junit.Test;
 
 import com.ibm.wala.shrikeBT.DupInstruction;
@@ -13,6 +16,7 @@ import com.ibm.wala.shrikeBT.LoadInstruction;
 import com.ibm.wala.shrikeBT.MethodData;
 import com.ibm.wala.shrikeBT.StoreInstruction;
 
+import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 import de.unifrankfurt.faststring.core.label.BuiltInTypes;
 import de.unifrankfurt.faststring.utils.BaseTransformerTest;
 
@@ -142,5 +146,10 @@ public class TestMethodTransformerDefinitionConversations extends BaseTransforme
 		assertThat(data.getInstructions()[17], instanceOf(InvokeInstruction.class));
 
 		assertTrue(data.getHasChanged());
+	}
+
+	@Override
+	protected Collection<TypeLabel> getTypeLabel() {
+		return Arrays.asList(BuiltInTypes.SUBSTRING);
 	}
 }

@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 
@@ -55,7 +56,12 @@ public abstract class InstructionNode implements Labelable {
 	}
 
 	public Collection<Integer> getLocals(Integer v) {
-		return localMap.get(v);
+		Collection<Integer> locals = localMap.get(v);
+		if (locals == null) {
+			locals = Sets.newHashSet();
+		}
+		
+		return locals;
 	}
 
 	public void addLocalVariableIndices(int v, Collection<Integer> locals) {
@@ -133,7 +139,11 @@ public abstract class InstructionNode implements Labelable {
 	public boolean isSameLabel(Labelable other) {
 		return isLabel(other.getLabel());
 	}
-
+	
+	public boolean isCompatibleWith(Reference ref) {
+		return isCompatibleWith(ref.getLabel(), ref.valueNumber());
+	}
+	
 	public static class Visitor {
 
 		public void visitConstant(ConstantNode node) {}
@@ -146,6 +156,9 @@ public abstract class InstructionNode implements Labelable {
 
 		public void visitReturn(ReturnNode node) {}
 
+		public void visitNew(NewNode newNode) {}
+
 	}
+
 
 }

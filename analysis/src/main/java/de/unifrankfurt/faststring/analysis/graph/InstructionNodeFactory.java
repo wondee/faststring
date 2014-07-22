@@ -14,6 +14,7 @@ import com.ibm.wala.ssa.SSAArrayStoreInstruction;
 import com.ibm.wala.ssa.SSAInstruction;
 import com.ibm.wala.ssa.SSAInstruction.Visitor;
 import com.ibm.wala.ssa.SSAInvokeInstruction;
+import com.ibm.wala.ssa.SSANewInstruction;
 import com.ibm.wala.ssa.SSAPhiInstruction;
 import com.ibm.wala.ssa.SSAPutInstruction;
 import com.ibm.wala.ssa.SSAReturnInstruction;
@@ -62,7 +63,7 @@ public class InstructionNodeFactory extends Visitor  {
 
 				checkLocalsForDef(instruction, result, index);
 				checkLocalsForUses(instruction, result, index);
-
+				
 				cache.put(instruction, result);
 
 				return result;
@@ -72,7 +73,6 @@ public class InstructionNodeFactory extends Visitor  {
 		}
 
 	}
-
 
 	private void checkLocalsForDef(SSAInstruction instruction, InstructionNode result, Integer index) {
 		int def = instruction.getDef();
@@ -109,21 +109,6 @@ public class InstructionNodeFactory extends Visitor  {
 			throw new UnsupportedOperationException("now we need to implement it");
 		}
 	}
-//
-//	private Set<Integer> findPossibleDefLocal(SSAInstruction instruction) {
-//		IInstruction[] instructions = ir.getLastIndexOfSinglePathReachedBlock(instruction);
-//
-//		LocalVariableSolver solver = new LocalVariableSolver(instruction.getDef());
-//
-//		for (int i = 0; i < instructions.length && !solver.isFinished(); i++) {
-//			IInstruction ins = instructions[i];
-//			ins.visit(solver);
-//
-//		}
-//
-//		return solver.getPossibleLocals();
-//	}
-
 
 	@Override
 	public void visitInvoke(SSAInvokeInstruction invoke) {
@@ -150,6 +135,11 @@ public class InstructionNodeFactory extends Visitor  {
 	@Override
 	public void visitArrayStore(SSAArrayStoreInstruction instruction) {
 		res = new ReturnNode(instruction.getValue());
+	}
+	
+	@Override
+	public void visitNew(SSANewInstruction instruction) {
+		res = new NewNode(instruction.getDef(), instruction.getConcreteType());
 	}
 
 }

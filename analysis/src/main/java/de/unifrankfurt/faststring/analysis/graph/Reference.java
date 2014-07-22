@@ -102,33 +102,6 @@ public class Reference implements Labelable {
 		
 		return convs;
 	}
-	
-	
-//	
-//	private void checkDefinitionBarrier() {
-//		if (!definition.isLabel(label)) {
-//			if (label == null) {
-//				definitionConversionFromOpt = true;
-//			} else {
-//				definitionConversionToOpt = true;
-//			}
-//		}
-//	}
-//	
-//	private void checkUseBarriers() {
-//		for (int i = 0; i < uses.size(); i++) {
-//			InstructionNode use = uses.get(i);
-//			
-//			if (!use.isLabel(label)) {
-//				if (label == null) {
-//					useConversionsToOpt.add(i);
-//				} else {
-//					useConversionsFromOpt.add(i);
-//				}
-//			}
-//		}
-//	}
-	
 
 	void setUsesMutable(LinkedList<InstructionNode> uses) {
 		this.uses = uses;
@@ -153,7 +126,7 @@ public class Reference implements Labelable {
 	
 	@Override
 	public String toString() {
-		return "Reference [v=" + v + ", def=" + definition
+		return "Reference [v=" + v + ", label=" + label + ", def=" + definition
 				+ ", uses=" + uses + "]";
 	}
 

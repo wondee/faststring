@@ -6,10 +6,12 @@ import com.ibm.wala.shrikeBT.LoadInstruction;
 import com.ibm.wala.shrikeBT.MethodEditor;
 import com.ibm.wala.shrikeBT.MethodEditor.Output;
 import com.ibm.wala.shrikeBT.MethodEditor.Patch;
+import com.ibm.wala.shrikeBT.NewInstruction;
 import com.ibm.wala.shrikeBT.StoreInstruction;
 import com.ibm.wala.shrikeBT.Util;
 
 import de.unifrankfurt.faststring.analysis.graph.MethodCallNode;
+import de.unifrankfurt.faststring.analysis.graph.NewNode;
 import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 import de.unifrankfurt.faststring.transform.TransformationInfo;
 
@@ -101,7 +103,6 @@ public class ConversationPatchFactory {
 		}
 	}
 
-
 	public void replaceMethodCall(MethodCallNode node) {
 		int bcIndex = node.getByteCodeIndex();
 
@@ -127,6 +128,23 @@ public class ConversationPatchFactory {
 			}
 		});
 
+	}
+
+
+	public void replaceNew(NewNode newNode) {
+		final Class<?> optimizedType = to.getOptimizedType();
+		
+		editor.replaceWith(newNode.getByteCodeIndex(), new Patch() {
+			
+			@Override
+			public void emitTo(Output w) {
+				w.emit(NewInstruction.make(Util.makeType(optimizedType), 0));
+			}
+		});
+		
+		for (int local : newNode.getDefLocal()) {
+			replaceStore(local, newNode.getStore(local), to);	
+		}
 	}
 
 }

@@ -39,7 +39,6 @@ public class DataFlowTestBuilder {
 	public DataFlowTestBuilder labelUse(int rec, int def) {
 		InstructionNode call = new MethodCallNode(def, Arrays.asList(rec), SubstringStringType.METHOD_SUBSTRING, false);
 				
-//				Use.createUsedAsReceiver(SubstringStringType.METHOD_SUBSTRING, def, Collections.<Integer>emptyList());
 		addUse(rec, call);
 				
 		addDefinition(def, call);
@@ -83,7 +82,7 @@ public class DataFlowTestBuilder {
 	}
 	
 	public DataFlowGraph create() {
-		DataFlowGraph graph = new DataFlowGraph(BuiltInTypes.SUBSTRING, nodeMap);
+		DataFlowGraph graph = new DataFlowGraph(nodeMap);
 		LOG.debug("created test graph:  {}", graph);
 		
 		return graph;

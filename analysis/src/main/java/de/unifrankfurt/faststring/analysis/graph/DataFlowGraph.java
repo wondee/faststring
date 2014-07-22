@@ -6,23 +6,20 @@ import java.util.Map;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Maps;
 
-import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 import de.unifrankfurt.faststring.analysis.util.StringUtil;
 
 public class DataFlowGraph {
 	
 	private final Map<Integer, Reference> nodes;
-	private final TypeLabel label;
 	private final Predicate<Reference> matchedLabel = new Predicate<Reference>() {
 		@Override
 		public boolean apply(Reference ref) {
-			return label == ref.getLabel();
+			return ref.getLabel() != null;
 		}
 	};
 	
-	public DataFlowGraph(TypeLabel label, Map<Integer, Reference> nodeMap) {
+	public DataFlowGraph(Map<Integer, Reference> nodeMap) {
 		this.nodes = nodeMap;
-		this.label = label;
 	}
 
 	public boolean contains(Integer key) {
@@ -46,10 +43,6 @@ public class DataFlowGraph {
 	@Override
 	public String toString() {
 		return StringUtil.toStringWithLineBreak(nodes.values());
-	}
-
-	public TypeLabel getLabel() {
-		return label;
 	}
 
 	public Collection<Reference> getReferences() {
