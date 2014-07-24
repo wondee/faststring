@@ -416,7 +416,7 @@ boolean compatibleWith(TypeLabel)
 	\begin{itemize}
     \item IR is an abstraction of the actual bytecode
     \item simple stack simulation tries to find the position at which the object is pushed onto / popped of the stack
-    \item save the local and the position of the relevant (if any) \texttt{store} / \texttt{load} instruction 
+    \item save the local and the position of the relevant (if any) \texttt{store} / \texttt{load} instruction within the \texttt{InstructionNode}
 	\end{itemize}
 \end{frame}
 
@@ -523,7 +523,7 @@ return result.toString();
       \item many conversations limit the performance (or make it even worse)  
       \item provide an additional label that works with the other ones can boost the performance
       \item because of Shrikes loose bytecode creation optimized classes need to be run with \texttt{-noverify}
-
+      \item Automated Tests are great!
    \end{itemize}
 \end{frame}
 
