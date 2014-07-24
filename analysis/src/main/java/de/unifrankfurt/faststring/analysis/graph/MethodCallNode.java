@@ -21,13 +21,13 @@ public class MethodCallNode extends InstructionNode {
 	private List<Integer> uses;
 	private MethodReference target;
 	private boolean isStatic;
-	
+
 	private Map<Integer, TypeLabel> labels = Maps.newHashMap();
 	private TypeLabel defLabel;
-	
+
 	public MethodCallNode(SSAInvokeInstruction instruction) {
 		this(
-			instruction.getDef(),
+			(instruction.hasDef()) ? instruction.getDef() : -1,
 			IRUtil.getUses(instruction),
 			instruction.getDeclaredTarget(),
 			instruction.isStatic()
@@ -47,7 +47,7 @@ public class MethodCallNode extends InstructionNode {
 	public MethodReference getTarget() {
 		return target;
 	}
-	
+
 	private int getParam(int index) {
 		return uses.get((isStatic) ? index - 1 : index);
 	}
@@ -55,7 +55,7 @@ public class MethodCallNode extends InstructionNode {
 	public void addLabelToUse(Integer valueNumber, TypeLabel label) {
 		labels.put(valueNumber, label);
 	}
-	
+
 	@Override
 	public List<Integer> getConnectedRefs(TypeLabel label, int inV) {
 		return determineMethodCallType(inV).getConnectedRefs(label, inV);
@@ -160,7 +160,7 @@ public class MethodCallNode extends InstructionNode {
 	@Override
 	public String toString() {
 		return "MethodCallNode [def=" + def + ", uses=" + uses
-				+ ", target=" + target + ", isStatic=" + isStatic + ", bcIndex=" + 
+				+ ", target=" + target + ", isStatic=" + isStatic + ", bcIndex=" +
 				getByteCodeIndex() + " localVarIndex=" + localMap + ", loadMap=" + loadMap + ", storeMap=" + storeMap + " ]";
 	}
 
@@ -180,7 +180,7 @@ public class MethodCallNode extends InstructionNode {
 	public List<Integer> getParams() {
 		return uses.subList((isStatic) ? 0 : 1, uses.size());
 	}
-	
+
 	public TypeLabel getLabelForUse(int v) {
 		return labels.get(v);
 	}
@@ -191,7 +191,7 @@ public class MethodCallNode extends InstructionNode {
 
 	public void setDefLabel(TypeLabel label) {
 		defLabel = label;
-		
+
 	}
 
 }

@@ -32,6 +32,18 @@ public class JarManager {
 
 	}
 
+
+
+	public JarManager(String jarFile, Map<String, AnalysisResult> analysisResult) {
+		int lastDot = jarFile.lastIndexOf('.');
+
+		baseName = jarFile.substring(lastDot - 1);
+
+		this.analysisResult = analysisResult;
+	}
+
+
+
 	public void process() {
 		try {
 			OfflineInstrumenter instrumenter = new OfflineInstrumenter();
@@ -72,7 +84,7 @@ public class JarManager {
 
 				AnalysisResult result = analysisResult.get(signature);
 				if (result != null) {
-					System.out.println("--- old code");
+					System.out.println("--- old code for " + signature);
 					new Disassembler(methodData).disassembleTo(writer);
 					writer.flush();
 

@@ -1,6 +1,7 @@
 package de.unifrankfurt.faststring.analysis.label;
 
 import java.util.Collection;
+import java.util.List;
 
 import com.google.common.collect.ImmutableList;
 import com.ibm.wala.types.MethodReference;
@@ -68,6 +69,12 @@ public class MockLabel extends BaseTypeLabel {
 
 	@Override
 	public Class<?> getReturnType(MethodReference target) {
+		return null;
+	}
+
+	@Override
+	public List<Class<?>> getParams(MethodReference target) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 

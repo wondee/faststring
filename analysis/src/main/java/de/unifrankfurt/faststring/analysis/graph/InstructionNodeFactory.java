@@ -63,7 +63,7 @@ public class InstructionNodeFactory extends Visitor  {
 
 				checkLocalsForDef(instruction, result, index);
 				checkLocalsForUses(instruction, result, index);
-				
+
 				cache.put(instruction, result);
 
 				return result;
@@ -75,18 +75,18 @@ public class InstructionNodeFactory extends Visitor  {
 	}
 
 	private void checkLocalsForDef(SSAInstruction instruction, InstructionNode result, Integer index) {
-		int def = instruction.getDef();
-		if (def != -1) {
+		if (instruction.hasDef()) {
+			int def = instruction.getDef();
 			result.addLocalVariableIndices(def, method.getLocalForDef(index, def));
-			
+
 			LOG.debug("determine store instruction for v={} at {}", def, instruction);
-			
+
 			LocalInfo store = method.getStoreFor(0, 1, (instruction instanceof SSAPhiInstruction) ? index - 1 : index);
 			if (store != null) {
 				result.addLocalVariableIndices(def, Arrays.asList(store.local()));
 				result.addStore(store.local(), store.bcIndex());
 			}
-			
+
 		}
 	}
 
@@ -101,7 +101,7 @@ public class InstructionNodeFactory extends Visitor  {
 				LocalInfo load = method.getLoadFor(vs.indexOf(v), vs.size(), index);
 				if (load != null) {
 					result.addLocalVariableIndices(v, Arrays.asList(load.local()));
-					
+
 					result.addLoad(load.local(), load.bcIndex());
 				}
 			}
@@ -135,7 +135,7 @@ public class InstructionNodeFactory extends Visitor  {
 	public void visitArrayStore(SSAArrayStoreInstruction instruction) {
 		res = new ReturnNode(instruction.getValue());
 	}
-	
+
 	@Override
 	public void visitNew(SSANewInstruction instruction) {
 		res = new NewNode(instruction.getDef(), instruction.getConcreteType());

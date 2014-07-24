@@ -1,6 +1,7 @@
 package de.unifrankfurt.faststring.analysis.label;
 
 import java.util.Collection;
+import java.util.List;
 
 import com.ibm.wala.ssa.SSAInstruction;
 import com.ibm.wala.types.MethodReference;
@@ -92,6 +93,8 @@ public interface TypeLabel {
 	String getToOriginalMethodName();
 
 	Class<?> getReturnType(MethodReference target);
+
+	List<Class<?>> getParams(MethodReference target);
 
 
 }

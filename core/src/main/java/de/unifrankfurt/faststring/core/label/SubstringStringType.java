@@ -1,6 +1,7 @@
 package de.unifrankfurt.faststring.core.label;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 import com.google.common.collect.ImmutableList;
@@ -28,7 +29,7 @@ public class SubstringStringType extends BaseTypeLabel {
 	public static final MethodReference METHOD_LENGTH = MethodReference
 			.findOrCreate(TYPE_STRING, "length", "()I");
 
-	
+
 	public static final MethodReference METHOD_STRING_VALUE_OF = MethodReference
 			.findOrCreate(TYPE_STRING, "valueOf", "(Ljava/lang/Object;)Ljava/lang/String;");
 
@@ -48,8 +49,8 @@ public class SubstringStringType extends BaseTypeLabel {
 
 	private static final Collection<MethodReference> methodsReturnThis = Sets.newHashSet(METHOD_SUBSTRING, METHOD_SUBSTRING_DEFAULT_START);
 	private static final Collection<MethodReference> methodsReturnInt = Sets.newHashSet(METHOD_LENGTH);
-	
-	
+
+
 	@Override
 	public Collection<MethodReference> methods() {
 		return methods;
@@ -68,7 +69,7 @@ public class SubstringStringType extends BaseTypeLabel {
 	public boolean canBeUsedAsReceiverFor(MethodReference calledMethod) {
 		Collection<MethodReference> compatibleMethods = Sets.newHashSet(compatibleMethods());
 		compatibleMethods.add(METHOD_LENGTH);
-		
+
 		return compatibleMethods.contains(calledMethod);
 	}
 
@@ -99,7 +100,7 @@ public class SubstringStringType extends BaseTypeLabel {
 	public Class<?> getOptimizedType() {
 		return SubstringString.class;
 	}
-	
+
 	@Override
 	public String getCreationMethodName() {
 		return "valueOf";
@@ -132,6 +133,11 @@ public class SubstringStringType extends BaseTypeLabel {
 		} else if (methodsReturnThis.contains(target)){
 			return getOptimizedType();
 		}
+		return null;
+	}
+
+	@Override
+	public List<Class<?>> getParams(MethodReference target) {
 		return null;
 	}
 }

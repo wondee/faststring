@@ -1,5 +1,10 @@
 package de.unifrankfurt.faststring.transform.patches;
 
+import java.util.List;
+
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Iterables;
 import com.ibm.wala.shrikeBT.IInvokeInstruction.Dispatch;
 import com.ibm.wala.shrikeBT.InvokeInstruction;
 import com.ibm.wala.shrikeBT.LoadInstruction;
@@ -112,11 +117,16 @@ public class ConversationPatchFactory {
 
 		String methodSignature = invoke.getMethodSignature();
 
+		List<Class<?>> paramsClasses = to.getParams(node.getTarget());
 
-		String params = methodSignature.substring(0, methodSignature.indexOf(')') + 1);
+		String params = (paramsClasses == null) ?
+				methodSignature.substring(0, methodSignature.indexOf(')') + 1) :
+				createParamsString(paramsClasses);
+
+
 		Class<?> returnTypeClass = to.getReturnType(node.getTarget());
-		
-		
+
+
 		String returnType = (returnTypeClass == null) ? "V" : Util.makeType(returnTypeClass);
 
 		String newSignature = params + returnType;
@@ -134,19 +144,32 @@ public class ConversationPatchFactory {
 	}
 
 
+	private String createParamsString(List<Class<?>> paramsClasses) {
+		Iterable<String> params = Iterables.transform(paramsClasses, new Function<Class<?>, String>() {
+
+			@Override
+			public String apply(Class<?> input) {
+				return 	Util.makeType(input);
+			}
+
+		});
+		return "(" + Joiner.on(",").join(params) + ")";
+	}
+
+
 	public void replaceNew(NewNode newNode) {
 		final Class<?> optimizedType = to.getOptimizedType();
-		
+
 		editor.replaceWith(newNode.getByteCodeIndex(), new Patch() {
-			
+
 			@Override
 			public void emitTo(Output w) {
 				w.emit(NewInstruction.make(Util.makeType(optimizedType), 0));
 			}
 		});
-		
+
 		for (int local : newNode.getDefLocal()) {
-			replaceStore(local, newNode.getStore(local), to);	
+			replaceStore(local, newNode.getStore(local), to);
 		}
 	}
 

@@ -58,7 +58,7 @@
 	</build>
 
 	<dependencies>
-		
+
 		<dependency>
 			<groupId>com.ibm.wala</groupId>
 			<artifactId>com.ibm.wala.core</artifactId>
@@ -83,6 +83,10 @@
 			<version>${groovy.version}</version>
 		</dependency>
 
-
+		<dependency>
+			<groupId>com.beust</groupId>
+			<artifactId>jcommander</artifactId>
+			<version>1.35</version>
+		</dependency>
 	</dependencies>
 </project>

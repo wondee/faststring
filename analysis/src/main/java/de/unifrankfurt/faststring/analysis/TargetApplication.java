@@ -18,41 +18,41 @@ import com.ibm.wala.ipa.cha.ClassHierarchy;
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
 import com.ibm.wala.ssa.DefUse;
 import com.ibm.wala.ssa.IR;
-import com.ibm.wala.util.config.AnalysisScopeReader;
 
 public final class TargetApplication {
 	// TODO make creation independent of input files (maybe manual)
-	
-	
+
+
 	private static final Logger LOG = LoggerFactory.getLogger(TargetApplication.class);
-	
+
 	private ClassHierarchy classHierarchy;
 	private AnalysisScope scope;
 	private AnalysisCache cache;
 
 	private AnalysisOptions options;
-	
+
 	private ImmutableSet<IClass> applicationClasses;
 
-	public TargetApplication(String fileName, String exclusionFileName) throws IOException, ClassHierarchyException {
-		LOG.info("reading analysis scope file {}", fileName);
-		
+	public TargetApplication(String jarName, String exclusionFileName) throws IOException, ClassHierarchyException {
+		LOG.info("creating analysis scope for {}", jarName);
+
 		File exclusionFile = null;
 		if (exclusionFileName != null) {
 			LOG.info("using exclusion file {}", exclusionFileName);
-			
+
 			exclusionFile = new File(exclusionFileName);
-			
+
 		}
-		scope = AnalysisScopeReader.readJavaScope(fileName, exclusionFile, TargetApplication.class.getClassLoader());		
-		LOG.info("building class hierarchy...", fileName);
+		scope = AnalysisScopeFactory.createJavaAnalysisScope(jarName, exclusionFile);
+
+		LOG.info("building class hierarchy...", jarName);
 		classHierarchy = ClassHierarchy.make(scope);
-		
+
 		cache = new AnalysisCache();
 		options = new AnalysisOptions();
-		
+
 		initApplicationClasses();
-		
+
 	}
 
 	public TargetApplication(String fileName) throws IOException, ClassHierarchyException {
@@ -62,27 +62,27 @@ public final class TargetApplication {
 
 	private void initApplicationClasses() {
 		Builder<IClass> builder = new ImmutableSet.Builder<IClass>();
-		
+
 		for (IClass cl : classHierarchy) {
 			if (scope.isApplicationLoader(cl.getClassLoader()))  {
-				
+
 				LOG.info("application class found: {}", cl.getName());
-				
+
 				builder.add(cl);
-				
+
 			}
 		}
-		
+
 		applicationClasses = builder.build();
 	}
 
 
-	
+
 	public ImmutableSet<IClass> getApplicationClasses() {
 		return applicationClasses;
 	}
 
-	public IR findIRForMethod(IMethod m) {		
+	public IR findIRForMethod(IMethod m) {
 		return cache.getSSACache().findOrCreateIR(m, Everywhere.EVERYWHERE, options.getSSAOptions());
 	}
 
@@ -93,10 +93,10 @@ public final class TargetApplication {
 	public AnalyzedMethod findIRMethodForMethod(IMethod m) {
 		return new AnalyzedMethod(findIRForMethod(m), findDefUseForMethod(m));
 	}
-	
+
 	public ClassHierarchy getClassHierachy() {
 		return classHierarchy;
 	}
 
-	
+
 }
