@@ -13,6 +13,7 @@ I'll try to keep the you up to date and dirstribute news in my blog at http://wo
 	- analysis			<- analysis and transformation (the real magic happens here) 
 	- analysis-test 	<- integration tests for the analysis
 	- test-classes		<- test classes for the use in the tests of the analysis project
+	- documenation 		<- all the documentation stuff
 ```
 
 To build the benchmark module you need to build the benchmark tool yabt (http://github.com/wondee/yabt).
