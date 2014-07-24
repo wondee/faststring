@@ -8,6 +8,7 @@
 \usepackage{zi4}
 \usepackage{tikz}
 \usepackage{bchart}
+\usepackage{adjustbox}
 
 \usetikzlibrary{positioning, arrows}
 
@@ -510,6 +511,19 @@ return result.toString();
     \bcbar[text=optimized system]{1048}
     \bcxlabel{time in $ns$}
   \end{bchart}
+\end{frame}
+
+\begin{frame}[fragile]
+   \frametitle{Result of JMH}
+   
+\begin{lstlisting}[breaklines=false]
+Benchmark                    Score  Score error
+complexBuilderNormal    608304.032     4526.851
+complexBuilderOpt       704025.416     6396.926
+complexNormal           442065.793     5267.021
+complexOpt              647222.194     4874.660
+\end{lstlisting}
+
 \end{frame}
 
 \section{Conclusion}
