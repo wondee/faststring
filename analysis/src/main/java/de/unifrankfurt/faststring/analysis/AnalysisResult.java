@@ -3,6 +3,7 @@ package de.unifrankfurt.faststring.analysis;
 import java.util.Collection;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 
 import de.unifrankfurt.faststring.analysis.graph.Reference;
 
@@ -18,6 +19,8 @@ import de.unifrankfurt.faststring.analysis.graph.Reference;
  *
  */
 public class AnalysisResult  {
+
+	public static final AnalysisResult EMPTY = new AnalysisResult(Lists.<Reference>newArrayList(), 0, "");
 
 	private Collection<Reference> refs;
 

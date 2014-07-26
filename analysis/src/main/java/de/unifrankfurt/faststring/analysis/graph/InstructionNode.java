@@ -4,6 +4,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -11,6 +14,10 @@ import com.google.common.collect.Sets;
 import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 
 public abstract class InstructionNode implements Labelable {
+
+	private static final Logger LOG = LoggerFactory
+			.getLogger(InstructionNode.class);
+
 	private TypeLabel label;
 	private int byteCodeIndex = -1;
 
@@ -60,7 +67,7 @@ public abstract class InstructionNode implements Labelable {
 		if (locals == null) {
 			locals = Sets.newHashSet();
 		}
-		
+
 		return locals;
 	}
 
@@ -83,14 +90,14 @@ public abstract class InstructionNode implements Labelable {
 
 	public void addStore(int local, int store) {
 		Integer old = storeMap.put(local, store);
-		
+
 		if (old != null && old != store) {
 			throw new IllegalStateException(String.format("old value was removed from storeMap local %d old %d new %d", local, old, store));
 		}
 	}
 
 	public void addLoad(Integer local, int load) {
-		
+		LOG.trace("adding load {}, for local {}", load, local);
 		Integer old = loadMap.put(local, load);
 
 		if (old != null && old != load) {
@@ -139,11 +146,11 @@ public abstract class InstructionNode implements Labelable {
 	public boolean isSameLabel(Labelable other) {
 		return isLabel(other.getLabel());
 	}
-	
+
 	public boolean isCompatibleWith(Reference ref) {
 		return isCompatibleWith(ref.getLabel(), ref.valueNumber());
 	}
-	
+
 	public static class Visitor {
 
 		public void visitConstant(ConstantNode node) {}
@@ -157,6 +164,10 @@ public abstract class InstructionNode implements Labelable {
 		public void visitReturn(ReturnNode node) {}
 
 		public void visitNew(NewNode newNode) {}
+
+		public void visitGet(GetNode getNode) {}
+
+		public void visitBranch(ConditionalBranchNode conditionalBranchNode) {}
 
 	}
 

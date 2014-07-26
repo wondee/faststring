@@ -36,42 +36,6 @@
 					</execution>
 				</executions>
 			</plugin>
-<!-- 
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>exec-maven-plugin</artifactId>
-				<version>1.2.1</version>
-				<executions>
-					<execution>
-						<id>printBytecode</id>
-						<phase>package</phase>
-						<goals>
-							<goal>java</goal>
-						</goals>
-						<configuration>
-							<mainClass>de.unifrankfurt.faststring.analysis.test.util.PrintTestBytecode</mainClass>
-							<arguments>
-								<argument>${project.build.directory}/bytecode</argument>
-								<argument>${project.build.directory}/classes</argument>
-							</arguments>
-						</configuration>
-					</execution>
-					<execution>
-						<id>printIRs</id>
-						<phase>package</phase>
-						<goals>
-							<goal>java</goal>
-						</goals>
-						<configuration>
-							<mainClass>de.unifrankfurt.faststring.analysis.test.util.PrintTestIRs</mainClass>
-							<arguments>
-								<argument>${project.build.directory}/irs</argument>
-							</arguments>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
- -->
 		</plugins>
 	</build>
 

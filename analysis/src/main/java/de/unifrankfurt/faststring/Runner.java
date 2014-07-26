@@ -1,6 +1,10 @@
 package de.unifrankfurt.faststring;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
@@ -10,7 +14,8 @@ import org.slf4j.LoggerFactory;
 import com.beust.jcommander.IStringConverter;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
-import com.google.common.base.Splitter;
+import com.google.common.base.Predicates;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.ibm.wala.classLoader.IClass;
@@ -18,6 +23,7 @@ import com.ibm.wala.classLoader.IMethod;
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
 
 import de.unifrankfurt.faststring.analysis.AnalysisResult;
+import de.unifrankfurt.faststring.analysis.AnalyzedMethod;
 import de.unifrankfurt.faststring.analysis.MethodAnalyzer;
 import de.unifrankfurt.faststring.analysis.TargetApplication;
 import de.unifrankfurt.faststring.analysis.label.TypeLabel;
@@ -29,7 +35,7 @@ public class Runner {
 	@Parameter(names = "-labels",
 			description = "The optimizing labels to be used",
 			required=true,
-			listConverter=TypeLabelCreator.class)
+			converter=TypeLabelCreator.class)
 	private List<TypeLabel> typeList;
 
 	@Parameter(names = "-jar", required=true)
@@ -46,35 +52,51 @@ public class Runner {
 		runner.run();
 	}
 
-
 	private void run() {
-		if (typeList.isEmpty()) {
+		List<TypeLabel> filteredList = Lists.newLinkedList(Iterables.filter(typeList, Predicates.notNull()));
+
+		if (filteredList.isEmpty()) {
 			throw new IllegalArgumentException("no label was found");
 		}
 
-		TargetApplication targetApplication;
 		try {
-			targetApplication = new TargetApplication(jarFile, exclusionFile);
+			TargetApplication targetApplication = new TargetApplication(jarFile, exclusionFile);
 
-			Map<String, AnalysisResult> analysisResult = Maps.newHashMap();
+			Map<String, AnalysisResult> analysisResult = Maps.newTreeMap();
 
 			for (IClass clazz : targetApplication.getApplicationClasses()) {
 
 				LOG.info("analyzing class: {}", clazz.getName());
 				for (IMethod m : clazz.getDeclaredMethods()) {
-					MethodAnalyzer analyzer = new MethodAnalyzer(targetApplication.findIRMethodForMethod(m), typeList);
+					AnalyzedMethod method = targetApplication.findIRMethodForMethod(m);
 
-					AnalysisResult candidates = analyzer.analyze();
+					if (method != null) {
+						MethodAnalyzer analyzer = new MethodAnalyzer(method, filteredList);
 
-					if (!candidates.isEmpty()) {
-						analysisResult.put(m.getSignature(), candidates);
+						AnalysisResult candidates = analyzer.analyze();
+
+						if (!candidates.isEmpty()) {
+							analysisResult.put(m.getSignature(), candidates);
+						}
+					} else {
+						LOG.error("method is skipped");
 					}
 
 				}
 
 			}
+			LOG.info("creating outputfile");
 
+			Path outputPath = Paths.get("faststring-output/");
 
+			if (!Files.exists(outputPath)) {
+				Files.createDirectory(outputPath);
+			}
+
+			Path outputFile = Paths.get("faststring-output/_optimizedMethods");
+			Files.write(outputFile, analysisResult.keySet(), Charset.defaultCharset());
+
+			LOG.info("finished analyzing; starting transforming");
 			new JarManager(jarFile, analysisResult).process();
 
 		} catch (ClassHierarchyException e) {
@@ -83,45 +105,37 @@ public class Runner {
 			throw new RuntimeException(e);
 		}
 
-
 	}
 
 
-	public static class TypeLabelCreator implements IStringConverter<List<TypeLabel>> {
+	public static class TypeLabelCreator implements IStringConverter<TypeLabel> {
 
 		@Override
-		public List<TypeLabel> convert(String value) {
-			Iterable<String> classNames = Splitter.on(";").split(value);
+		public TypeLabel convert(String string) {
 
-			List<TypeLabel> list = Lists.newLinkedList();
+			try {
+				Class<?> c = Class.forName(string);
 
-			for (String string : classNames) {
+				if (TypeLabel.class.isAssignableFrom(c)) {
 
-				try {
-					Class<?> c = Class.forName(string);
+					LOG.info("using typelabel: {}", c.getName());
 
-					if (TypeLabel.class.isAssignableFrom(c)) {
+					TypeLabel label = (TypeLabel) c.newInstance();
 
-						LOG.info("using typelabel: {}", c.getName());
+					return label;
 
-						TypeLabel label = (TypeLabel) c.newInstance();
-
-						list.add(label);
-
-					} else {
-						LOG.error("class is not implementing the TypeLabel interface: {}", c.getName());
-					}
-
-
-				} catch (ClassNotFoundException e) {
-					LOG.error("could not load type label", string, e);
-				} catch (InstantiationException | IllegalAccessException e) {
-					LOG.error("could not initiate type label", string, e);
+				} else {
+					LOG.error("class is not implementing the TypeLabel interface: {}", c.getName());
 				}
 
+
+			} catch (ClassNotFoundException e) {
+				LOG.error("could not load type label", string, e);
+			} catch (InstantiationException | IllegalAccessException e) {
+				LOG.error("could not initiate type label", string, e);
 			}
 
-			return list;
+			return null;
 		}
 
 	}

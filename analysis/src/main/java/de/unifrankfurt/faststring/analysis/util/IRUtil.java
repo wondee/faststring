@@ -19,6 +19,8 @@ import de.unifrankfurt.faststring.analysis.util.QueueUtil.BaseQueueProcessingStr
 
 public final class IRUtil {
 
+//	private static final Logger LOG = LoggerFactory.getLogger(IRUtil.class);
+
 	private IRUtil() {
 		// empty
 	}
@@ -68,13 +70,13 @@ public final class IRUtil {
 		}
 		throw new IllegalStateException("value number " + v + " not found in uses list " + list +  " started with " + startWith);
 	}
-	
+
 	public static Map<SSAInstruction, Integer> createInstructionToIndexMap(IR ir) {
+
 		Map<SSAInstruction, Integer> map = Maps.newHashMap();
 
 		for (int i = 0; i < ir.getInstructions().length; i++) {
 			SSAInstruction instruction = ir.getInstructions()[i];
-
 			if (instruction != null) {
 				Integer old = map.put(instruction, i);
 				if (old != null) {

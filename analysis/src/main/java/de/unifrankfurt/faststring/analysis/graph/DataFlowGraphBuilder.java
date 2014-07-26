@@ -29,7 +29,7 @@ import de.unifrankfurt.faststring.analysis.util.UniqueQueue;
 public class DataFlowGraphBuilder {
 
 	private static final Logger LOG = LoggerFactory.getLogger(DataFlowGraphBuilder.class);
-	
+
 	private final AnalyzedMethod method;
 
 	private InstructionNodeFactory instructionFactory;
@@ -50,28 +50,36 @@ public class DataFlowGraphBuilder {
 		return createDataFlowGraph(label.findTypeUses(method), Sets.newHashSet(label));
 	}
 
-	public DataFlowGraph createDataFlowGraph(Collection<Reference> stringRefs, Collection<TypeLabel> labels) {
-
-		Queue<Reference> refs = new UniqueQueue<Reference>(stringRefs);
+	public DataFlowGraph createDataFlowGraph(Collection<Reference> initialRefs, Collection<TypeLabel> labels) {
+		LOG.trace("starting with {}", initialRefs);
+		Queue<Reference> refs = new UniqueQueue<Reference>(initialRefs);
 
 		Map<Integer, Reference> refMap = Maps.newHashMap();
 
 		while(!refs.isEmpty()) {
+			LOG.trace("refs: {}", refs);
+
 			Reference stringRef = refs.remove();
 			int ref = stringRef.valueNumber();
 
 			if (!refMap.containsKey(ref)) {
 				refMap.put(ref, stringRef);
 			}
-
+			LOG.trace("check definitions");
 			checkDefinition(stringRef);
+			LOG.trace("check uses");
 			checkUses(stringRef);
-
+			LOG.trace("adding new refs");
 			refs.addAll(findNewRefs(stringRef, refMap.keySet(), labels));
 		}
 
 		DataFlowGraph graph = new DataFlowGraph(ImmutableMap.copyOf(refMap));
-		LOG.debug("created dataflow graph for : {}", graph);
+
+		if (!refMap.isEmpty()) {
+			LOG.debug("created dataflow graph for : {}", graph);
+		} else {
+			LOG.debug("no refs found to build a graph off");
+		}
 
 		return graph;
 	}
@@ -79,7 +87,7 @@ public class DataFlowGraphBuilder {
 
 	private Collection<Reference> findNewRefs(Reference ref, Set<Integer> contained, Collection<TypeLabel> labels) {
 		Set<Reference> newRefs = Sets.newHashSet();
-		
+
 		for (TypeLabel label : labels) {
 			Set<Reference> refs = Sets.newHashSet(transform(filter(ref.getConnectedRefs(label), not(in(contained))), toReferences));
 			newRefs.addAll(refs);
@@ -107,6 +115,8 @@ public class DataFlowGraphBuilder {
 		SSAInstruction instruction = method.getDef(v);
 
 		InstructionNode definition = null;
+
+		LOG.trace("instruction found: {}", instruction);
 
 		if (instruction == null) {
 			if (method.getParams().contains(v)) {

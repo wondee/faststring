@@ -9,6 +9,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -31,7 +32,7 @@ import de.unifrankfurt.faststring.analysis.util.IRUtil;
 /**
  * Represents a method from bytecode which is about to be analyzed
  * <p>
- * This class provides access to the methods bytecode instructions and offers functionality to 
+ * This class provides access to the methods bytecode instructions and offers functionality to
  * determine locals with their <code>load</code> and <code>store</code> instructions for value numbers.
  *
  */
@@ -49,6 +50,9 @@ public class AnalyzedMethod {
 	private IInstruction[] bytecodeInstructions;
 
 	public AnalyzedMethod(IR ir, DefUse defUse) {
+		Preconditions.checkNotNull(ir, "ir is null");
+		Preconditions.checkNotNull(defUse, "defUse is null");
+
 		this.ir = ir;
 		this.defUse = defUse;
 	}
@@ -59,10 +63,13 @@ public class AnalyzedMethod {
 	 */
 	public Integer getIndexFor(SSAInstruction instruction) {
 
+		LOG.trace("get bytecode index");
+
 		if (instruction instanceof SSAPhiInstruction) {
 			return getIndexForPhi((SSAPhiInstruction) instruction);
 		} else {
 			if (instructionToIndexMap == null) {
+				LOG.trace("creating instruction index map");
 				instructionToIndexMap = IRUtil.createInstructionToIndexMap(ir);
 			}
 			return instructionToIndexMap.get(instruction);
@@ -73,6 +80,11 @@ public class AnalyzedMethod {
 	public String getMethodName() {
 		return ir.getMethod().getName().toString();
 	}
+
+	public String getSignature() {
+		return ir.getMethod().getSignature();
+	}
+
 
 	/**
 	 * @param v
@@ -92,10 +104,10 @@ public class AnalyzedMethod {
 
 	/**
 	 * Tries to determine the local for a value number when it is defined
-	 * 
+	 *
 	 * @param bcIndex the bytecode index where the value number is defined
-	 * @param valueNumber the value number too check 
-	 * @return all possible locals for that value number 
+	 * @param valueNumber the value number too check
+	 * @return all possible locals for that value number
 	 */
 	public Collection<Integer> getLocalForDef(int bcIndex, int valueNumber) {
 
@@ -112,10 +124,10 @@ public class AnalyzedMethod {
 
 	/**
 	 * Tries to determine the local for a value number when it is used
-	 * 
+	 *
 	 * @param bcIndex the bytecode index where the value number is used
-	 * @param valueNumber the value number too check 
-	 * @return all possible locals for that value number 
+	 * @param valueNumber the value number too check
+	 * @return all possible locals for that value number
 	 */
 	public Collection<Integer> getLocalForUse(int bcIndex, int valueNumber) {
 
@@ -129,17 +141,17 @@ public class AnalyzedMethod {
 
 		return locals;
 	}
-	
+
 	/**
 	 * Tries to determine the position of the <code>load</code> instruction where the
 	 * that loads the given local on to the stack, depending on the position of the local
-	 * at the current stack. 
-	 *  
+	 * at the current stack.
+	 *
 	 * @param local the local to find the load for
-	 * @param index the position of local at the stack  
+	 * @param index the position of local at the stack
 	 * @param stackSize the initial stack size
-	 * @param bcIndex the bytecode index 
-	 * 
+	 * @param bcIndex the bytecode index
+	 *
 	 * @return a pair (local, bytecode index), or <code>null</code> if no load was found
 	 */
 	public LocalInfo getLoadFor(int index, int stackSize, int bcIndex) {
@@ -180,20 +192,20 @@ public class AnalyzedMethod {
 	/**
 	 * Tries to determine the position of the <code>store</code> instruction where the
 	 * that loads the given local on to the stack, depending on the position of the local
-	 * at the current stack. 
-	 *  
+	 * at the current stack.
+	 *
 	 * @param local the local to find the load for
-	 * @param index the position of local at the stack  
+	 * @param index the position of local at the stack
 	 * @param stackSize the initial stack size
-	 * @param bcIndex the bytecode index 
-	 * 
+	 * @param bcIndex the bytecode index
+	 *
 	 * @return the bytecode index of the load instruction, or -1 if none was found
 	 */
 	public LocalInfo getStoreFor(int index, int stackSize, int bcIndex) {
 		LOG.trace("getStore(index={},stackSize={},bytecodeIndex={})",index, stackSize, bcIndex);
 
 		StackSimulator locator = new StackSimulator(stackSize, index);
-		
+
 		SSACFG cfg = ir.getControlFlowGraph();
 		ISSABasicBlock block = cfg.getBlockForInstruction(bcIndex);
 
@@ -211,8 +223,8 @@ public class AnalyzedMethod {
 					return new LocalInfo(locator.getLocal(), i);
 				}
 			}
-			
-			if (cfg.getSuccNodeCount(block) == 2) {
+
+			if (nodeCountWithoutExit(cfg, block) == 1) {
 				block = cfg.getSuccNodes(block).next();
 				start = block.getFirstInstructionIndex();
 			} else {
@@ -228,7 +240,7 @@ public class AnalyzedMethod {
 		protected LocalInfo(Integer fst, Integer snd) {
 			super(fst, snd);
 		}
-		
+
 		public int local() {
 			return fst;
 		}
@@ -236,7 +248,7 @@ public class AnalyzedMethod {
 			return snd;
 		}
 	}
-	
+
 	private IInstruction[] getBytecodeInstructions() {
 		if (bytecodeInstructions == null) {
 
@@ -300,13 +312,29 @@ public class AnalyzedMethod {
 
 		ISSABasicBlock block = cfg.getBlockForInstruction(bcIndex);
 
-		while (cfg.getSuccNodeCount(block) == 2) {
+		while (nodeCountWithoutExit(cfg, block) == 1) {
 			block = cfg.getSuccNodes(block).next();
 		}
 
 		return block.getLastInstructionIndex();
 	}
-	
+
+	private int nodeCountWithoutExit(SSACFG cfg, ISSABasicBlock block) {
+		Iterator<ISSABasicBlock> iter = cfg.getSuccNodes(block);
+		int count = 0;
+
+		while (iter.hasNext()) {
+			ISSABasicBlock next = iter.next();
+
+			if (!next.isExitBlock()) {
+				count++;
+			}
+		}
+
+
+		return count;
+	}
+
 	private int findFirstIndexBeforeBranch(int bcIndex) {
 		SSACFG cfg = ir.getControlFlowGraph();
 
@@ -322,7 +350,7 @@ public class AnalyzedMethod {
 	/**
 	 * Tries to determine the bytecode index of the first instruction where a phi definition is created for
 	 * @param instruction the phi instruction to check for
-	 * @return the bytecode index found 
+	 * @return the bytecode index found
 	 */
 	public Integer getIndexForPhi(SSAPhiInstruction instruction) {
 		if (phi2BlockMap == null) {

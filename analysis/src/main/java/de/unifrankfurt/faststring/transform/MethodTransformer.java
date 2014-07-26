@@ -13,6 +13,7 @@ import com.ibm.wala.shrikeBT.analysis.Verifier;
 import de.unifrankfurt.faststring.analysis.graph.ConstantNode;
 import de.unifrankfurt.faststring.analysis.graph.InstructionNode;
 import de.unifrankfurt.faststring.analysis.graph.InstructionNode.Visitor;
+import de.unifrankfurt.faststring.analysis.graph.GetNode;
 import de.unifrankfurt.faststring.analysis.graph.MethodCallNode;
 import de.unifrankfurt.faststring.analysis.graph.NewNode;
 import de.unifrankfurt.faststring.analysis.graph.ParameterNode;
@@ -43,14 +44,14 @@ public class MethodTransformer {
 		editor.beginPass();
 
 		for (Reference ref : transformationInfo.getReferences()) {
-		
+
 			createDefinitionConversations(ref.getDefinition(), ref);
-		
+
 			for (InstructionNode use : ref.getUses()) {
 				createUseOptimization(ref, use);
 				createUseConversations(ref, use);
 			}
-		
+
 		}
 
 		try {
@@ -72,19 +73,19 @@ public class MethodTransformer {
 					converter.setLocal(transformationInfo.getLocalForLabel(null, ref.getLabel(), local));
 //					converter.setLocal(local);
 					use.visit(converter);
-					
+
 				}
 			} else {
 				converter.setLocal(-1);
 				use.visit(converter);
 			}
 		}
-		
+
 	}
 
 	private void createUseOptimization(Reference ref, InstructionNode use) {
 		if (use.getLabel()!= null) {
-			use.visit(new Optimizer(ref.valueNumber(), 
+			use.visit(new Optimizer(ref.valueNumber(),
 					new ConversationPatchFactory(transformationInfo, editor, use.getLabel())));
 		}
 	}
@@ -97,7 +98,7 @@ public class MethodTransformer {
 				for (Integer local : locals) {
 					converter.setLocal(local);
 					instructionNode.visit(converter);
-					
+
 				}
 			} else {
 				converter.setLocal(-1);
@@ -119,7 +120,7 @@ public class MethodTransformer {
 			this.local = local;
 		}
 	}
-	
+
 	private class DefinitionConverter extends Converter {
 
 		public DefinitionConverter(TypeLabel from, TypeLabel to) {
@@ -139,6 +140,11 @@ public class MethodTransformer {
 		@Override
 		public void visitParameter(ParameterNode node) {
 			patchFactory.createConversationAtStart(local);
+		}
+
+		@Override
+		public void visitGet(GetNode node) {
+			patchFactory.createConversationAfter(node.getByteCodeIndex());
 		}
 
 		@Override
@@ -163,29 +169,29 @@ public class MethodTransformer {
 		public void visitNew(NewNode newNode) {
 			patchFactory.replaceNew(newNode);
 		}
-		
+
 	}
 
 	private class UseConverter extends Converter {
 
 		TypeLabel from;
-		
+
 		public UseConverter(TypeLabel from, TypeLabel to) {
 			super(from, to);
 			this.from = from;
 		}
-		
+
 		@Override
 		public void visitReturn(ReturnNode node) {
 			createConversation(node);
-			
+
 		}
 
 		@Override
 		public void visitMethodCall(MethodCallNode node) {
 			createConversation(node);
 		}
-		
+
 
 		private void createConversation(InstructionNode node) {
 			if (local != -1) {
@@ -194,7 +200,7 @@ public class MethodTransformer {
 			}
 			patchFactory.createConversationBefore(node.getByteCodeIndex());
 		}
-		
+
 	}
-	
+
 }

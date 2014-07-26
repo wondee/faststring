@@ -22,8 +22,8 @@ import com.ibm.wala.ssa.IR;
 public final class TargetApplication {
 	// TODO make creation independent of input files (maybe manual)
 
-
-	private static final Logger LOG = LoggerFactory.getLogger(TargetApplication.class);
+	private static final Logger LOG = LoggerFactory
+			.getLogger(TargetApplication.class);
 
 	private ClassHierarchy classHierarchy;
 	private AnalysisScope scope;
@@ -33,7 +33,8 @@ public final class TargetApplication {
 
 	private ImmutableSet<IClass> applicationClasses;
 
-	public TargetApplication(String jarName, String exclusionFileName) throws IOException, ClassHierarchyException {
+	public TargetApplication(String jarName, String exclusionFileName)
+			throws IOException, ClassHierarchyException {
 		LOG.info("creating analysis scope for {}", jarName);
 
 		File exclusionFile = null;
@@ -43,7 +44,8 @@ public final class TargetApplication {
 			exclusionFile = new File(exclusionFileName);
 
 		}
-		scope = AnalysisScopeFactory.createJavaAnalysisScope(jarName, exclusionFile);
+		scope = AnalysisScopeFactory.createJavaAnalysisScope(jarName,
+				exclusionFile);
 
 		LOG.info("building class hierarchy...", jarName);
 		classHierarchy = ClassHierarchy.make(scope);
@@ -51,20 +53,18 @@ public final class TargetApplication {
 		cache = new AnalysisCache();
 		options = new AnalysisOptions();
 
-		initApplicationClasses();
-
 	}
 
-	public TargetApplication(String fileName) throws IOException, ClassHierarchyException {
+	public TargetApplication(String fileName) throws IOException,
+			ClassHierarchyException {
 		this(fileName, null);
 	}
-
 
 	private void initApplicationClasses() {
 		Builder<IClass> builder = new ImmutableSet.Builder<IClass>();
 
 		for (IClass cl : classHierarchy) {
-			if (scope.isApplicationLoader(cl.getClassLoader()))  {
+			if (scope.isApplicationLoader(cl.getClassLoader())) {
 
 				LOG.info("application class found: {}", cl.getName());
 
@@ -76,27 +76,38 @@ public final class TargetApplication {
 		applicationClasses = builder.build();
 	}
 
-
-
 	public ImmutableSet<IClass> getApplicationClasses() {
+		if (applicationClasses == null) {
+			initApplicationClasses();
+		}
+
 		return applicationClasses;
 	}
 
 	public IR findIRForMethod(IMethod m) {
-		return cache.getSSACache().findOrCreateIR(m, Everywhere.EVERYWHERE, options.getSSAOptions());
+		return cache.getSSACache().findOrCreateIR(m, Everywhere.EVERYWHERE,
+				options.getSSAOptions());
 	}
 
 	public DefUse findDefUseForMethod(IMethod method) {
-		return cache.getSSACache().findOrCreateDU(method, Everywhere.EVERYWHERE, options.getSSAOptions()) ;
+		return cache.getSSACache().findOrCreateDU(method,
+				Everywhere.EVERYWHERE, options.getSSAOptions());
 	}
 
 	public AnalyzedMethod findIRMethodForMethod(IMethod m) {
-		return new AnalyzedMethod(findIRForMethod(m), findDefUseForMethod(m));
+		LOG.trace("getting ir for {}", m.getSignature());
+		IR ir = findIRForMethod(m);
+		if (ir == null) {
+			LOG.error("could not find ir for method {}", m.getSignature());
+			return null;
+		}
+		DefUse defUse = findDefUseForMethod(m);
+
+		return new AnalyzedMethod(ir, defUse);
 	}
 
 	public ClassHierarchy getClassHierachy() {
 		return classHierarchy;
 	}
-
 
 }

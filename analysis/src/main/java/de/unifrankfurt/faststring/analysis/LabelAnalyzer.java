@@ -98,7 +98,7 @@ public class LabelAnalyzer extends BaseQueueProcessingStrategy<Reference>{
 			} else {
 				final TypeLabel label = ref.getLabel();
 
-				if (o.isCompatibleWith(label, ref.valueNumber())) {
+				if (label != null && o.isCompatibleWith(label, ref.valueNumber())) {
 					o.setLabel(label);
 					LOG.trace("inspecting {}", o);
 					for (Integer connectedRefId : o.getConnectedRefs(label, ref.valueNumber())) {
@@ -121,7 +121,7 @@ public class LabelAnalyzer extends BaseQueueProcessingStrategy<Reference>{
 		while(!phis.isEmpty()) {
 			PhiNode phi = phis.pop();
 			phi.setLabel(strategy.shouldBeLabeled(graph, phi));
-			
+
 		}
 
 	}

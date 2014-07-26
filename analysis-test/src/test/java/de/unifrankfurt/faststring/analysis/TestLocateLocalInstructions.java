@@ -1,11 +1,14 @@
 package de.unifrankfurt.faststring.analysis;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.NoSuchElementException;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import de.unifrankfurt.faststring.analysis.graph.InstructionNode;
@@ -47,7 +50,16 @@ public class TestLocateLocalInstructions extends BaseTransformerTest {
 
 	}
 
-	
+
+	@Test
+	@Ignore // TODO to be fixed
+	public void testErrorFromH2() throws Exception {
+		AnalysisResult result = analyzeToResult("dumpData");
+
+		assertFalse(result.isEmpty());
+	}
+
+
 	private Reference findRef(AnalysisResult result, int i) {
 		for (Reference ref : result.getRefs()) {
 			if (ref.valueNumber() == i) {
@@ -61,7 +73,7 @@ public class TestLocateLocalInstructions extends BaseTransformerTest {
 	public String getTestClass() {
 		return "LoadTestClass";
 	}
-	
+
 	@Override
 	protected Collection<TypeLabel> getTypeLabel() {
 		return Arrays.asList(BuiltInTypes.SUBSTRING);

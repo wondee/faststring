@@ -9,10 +9,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.ibm.wala.ssa.SSAArrayStoreInstruction;
+import com.ibm.wala.ssa.SSAGetInstruction;
 import com.ibm.wala.ssa.SSAInstruction;
 import com.ibm.wala.ssa.SSAInstruction.Visitor;
+import com.ibm.wala.ssa.SSAArrayLoadInstruction;
+import com.ibm.wala.ssa.SSACheckCastInstruction;
+import com.ibm.wala.ssa.SSAConditionalBranchInstruction;
 import com.ibm.wala.ssa.SSAInvokeInstruction;
 import com.ibm.wala.ssa.SSANewInstruction;
 import com.ibm.wala.ssa.SSAPhiInstruction;
@@ -36,10 +39,9 @@ public class InstructionNodeFactory extends Visitor  {
 		this.method = ir;
 	}
 
-
 	public InstructionNode createConstant(int v) {
 
-		ConstantNode constant = new ConstantNode(method.getConstantValue(v), method.getConstantIndex(v));
+		ConstantNode constant = new ConstantNode(method.getConstantIndex(v));
 		Collection<Integer> locals = method.getLocalForDef(0, v);
 		constant.addLocalVariableIndices(v, locals);
 
@@ -47,6 +49,8 @@ public class InstructionNodeFactory extends Visitor  {
 	}
 
 	public InstructionNode create(SSAInstruction instruction) {
+		LOG.trace("creating instruction node");
+
 		if (!cache.containsKey(instruction)) {
 
 			instruction.visit(this);
@@ -61,9 +65,9 @@ public class InstructionNodeFactory extends Visitor  {
 
 				result.setByteCodeIndex(index);
 
+				LOG.trace("check locals");
 				checkLocalsForDef(instruction, result, index);
 				checkLocalsForUses(instruction, result, index);
-
 				cache.put(instruction, result);
 
 				return result;
@@ -77,6 +81,7 @@ public class InstructionNodeFactory extends Visitor  {
 	private void checkLocalsForDef(SSAInstruction instruction, InstructionNode result, Integer index) {
 		if (instruction.hasDef()) {
 			int def = instruction.getDef();
+
 			result.addLocalVariableIndices(def, method.getLocalForDef(index, def));
 
 			LOG.debug("determine store instruction for v={} at {}", def, instruction);
@@ -94,19 +99,17 @@ public class InstructionNodeFactory extends Visitor  {
 	private void checkLocalsForUses(SSAInstruction instruction, InstructionNode result, Integer index) {
 		List<Integer> vs = IRUtil.getUses(instruction);
 
-		if (vs.size() == Sets.newHashSet(vs).size()) {
-			for (int v : vs) {
-				result.addLocalVariableIndices(v, method.getLocalForUse(index, v));
-				LOG.debug("determine load instruction for v={} at {}", v, instruction);
-				LocalInfo load = method.getLoadFor(vs.indexOf(v), vs.size(), index);
-				if (load != null) {
-					result.addLocalVariableIndices(v, Arrays.asList(load.local()));
+		for (int i = 0; i < vs.size(); i++) {
+			int v = vs.get(i);
 
-					result.addLoad(load.local(), load.bcIndex());
-				}
+			result.addLocalVariableIndices(v, method.getLocalForUse(index, v));
+			LOG.debug("determine load instruction for v={} at {}", v, instruction);
+			LocalInfo load = method.getLoadFor(i, vs.size(), index);
+			if (load != null) {
+				result.addLocalVariableIndices(v, Arrays.asList(load.local()));
+
+				result.addLoad(load.local(), load.bcIndex());
 			}
-		} else {
-			throw new UnsupportedOperationException("now we need to implement it");
 		}
 	}
 
@@ -118,7 +121,6 @@ public class InstructionNodeFactory extends Visitor  {
 	@Override
 	public void visitPhi(SSAPhiInstruction instruction) {
 		res = new PhiNode(instruction.getDef(), IRUtil.getUses(instruction));
-
 	}
 
 	@Override
@@ -139,6 +141,28 @@ public class InstructionNodeFactory extends Visitor  {
 	@Override
 	public void visitNew(SSANewInstruction instruction) {
 		res = new NewNode(instruction.getDef(), instruction.getConcreteType());
+	}
+
+	@Override
+	public void visitGet(SSAGetInstruction instruction) {
+		res = new GetNode();
+	}
+
+	@Override
+	public void visitConditionalBranch(SSAConditionalBranchInstruction instruction) {
+		// TODO implement support
+		res = new ConditionalBranchNode();
+	}
+
+	@Override
+	public void visitCheckCast(SSACheckCastInstruction instruction) {
+		// TODO implement support
+		res = new CheckCastNode();
+	}
+
+	@Override
+	public void visitArrayLoad(SSAArrayLoadInstruction instruction) {
+		res = new GetNode();
 	}
 
 }

@@ -1,8 +1,12 @@
 package de.unifrankfurt.faststring.transform;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -37,7 +41,7 @@ public class JarManager {
 	public JarManager(String jarFile, Map<String, AnalysisResult> analysisResult) {
 		int lastDot = jarFile.lastIndexOf('.');
 
-		baseName = jarFile.substring(lastDot - 1);
+		baseName = jarFile.substring(0, lastDot);
 
 		this.analysisResult = analysisResult;
 	}
@@ -65,13 +69,9 @@ public class JarManager {
 
 	private void iterateClasses(OfflineInstrumenter instrumenter)
 			throws IOException, InvalidClassFileException, FailureException {
-//		final GetInstruction getOut = Util.makeGet(System.class, "out");
-//		final Instruction callPrintln = Util.makeInvoke(PrintStream.class, "println", new Class[] { String.class });
 
 		instrumenter.beginTraversal();
-		PrintWriter writer = new PrintWriter(System.out);
 		instrumenter.setPassUnmodifiedClasses(true);
-
 
 		ClassInstrumenter ci;
 		while ((ci = instrumenter.nextClass()) != null) {
@@ -80,20 +80,26 @@ public class JarManager {
 
 				MethodData methodData = ci.visitMethod(i);
 
-				String signature = ci.getReader().getName().replace('/', '.') + "." + methodData.getName() + methodData.getSignature();
+
+				String signature = (ci.getReader().getName()).replace('/', '.') + "." + methodData.getName() + methodData.getSignature();
 
 				AnalysisResult result = analysisResult.get(signature);
 				if (result != null) {
-					System.out.println("--- old code for " + signature);
+
+					Path outFile = Paths.get("faststring-output/", signature.replace('/', '.'));
+
+					BufferedWriter writer = Files.newBufferedWriter(outFile, Charset.defaultCharset());
+
+					writer.write("--- old code " + System.getProperty("line.separator"));
 					new Disassembler(methodData).disassembleTo(writer);
-					writer.flush();
 
 					new MethodTransformer(methodData, new TransformationInfo(result)).transformMethod();
 
-					System.out.println("--- new code");
+					writer.write("--- new code " + System.getProperty("line.separator"));
 					new Disassembler(methodData).disassembleTo(writer);
-					writer.flush();
 
+					writer.flush();
+					writer.close();
 
 					instrumenter.outputModifiedClass(ci, ci.emitClass());
 				} else {
