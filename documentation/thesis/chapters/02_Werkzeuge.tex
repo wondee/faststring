@@ -1,0 +1,54 @@
+\chapter{Werkzeuge}
+
+In den folgenden Abschnitten sollen die verwendeten Werkzeuge kurz vorgestellt werden. Dabei handelt es sich zum einen um
+den Java Bytecode, als auch um die Software Bibliothek \textit{WALA}, auf deren API das von mir entwickelte System 
+basiert. 
+
+\section{Java Bytecode}
+
+Die Plattformunabhängigkeit, die in Java geschriebenen Programmen zugesprochen wird, ist vorallem mit der Rolle der Java 
+Virtual Machine zu erklären. Java Programme werden in einen Zwischencode, den Java Bytecode, übersetzt, welcher von der 
+System spezifischen JVM ausgeführt wird. Dabei ist Programmiersprache Java nicht die einzige in Bytecode übersetzbare 
+Sprache. Es existieren neben den bekanntesten Scala, Jython, Groovy, JavaScript noch viele weitere. Einmal in Bytecode 
+übersetzt in diesen Sprachen geschriebene Programme auf jeder der Java Spezifikation entsprechenden JVM ausführen. 
+\\
+Bytecode ist eine Sammlung von Instruktionen welche durch \textit{opcodes} von 2 Byte Länge definiert werden. Zusätzlich
+können noch 1 bis $n$ Parameter verwendet werden. Die Sprache ist Stack-orientiert, das bedeutet, dass von Operationen 
+verwendete Parameter über einen internen Stack übergeben werden. Als Beispiel dient der folgende Bytecode:
+
+\begin{lstlisting}[language=bytecode]
+	ICONST 5 	// legt den konstanten int Wert 5 auf den Stack 
+	ILOAD 1		// läd die lokale integer Variable 1 und legt sie auf den Stack
+	IADD 		// addiert die ersten beiden Werte auf dem Stack und legt das Ergebnis auf den Stack
+	ISTORE 2	// speichert den Wert auf dem Stack in der Variable 2
+\end{lstlisting} 
+
+Dabei existiert der Stack nur als Abstraktion für den eigentlichen Prozessor im Zielsystem. Wie die jeweilige JVM den 
+Stack in der Ziel Plattform umsetzt ist nicht definiert. Die Instruktionen lassen sich in folgende Kategorien einordnen:
+
+\begin{itemize}
+	\item Laden und Speichern von lokalen Variablen (\texttt{ILOAD}, \texttt{ISTORE})
+	\item Arithmetische und logische ausdrücke (\texttt{IADD})
+	\item Object Erzeugung bzw. Manipulation (\texttt{NEW}, \texttt{PUTFIELD})
+	\item Stack Verwaltung (\texttt{POP}, \texttt{PUSH}) 
+	\item Kontrollstruktur (\texttt{IFEQ}, \texttt{GOTO})
+	\item Methoden Aufrufe (\texttt{INVOKEVIRTUAL}, \texttt{INVOKESTATIC})
+\end{itemize}  
+
+
+\section{WALA}
+
+Bei \textit{WALA} handelt es sich um die "T.J. Watson Library for Analysis". Eine von ehemals von IBM entwickelte 
+Bibliothek für die statische Codeanalyse von Java- und JavaScript Programmen. Das Framework übernimmt dabei das Einlesen 
+von \textit{class} Dateien und stellt eine Repräsentation, die sogenannte \textit{Intermediate Representation}, des 
+Bytecodes zur Verfügung. Diese IR stellt die zentrale Datenstruktur dar und soll in diesem Abschnitt detailiert 
+beschrieben werden.
+\\
+Für die Manipulation des Bytecodes existiert innerhalb des Frameworks ein Unterprojekt, das diese Aufgabe übernimmt: 
+Shrike. Im Zweiten Abschnitt soll diese API kurz vorgestellt werden.  
+
+\subsection{IR}
+
+
+
+\subsection{Shrike}
