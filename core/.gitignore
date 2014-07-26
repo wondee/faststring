@@ -2,3 +2,8 @@
 /.settings
 /.classpath
 /.project
+/faststring-output/
+/dacapo-9.12-bach.jar
+/dacapoExclusions.txt
+/test-opt.jar
+/test.jar
