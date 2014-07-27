@@ -108,7 +108,7 @@ public class InstructionNodeFactory extends Visitor  {
 			if (load != null) {
 				result.addLocalVariableIndices(v, Arrays.asList(load.local()));
 
-				result.addLoad(load.local(), load.bcIndex());
+				result.addLoad(i, load.bcIndex());
 			}
 		}
 	}

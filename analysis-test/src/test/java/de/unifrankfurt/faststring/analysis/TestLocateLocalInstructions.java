@@ -2,14 +2,13 @@ package de.unifrankfurt.faststring.analysis;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.NoSuchElementException;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import de.unifrankfurt.faststring.analysis.graph.InstructionNode;
@@ -29,11 +28,11 @@ public class TestLocateLocalInstructions extends BaseTransformerTest {
 		InstructionNode substring = ref.getDefinition();
 		InstructionNode startsWith = ref.getUses().get(0);
 
-		assertNotNull(substring.getLoad(1));
-		assertNotNull(startsWith.getLoad(1));
+		assertNotNull(substring.getLoad(0));
+		assertNotNull(startsWith.getLoad(0));
 
-		assertEquals(3, (int)substring.getLoad(1));
-		assertEquals(2, (int)startsWith.getLoad(1));
+		assertEquals(3, (int)substring.getLoad(0));
+		assertEquals(2, (int)startsWith.getLoad(0));
 
 	}
 
@@ -53,7 +52,6 @@ public class TestLocateLocalInstructions extends BaseTransformerTest {
 
 
 	@Test
-	@Ignore // TODO to be fixed
 	public void testErrorFromH2() throws Exception {
 		AnalysisResult result = analyzeToResult("dumpData");
 

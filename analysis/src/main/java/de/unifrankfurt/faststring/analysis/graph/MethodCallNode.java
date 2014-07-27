@@ -17,7 +17,6 @@ import de.unifrankfurt.faststring.analysis.util.IRUtil;
 
 public class MethodCallNode extends InstructionNode {
 
-	private List<Integer> uses;
 	private MethodReference target;
 	private boolean isStatic;
 
@@ -38,7 +37,7 @@ public class MethodCallNode extends InstructionNode {
 			MethodReference target, boolean isStatic) {
 		super();
 		setDef(def);
-		this.uses = uses;
+		setUses(uses);
 		this.target = target;
 		this.isStatic = isStatic;
 	}
@@ -192,6 +191,10 @@ public class MethodCallNode extends InstructionNode {
 	public void setDefLabel(TypeLabel label) {
 		defLabel = label;
 
+	}
+
+	public int getUse(int i) {
+		return uses.get(i);
 	}
 
 }

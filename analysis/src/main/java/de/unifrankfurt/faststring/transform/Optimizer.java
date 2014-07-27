@@ -43,22 +43,20 @@ class Optimizer extends InstructionNode.Visitor {
 
 	private void updateLoads(MethodCallNode node) {
 
-		for (Integer v : node.getParams()) {
+		for (int i = 0; i < node.getParams().size() + 1; i++) {
+			int v = node.getUse(i);
+
 			TypeLabel useLabel = node.getLabelForUse(v);
+
 			if (useLabel != null) {
+
 				for (int local : node.getLocals(v)) {
-					patchFactory.replaceLoad(local, node.getLoad(local), useLabel);
+					patchFactory.replaceLoad(local, node.getLoad(i), useLabel);
 
 				}
 			}
-		}
 
-		for (int local : node.getLocals(v)) {
 
-			Integer loadIndex = node.getLoad(local);
-			if (loadIndex != null) {
-				patchFactory.replaceLoad(local, loadIndex, node.getLabel());
-			}
 		}
 	}
 

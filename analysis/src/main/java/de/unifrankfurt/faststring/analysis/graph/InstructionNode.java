@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
@@ -23,9 +24,13 @@ public abstract class InstructionNode implements Labelable {
 	private int byteCodeIndex = -1;
 
 	Map<Integer, Collection<Integer>> localMap = Maps.newHashMap();
+
+	/** maps from use index to bcIndex where this value is pushed to the stack */
 	Map<Integer, Integer> loadMap = Maps.newHashMap();
+
 	int storeIndex = -1;
 	int def = -1;
+	List<Integer> uses;
 
 	public List<Integer> getConnectedRefs(TypeLabel label, int inV) {
 		return ImmutableList.of();
@@ -106,20 +111,38 @@ public abstract class InstructionNode implements Labelable {
 
 	}
 
-	public void setDef(int def) {
+	public Iterable<Integer> getIndicesForV(Integer valueNumber) {
+
+		List<Integer> indices = Lists.newLinkedList();
+
+		for (int i = 0; i < uses.size(); i++) {
+			if (uses.get(i) == valueNumber) {
+				indices.add(i);
+			}
+		}
+
+		return indices;
+	}
+
+
+	void setDef(int def) {
 		this.def = def;
+	}
+
+	void setUses(List<Integer> uses) {
+		this.uses = uses;
 	}
 
 	public int getDef() {
 		return def;
 	}
 
-	public void addLoad(Integer local, int load) {
-		LOG.trace("adding load {}, for local {}", load, local);
-		Integer old = loadMap.put(local, load);
+	public void addLoad(int index, int load) {
+		LOG.trace("adding load {}, for index {}", load, index);
+		Integer old = loadMap.put(index, load);
 
 		if (old != null && old != load) {
-			throw new IllegalStateException(String.format("old value was removed from loadMap local %d old %d new %d", local, old, load));
+			throw new IllegalStateException(String.format("old value was removed from loadMap index %index old %d new %d", index, old, load));
 		}
 
 	}
@@ -188,7 +211,6 @@ public abstract class InstructionNode implements Labelable {
 		public void visitBranch(ConditionalBranchNode conditionalBranchNode) {}
 
 	}
-
 
 
 }

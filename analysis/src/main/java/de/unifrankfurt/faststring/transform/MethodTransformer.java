@@ -71,18 +71,21 @@ public class MethodTransformer {
 
 	private void createUseConversations(Reference ref, InstructionNode use) {
 		if (!use.isCompatibleWith(ref)) {
-			Converter converter = new UseConverter(ref.getLabel(), use.getLabel());
+			UseConverter converter = new UseConverter(ref.getLabel(), use.getLabel());
 			Collection<Integer> locals = use.getLocals(ref.valueNumber());
-			if (!locals.isEmpty()) {
-				for (Integer local : locals) {
-					converter.setLocal(transformationInfo.getLocalForLabel(null, ref.getLabel(), local));
-//					converter.setLocal(local);
-					use.visit(converter);
 
+			for (int index : use.getIndicesForV(ref.valueNumber())) {
+				if (!locals.isEmpty()) {
+					for (Integer local : locals) {
+						converter.setLocal(transformationInfo.getLocalForLabel(null, ref.getLabel(), local), index);
+	//					converter.setLocal(local);
+						use.visit(converter);
+
+					}
+				} else {
+					converter.setLocal(-1);
+					use.visit(converter);
 				}
-			} else {
-				converter.setLocal(-1);
-				use.visit(converter);
 			}
 		}
 
@@ -180,6 +183,7 @@ public class MethodTransformer {
 	private class UseConverter extends Converter {
 
 		TypeLabel from;
+		private int index;
 
 		public UseConverter(TypeLabel from, TypeLabel to) {
 			super(from, to);
@@ -201,9 +205,14 @@ public class MethodTransformer {
 		private void createConversation(InstructionNode node) {
 			if (local != -1) {
 				int orgLocal = transformationInfo.getOrgLocalForLabel(from, local);
-				patchFactory.replaceLoad(orgLocal, node.getLoad(orgLocal), from);
+				patchFactory.replaceLoad(orgLocal, node.getLoad(index), from);
 			}
 			patchFactory.createConversationBefore(node.getByteCodeIndex());
+		}
+
+		void setLocal(int local, int index) {
+			super.setLocal(local);
+			this.index = index;
 		}
 
 	}

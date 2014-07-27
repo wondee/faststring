@@ -11,15 +11,14 @@ import de.unifrankfurt.faststring.analysis.util.IRUtil;
 
 public class PhiNode extends InstructionNode {
 
-	private List<Integer> uses;
 
 	public PhiNode(SSAPhiInstruction instruction) {
 		this(instruction.getDef(), IRUtil.getUses(instruction));
 	}
 
 	public PhiNode(int def, List<Integer> uses) {
-		this.def = def;
-		this.uses = uses;
+		setDef(def);
+		setUses(uses);
 	}
 
 	@Override
