@@ -145,7 +145,7 @@ public class InstructionNodeFactory extends Visitor  {
 
 	@Override
 	public void visitGet(SSAGetInstruction instruction) {
-		res = new GetNode();
+		res = new GetNode(instruction.getDef());
 	}
 
 	@Override
@@ -162,7 +162,7 @@ public class InstructionNodeFactory extends Visitor  {
 
 	@Override
 	public void visitArrayLoad(SSAArrayLoadInstruction instruction) {
-		res = new GetNode();
+		res = new GetNode(instruction.getDef());
 	}
 
 }
