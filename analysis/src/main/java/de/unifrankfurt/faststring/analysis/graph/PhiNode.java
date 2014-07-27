@@ -12,7 +12,6 @@ import de.unifrankfurt.faststring.analysis.util.IRUtil;
 public class PhiNode extends InstructionNode {
 
 	private List<Integer> uses;
-	private int def;
 
 	public PhiNode(SSAPhiInstruction instruction) {
 		this(instruction.getDef(), IRUtil.getUses(instruction));
@@ -49,10 +48,6 @@ public class PhiNode extends InstructionNode {
 	@Override
 	public void visit(Visitor visitor) {
 		visitor.visitPhi(this);
-	}
-
-	public Integer getDef() {
-		return def;
 	}
 
 	public List<Integer> getUses() {

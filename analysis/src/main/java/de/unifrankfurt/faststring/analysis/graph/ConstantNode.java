@@ -6,8 +6,9 @@ public class ConstantNode extends InstructionNode {
 
 	private Object value;
 
-	public ConstantNode(int bcIndex) {
+	public ConstantNode(int bcIndex, int def) {
 		setByteCodeIndex(bcIndex);
+		setDef(def);
 	}
 
 	@Override

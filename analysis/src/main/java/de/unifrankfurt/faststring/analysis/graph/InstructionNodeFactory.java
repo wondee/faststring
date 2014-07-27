@@ -41,7 +41,7 @@ public class InstructionNodeFactory extends Visitor  {
 
 	public InstructionNode createConstant(int v) {
 
-		ConstantNode constant = new ConstantNode(method.getConstantIndex(v));
+		ConstantNode constant = new ConstantNode(method.getConstantIndex(v), v);
 		Collection<Integer> locals = method.getLocalForDef(0, v);
 		constant.addLocalVariableIndices(v, locals);
 
@@ -89,7 +89,7 @@ public class InstructionNodeFactory extends Visitor  {
 			LocalInfo store = method.getStoreFor(0, 1, (instruction instanceof SSAPhiInstruction) ? index - 1 : index);
 			if (store != null) {
 				result.addLocalVariableIndices(def, Arrays.asList(store.local()));
-				result.addStore(store.local(), store.bcIndex());
+				result.setStore(store.local(), store.bcIndex());
 			}
 
 		}

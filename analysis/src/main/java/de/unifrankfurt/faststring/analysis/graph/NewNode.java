@@ -8,8 +8,6 @@ public class NewNode extends InstructionNode {
 
 	private TypeReference type;
 	private int ctorCallIndex;
-	
-	private int def;
 
 	public NewNode(int def, TypeReference concreteType) {
 		this.type = concreteType;
@@ -19,7 +17,7 @@ public class NewNode extends InstructionNode {
 	public void setCtorCallIndex(int ctorCallIndex) {
 		this.ctorCallIndex = ctorCallIndex;
 	}
-	
+
 	@Override
 	public void visit(Visitor visitor) {
 		visitor.visitNew(this);
@@ -28,13 +26,13 @@ public class NewNode extends InstructionNode {
 	@Override
 	public String toString() {
 		return "NewNode [def=" + def + ", type=" + type + ",ctorCall=" + ctorCallIndex + " localMap=" + localMap
-				+ " storeMap=" + storeMap + ", getByteCodeIndex()=" + getByteCodeIndex() + "]";
+				+ " storeIndex=" + storeIndex + ", getByteCodeIndex()=" + getByteCodeIndex() + "]";
 	}
-	
+
 	public Collection<Integer> getDefLocal() {
 		return getLocals(def);
 	}
-	
+
 	public TypeReference getType() {
 		return type;
 	}

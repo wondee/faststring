@@ -17,7 +17,6 @@ import de.unifrankfurt.faststring.analysis.util.IRUtil;
 
 public class MethodCallNode extends InstructionNode {
 
-	private int def;
 	private List<Integer> uses;
 	private MethodReference target;
 	private boolean isStatic;
@@ -38,7 +37,7 @@ public class MethodCallNode extends InstructionNode {
 	public MethodCallNode(int def, List<Integer> uses,
 			MethodReference target, boolean isStatic) {
 		super();
-		this.def = def;
+		setDef(def);
 		this.uses = uses;
 		this.target = target;
 		this.isStatic = isStatic;
@@ -161,7 +160,8 @@ public class MethodCallNode extends InstructionNode {
 	public String toString() {
 		return "MethodCallNode [def=" + def + ", uses=" + uses
 				+ ", target=" + target + ", isStatic=" + isStatic + ", bcIndex=" +
-				getByteCodeIndex() + " localVarIndex=" + localMap + ", loadMap=" + loadMap + ", storeMap=" + storeMap + " ]";
+				getByteCodeIndex() + " localVarIndex=" + localMap + ", loadMap=" +
+				loadMap + ", store=" + storeIndex + " ]";
 	}
 
 	@Override

@@ -169,7 +169,7 @@ public class ConversationPatchFactory {
 		});
 
 		for (int local : newNode.getDefLocal()) {
-			replaceStore(local, newNode.getStore(local), to);
+			replaceStore(local, newNode.getStore(), to);
 		}
 	}
 

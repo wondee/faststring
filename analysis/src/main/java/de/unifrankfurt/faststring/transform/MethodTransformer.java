@@ -55,7 +55,12 @@ public class MethodTransformer {
 		}
 
 		try {
-			new Verifier(methodData).verify();
+			Verifier verifier = new Verifier(methodData);
+
+			// set classhierachieprovider
+
+
+			verifier.verify();
 			editor.applyPatches();
 			editor.endPass();
 

@@ -1,5 +1,6 @@
 package de.unifrankfurt.faststring.analysis.graph;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -23,7 +24,8 @@ public abstract class InstructionNode implements Labelable {
 
 	Map<Integer, Collection<Integer>> localMap = Maps.newHashMap();
 	Map<Integer, Integer> loadMap = Maps.newHashMap();
-	Map<Integer, Integer> storeMap = Maps.newHashMap();
+	int storeIndex = -1;
+	int def = -1;
 
 	public List<Integer> getConnectedRefs(TypeLabel label, int inV) {
 		return ImmutableList.of();
@@ -77,23 +79,39 @@ public abstract class InstructionNode implements Labelable {
 		} else {
 			localMap.get(v).addAll(locals);
 		}
-
 	}
 
 	public Integer getLoad(int i) {
 		return loadMap.get(i);
 	}
 
-	public Integer getStore(int i) {
-		return storeMap.get(i);
+	public Integer getStore() {
+		return storeIndex;
 	}
 
-	public void addStore(int local, int store) {
-		Integer old = storeMap.put(local, store);
+	public void setStore(int local, int bcIndex) {
+		int def = getDef();
+		if (def != -1) {
+			addLocalVariableIndices(def, Arrays.asList(local));
 
-		if (old != null && old != store) {
-			throw new IllegalStateException(String.format("old value was removed from storeMap local %d old %d new %d", local, old, store));
+			if (storeIndex == -1) {
+				storeIndex = bcIndex;
+			} else {
+				throw new IllegalStateException(String.format("store was set twice: old=%d; new=%d", storeIndex, bcIndex));
+			}
+		} else {
+			throw new IllegalStateException(String.format("instruction %s has no def but a store at %d for local %d",
+					this, bcIndex, local));
 		}
+
+	}
+
+	public void setDef(int def) {
+		this.def = def;
+	}
+
+	public int getDef() {
+		return def;
 	}
 
 	public void addLoad(Integer local, int load) {
@@ -170,6 +188,7 @@ public abstract class InstructionNode implements Labelable {
 		public void visitBranch(ConditionalBranchNode conditionalBranchNode) {}
 
 	}
+
 
 
 }
