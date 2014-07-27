@@ -157,7 +157,7 @@ public class InstructionNodeFactory extends Visitor  {
 	@Override
 	public void visitCheckCast(SSACheckCastInstruction instruction) {
 		// TODO implement support
-		res = new CheckCastNode();
+		res = new CheckCastNode(instruction.getDef());
 	}
 
 	@Override
