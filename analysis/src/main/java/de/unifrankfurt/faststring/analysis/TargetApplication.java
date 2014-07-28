@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSet.Builder;
+import com.ibm.wala.classLoader.IBytecodeMethod;
 import com.ibm.wala.classLoader.IClass;
 import com.ibm.wala.classLoader.IMethod;
 import com.ibm.wala.ipa.callgraph.AnalysisCache;
@@ -16,6 +17,8 @@ import com.ibm.wala.ipa.callgraph.AnalysisScope;
 import com.ibm.wala.ipa.callgraph.impl.Everywhere;
 import com.ibm.wala.ipa.cha.ClassHierarchy;
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
+import com.ibm.wala.shrikeBT.IInstruction;
+import com.ibm.wala.shrikeCT.InvalidClassFileException;
 import com.ibm.wala.ssa.DefUse;
 import com.ibm.wala.ssa.IR;
 
@@ -25,6 +28,7 @@ public final class TargetApplication {
 	private static final Logger LOG = LoggerFactory
 			.getLogger(TargetApplication.class);
 
+
 	private ClassHierarchy classHierarchy;
 	private AnalysisScope scope;
 	private AnalysisCache cache;
@@ -32,6 +36,9 @@ public final class TargetApplication {
 	private AnalysisOptions options;
 
 	private ImmutableSet<IClass> applicationClasses;
+
+//	private static final int LIMIT_SECONDS = 3;
+//	private ExecutorService executor = Executors.newFixedThreadPool(1);
 
 	public TargetApplication(String jarName, String exclusionFileName)
 			throws IOException, ClassHierarchyException {
@@ -85,9 +92,53 @@ public final class TargetApplication {
 	}
 
 	public IR findIRForMethod(IMethod m) {
-		return cache.getSSACache().findOrCreateIR(m, Everywhere.EVERYWHERE,
-				options.getSSAOptions());
+		try {
+			IInstruction[] instructions = ((IBytecodeMethod) m).getInstructions();
+			if (instructions != null) {
+
+				return cache.getSSACache().findOrCreateIR(m, Everywhere.EVERYWHERE,
+					options.getSSAOptions());
+			}
+		} catch (InvalidClassFileException e) {
+			e.printStackTrace();
+		}
+		return null;
+//		FutureTask<IR> task = new FutureTask<IR>(new IRFinder(m));
+//
+//		executor.execute(task);
+//
+//		try {
+//			IR result = task.get(LIMIT_SECONDS, TimeUnit.SECONDS);
+//
+//			return result;
+//		} catch (InterruptedException e) {
+//			e.printStackTrace();
+//		} catch (ExecutionException e) {
+//			e.printStackTrace();
+//		} catch (TimeoutException e) {
+//			e.printStackTrace();
+//		}
+//		LOG.info("timed out ir creation");
+//		task.cancel(true);
+//		cache.getSSACache().wipe();
+//		return null;
 	}
+//
+//	private class IRFinder implements Callable<IR> {
+//		private IMethod method;
+//
+//		public IRFinder(IMethod m) {
+//			this.method = m;
+//		}
+//
+//		@Override
+//		public IR call() throws Exception {
+//			return cache.getSSACache().findOrCreateIR(method, Everywhere.EVERYWHERE,
+//					options.getSSAOptions());
+//		}
+//
+//	}
+
 
 	public DefUse findDefUseForMethod(IMethod method) {
 		return cache.getSSACache().findOrCreateDU(method,
