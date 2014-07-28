@@ -1,0 +1,87 @@
+\documentclass[12pt]{report}
+
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{setspace}
+\usepackage{xcolor}
+\usepackage{listings}
+
+
+\lstset{basicstyle=\ttfamily,breaklines=true}
+
+\definecolor{javared}{rgb}{0.6,0,0} % for strings
+\definecolor{javagreen}{rgb}{0.25,0.5,0.35} % comments
+\definecolor{javapurple}{rgb}{0.5,0,0.35} % keywords
+\definecolor{javadocblue}{rgb}{0.25,0.35,0.75} % javadoc
+ 
+\lstset{language=Java,
+basicstyle=\footnotesize\ttfamily,
+keywordstyle=\color{javapurple}\bfseries,
+stringstyle=\color{javared},
+commentstyle=\color{javagreen},
+morecomment=[s][\color{javadocblue}]{/**}{*/},
+%numbers=left,
+%numberstyle=\tiny\color{black},
+%stepnumber=1,
+%numbersep=10pt,
+tabsize=4,
+showspaces=false,
+showstringspaces=false}
+
+\lstset{literate=%
+    {Ö}{{\"O}}1
+    {Ä}{{\"A}}1
+    {Ü}{{\"U}}1
+    {ß}{{\ss}}1
+    {ü}{{\"u}}1
+    {ä}{{\"a}}1
+    {ö}{{\"o}}1
+    {~}{{\textasciitilde}}1
+}
+
+
+\lstdefinelanguage{Bytecode}{
+  keywords={GETSTATIC, INVOKEVIRTUAL, LDC, RETURN, ICONST, ILOAD, IADD, ISTORE},
+  keywordstyle=\color{black}\bfseries,
+  identifierstyle=\color{black},
+  sensitive=false,
+  comment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  commentstyle=\color{purple}\ttfamily,
+  stringstyle=\color{red}\ttfamily,
+  morestring=[b]',
+  morestring=[b]",
+  basicstyle=\footnotesize\ttfamily
+}
+
+\title{Optimierung mittels der Auswahl von String Repräsentationen in Java Bytecode}
+\author{Markus Wondrak\\Goethe Universität Frankfurt am Main\\http://www.sepl.informatik.uni-frankfurt.de}
+\date{\today}
+
+
+\begin{document}
+\maketitle
+\pagenumbering{roman}
+\tableofcontents
+\listoffigures
+\listoftables
+
+\begin{abstract}
+Es geht um blibla blubb
+\end{abstract}
+\pagenumbering{arabic}
+
+
+\include{chapters/01_Einleitung}
+\include{chapters/02_Werkzeuge}
+
+\chapter{Analyse}
+
+\chapter{Transformation}
+
+\chapter{Auswertung}
+
+\chapter{Fazit}
+
+\end{document}
