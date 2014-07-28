@@ -63,6 +63,10 @@ public class InstructionNodeFactory extends Visitor  {
 				res = null;
 				Integer index = method.getIndexFor(instruction);
 
+				if (index == null) {
+					throw new IllegalStateException("no index found for " + instruction);
+				}
+
 				result.setByteCodeIndex(index);
 
 				LOG.trace("check locals");
@@ -86,7 +90,7 @@ public class InstructionNodeFactory extends Visitor  {
 
 			LOG.debug("determine store instruction for v={} at {}", def, instruction);
 
-			LocalInfo store = method.getStoreFor(0, 1, (instruction instanceof SSAPhiInstruction) ? index - 1 : index);
+			LocalInfo store = method.getStoreFor(0, 1, (instruction instanceof SSAPhiInstruction) && index > 0 ? index - 1 : index);
 			if (store != null) {
 				result.addLocalVariableIndices(def, Arrays.asList(store.local()));
 				result.setStore(store.local(), store.bcIndex());
