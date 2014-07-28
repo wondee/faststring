@@ -49,6 +49,17 @@ Shrike. Im Zweiten Abschnitt soll diese API kurz vorgestellt werden.
 
 \subsection{IR}
 
-
+Die \textit{Intermediate Representation} abstrahiert vom Stack basierten Bytecode zu einer \textit{single static assignment}
+Form
 
 \subsection{Shrike}
+
+Shrike ist ein Unterprojekt innerhalb des WALA Frameworks. Shrike übernimmt dabei das Lesen und das Schreiben von Bytecode 
+aus bzw. in class Dateien. Dabei wird es zum einen beim Erstellen eines IR aus einer Methode verwendet, zum Anderen bietet 
+es eine "Patch-based" API an um den Bytecode einer eingelesenen Methode zu verändern. Dies geschieht über das Einfügen 
+von \texttt{Patch}es, welche über einen entsprechenden \texttt{MethodEditor} überall im Bytecode einer Methode eingefügt 
+werden oder auch ursprüngliche Instruktionen komplett ersetzen. Zusätzlich enthält es einen \texttt{Verifier}, der  
+erzeugten Bytecode überprüft, so dass ungültige Stack Zustände oder Typfehler noch während der Manipulation erkannt werden können. 
+\\
+In dem von mir entwickelten System werden alle Bytecode Manipulationen mit Hilfe von Shrike umgesetzt. 
+
