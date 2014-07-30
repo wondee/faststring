@@ -1,7 +1,6 @@
 package de.unifrankfurt.faststring.analysis;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -49,15 +48,6 @@ public class TestLocateLocalInstructions extends BaseTransformerTest {
 		assertEquals(3, (int)substring.getStore());
 
 	}
-
-
-	@Test
-	public void testErrorFromH2() throws Exception {
-		AnalysisResult result = analyzeToResult("dumpData");
-
-		assertFalse(result.isEmpty());
-	}
-
 
 	private Reference findRef(AnalysisResult result, int i) {
 		for (Reference ref : result.getRefs()) {
