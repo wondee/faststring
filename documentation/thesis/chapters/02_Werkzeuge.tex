@@ -52,8 +52,33 @@ Für die Manipulation des Bytecodes existiert innerhalb des Frameworks ein Unter
 
 \subsection{IR}
 
-Die \textit{Intermediate Representation} abstrahiert vom Stack basierten Bytecode zu einer \textit{single 
-static assignment} Form
+Die \textit{Intermediate Representation} (IR) eine Abstraktion zum Stack basierten Bytecode. Ein IR ist
+in Single Static Assignment Form, welche sich dadurch auszeichnet, dass jeder Variablen immer genau 
+\textbf{einmal} ein Wert zugewiesen wird. Zusätzlich besteht die IR aus dem Kontroll Fluß Graphen der 
+Methode, welcher wiederrum aus Basic Blocks zusammengesetzt ist. Ein Basic Block ist eine Zusammenfassung 
+von aufeinander Folgende Instruktionen, welche in jedem Fall nach einander ausgeführt werden.
+\\
+Die Variablen innerhalb des IRs nennt WALA \textit{value numbers}. Diese beziehen sich immer auf eine 
+Referenz, allerdings kann eine Referenz sich auf mehrere tatsächliche value numbers in der IR beziehen.
+\\
+% phis
+% instruktionen
+% Symboltable!
+
+\subsubsection{Anpassungen}
+
+In WALA werden beim Erstellen des IR für alle Konstanten mit demselben Wert dieselbe value numbers erzeugt. 
+Da für die \textit{Analyse} verschiedenen Referenzen getrennt getrennt untersucht werden mussten, wurde 
+für die Erzeugung einer value number für eine Konstante der eingebaute caching Mechanismus umgangen. 
+\\
+Darüber hinaus war für die \textit{Transformation} die Information nötig, an welcher Stelle im Bytecode eine
+entsprechende Konstante erzeugt wird (z.B. mittels \texttt{LCD}). Um dies zu Erreichen wurde dieser Bytecode 
+Index während dem Durchlaufen der Instrukionen innerhalb der \texttt{SymbolTable} gespeichert, sodass er 
+beim Klienten des IRs zur Verfügung steht.
+\\
+Da diese Änderungen nicht in den Haupt Branch von WALA eingepflegt werden durften, benötigt das System den 
+Fork des WALA Projektes \footnote{Dieser ist unter \texttt{http://github.com/wondee/WALA} zu finden.}.
+
 
 \subsection{Shrike}
 
