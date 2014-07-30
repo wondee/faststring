@@ -1,0 +1,20 @@
+{
+	"name" : "StringListBuilder",
+	"originalType" : "java.lang.StringBuilder",
+	"optimizedType" : "de.unifrankfurt.faststring.core.StringListBuilder",
+	"methodsDefs" : [
+		{ "id" : "append", 			"desc" : { "name" : "append", "signature" : "(Ljava/lang/String;)Ljava/lang/StringBuilder;" } },
+		{ "id" : "ctor_default", 	"desc" : { "name" : "<init>", "signature" : "()V" } },
+		{ "id" : "ctor_string", 	"desc" : { "name" : "<init>", "signature" : "(Ljava/lang/String;)V" } }
+	],
+	
+	"effectedMethods" : ["append"],
+	"supportedMethods" : ["ctor_default", "ctor_string"],
+	"producingMethods" : ["append"],
+	
+	"compatibleLabels" : ["SubstringString"],
+	
+	"parameterUsage" : {"valueOf" : [0]},
+	
+	"toOriginalMethod" : "toString" 
+}

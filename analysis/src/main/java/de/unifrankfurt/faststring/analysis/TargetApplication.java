@@ -103,41 +103,7 @@ public final class TargetApplication {
 			e.printStackTrace();
 		}
 		return null;
-//		FutureTask<IR> task = new FutureTask<IR>(new IRFinder(m));
-//
-//		executor.execute(task);
-//
-//		try {
-//			IR result = task.get(LIMIT_SECONDS, TimeUnit.SECONDS);
-//
-//			return result;
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//		} catch (ExecutionException e) {
-//			e.printStackTrace();
-//		} catch (TimeoutException e) {
-//			e.printStackTrace();
-//		}
-//		LOG.info("timed out ir creation");
-//		task.cancel(true);
-//		cache.getSSACache().wipe();
-//		return null;
 	}
-//
-//	private class IRFinder implements Callable<IR> {
-//		private IMethod method;
-//
-//		public IRFinder(IMethod m) {
-//			this.method = m;
-//		}
-//
-//		@Override
-//		public IR call() throws Exception {
-//			return cache.getSSACache().findOrCreateIR(method, Everywhere.EVERYWHERE,
-//					options.getSSAOptions());
-//		}
-//
-//	}
 
 
 	public DefUse findDefUseForMethod(IMethod method) {

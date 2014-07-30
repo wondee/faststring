@@ -9,7 +9,6 @@ import org.junit.Test;
 
 import de.unifrankfurt.faststring.analysis.AnalysisResult;
 import de.unifrankfurt.faststring.analysis.MethodAnalyzer;
-import de.unifrankfurt.faststring.core.label.BuiltInTypes;
 import de.unifrankfurt.faststring.utils.BaseAnalysisTest;
  
 public class TestTransformationInfo extends BaseAnalysisTest  {
@@ -23,12 +22,12 @@ public class TestTransformationInfo extends BaseAnalysisTest  {
 		
 //		assertThat(result.getLocalForLabel(null, BuiltInTypes.SUBSTRING, 2), not(isIn(result.getEffectedVars())));
 //		assertThat(result.getLocalForLabel(null, BuiltInTypes.SUBSTRING, 3), not(isIn(result.getEffectedVars())));
-		assertThat(result.getLocalForLabel(null, BuiltInTypes.SUBSTRING, 4), not(isIn(result.getEffectedVars())));
+		assertThat(result.getLocalForLabel(null, SUBSTRING, 4), not(isIn(result.getEffectedVars())));
 	
 	}
 	
 	private TransformationInfo getTransformationInfo(String methodName) {
-		AnalysisResult result = new MethodAnalyzer(getIRMethod(TEST_CLASS, methodName), BuiltInTypes.SUBSTRING).analyze();
+		AnalysisResult result = new MethodAnalyzer(getIRMethod(TEST_CLASS, methodName), SUBSTRING).analyze();
 		return new TransformationInfo(result);
 	}
 

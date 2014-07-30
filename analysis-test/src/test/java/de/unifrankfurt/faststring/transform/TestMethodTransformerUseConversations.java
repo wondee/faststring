@@ -18,7 +18,6 @@ import com.ibm.wala.shrikeBT.ReturnInstruction;
 import com.ibm.wala.shrikeBT.StoreInstruction;
 
 import de.unifrankfurt.faststring.analysis.label.TypeLabel;
-import de.unifrankfurt.faststring.core.label.BuiltInTypes;
 import de.unifrankfurt.faststring.utils.BaseTransformerTest;
 
 public class TestMethodTransformerUseConversations extends BaseTransformerTest {
@@ -41,7 +40,7 @@ public class TestMethodTransformerUseConversations extends BaseTransformerTest {
 		LoadInstruction load = (LoadInstruction) data.getInstructions()[5];
 
 		assertEquals(store.getVarIndex(), load.getVarIndex());
-		assertEquals(info.getLocalForLabel(null, BuiltInTypes.SUBSTRING, 1), load.getVarIndex());
+		assertEquals(info.getLocalForLabel(null, SUBSTRING, 1), load.getVarIndex());
 
 	}
 
@@ -71,7 +70,7 @@ public class TestMethodTransformerUseConversations extends BaseTransformerTest {
 		LoadInstruction load = (LoadInstruction) data.getInstructions()[14];
 
 		assertEquals(store.getVarIndex(), load.getVarIndex());
-		assertEquals(info.getLocalForLabel(null, BuiltInTypes.SUBSTRING, 4), load.getVarIndex());
+		assertEquals(info.getLocalForLabel(null, SUBSTRING, 4), load.getVarIndex());
 	}
 
 	@Test
@@ -92,7 +91,7 @@ public class TestMethodTransformerUseConversations extends BaseTransformerTest {
 		LoadInstruction load = (LoadInstruction) data.getInstructions()[5];
 
 		assertEquals(store.getVarIndex(), load.getVarIndex());
-		assertEquals(info.getLocalForLabel(null, BuiltInTypes.SUBSTRING, 1), load.getVarIndex());
+		assertEquals(info.getLocalForLabel(null, SUBSTRING, 1), load.getVarIndex());
 	}
 
 
@@ -112,7 +111,7 @@ public class TestMethodTransformerUseConversations extends BaseTransformerTest {
 		LoadInstruction load = (LoadInstruction) data.getInstructions()[5];
 
 		assertEquals(store.getVarIndex(), load.getVarIndex());
-		assertEquals(info.getLocalForLabel(null, BuiltInTypes.SUBSTRING, 1), load.getVarIndex());
+		assertEquals(info.getLocalForLabel(null, SUBSTRING, 1), load.getVarIndex());
 	}
 
 
@@ -156,6 +155,6 @@ public class TestMethodTransformerUseConversations extends BaseTransformerTest {
 
 	@Override
 	protected Collection<TypeLabel> getTypeLabel() {
-		return Arrays.asList(BuiltInTypes.SUBSTRING);
+		return Arrays.asList(SUBSTRING);
 	}
 }

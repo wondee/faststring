@@ -22,6 +22,7 @@ import com.ibm.wala.ssa.IR;
 
 import de.unifrankfurt.faststring.analysis.AnalyzedMethod;
 import de.unifrankfurt.faststring.analysis.TargetApplication;
+import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 import de.unifrankfurt.faststring.analysis.test.util.TestUtilities;
 
 /**
@@ -35,10 +36,14 @@ import de.unifrankfurt.faststring.analysis.test.util.TestUtilities;
  */
 public abstract class BaseAnalysisTest {
 
+	protected static final TypeLabel SUBSTRING = TestUtilities.loadTestLabel("SubstringString");
+	protected static final TypeLabel STRING_BUILDER = TestUtilities.loadTestLabel("StringListBuilder");
+	
 	private static final Logger LOG = LoggerFactory.getLogger(BaseAnalysisTest.class);
 	
 	private static TargetApplication targetApplication;
 
+	
 	private static Map<String, IClass> testClassMap = null;
 	
 	@BeforeClass

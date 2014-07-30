@@ -31,7 +31,6 @@ public class Reference implements Labelable {
 
 	}
 
-
 	public Reference(int receiver, TypeLabel label) {
 		this(receiver);
 		this.label = label;
@@ -108,14 +107,14 @@ public class Reference implements Labelable {
 	}
 
 
-	public List<Integer> getConnectedRefs(final TypeLabel label) {
-		List<Integer> refs = Lists.newLinkedList(definition.getConnectedRefs(label, v));
+	public List<Integer> getConnectedRefs() {
+		List<Integer> refs = Lists.newLinkedList(definition.getConnectedRefs(v));
 		
 		Iterables.<Integer>addAll(refs, 
 				Iterables.concat(Iterables.transform(uses, new Function<InstructionNode, List<Integer>>() {
 						@Override
 						public List<Integer> apply(InstructionNode input) {
-							return input.getConnectedRefs(label, v);
+							return input.getConnectedRefs(v);
 						}
 					}
 				))

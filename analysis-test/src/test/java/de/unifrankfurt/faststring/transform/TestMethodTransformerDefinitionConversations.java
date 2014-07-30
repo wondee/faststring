@@ -17,13 +17,12 @@ import com.ibm.wala.shrikeBT.MethodData;
 import com.ibm.wala.shrikeBT.StoreInstruction;
 
 import de.unifrankfurt.faststring.analysis.label.TypeLabel;
-import de.unifrankfurt.faststring.core.label.BuiltInTypes;
 import de.unifrankfurt.faststring.utils.BaseTransformerTest;
 
 public class TestMethodTransformerDefinitionConversations extends BaseTransformerTest {
 
-	private static final String TEST_CLASS = "TransformationDefinitionTestClass";
-
+	private static final String TEST_CLASS = "TransformationDefinitionTestClass";	
+	
 	public String getTestClass() {
 		return TEST_CLASS;
 	}
@@ -43,7 +42,7 @@ public class TestMethodTransformerDefinitionConversations extends BaseTransforme
 		StoreInstruction store = (StoreInstruction) data.getInstructions()[2];
 
 		assertEquals(1, load.getVarIndex());
-		assertEquals(info.getLocalForLabel(null, BuiltInTypes.SUBSTRING, 1), store.getVarIndex());
+		assertEquals(info.getLocalForLabel(null, SUBSTRING, 1), store.getVarIndex());
 
 		assertEquals(13, data.getInstructions().length);
 	}
@@ -61,7 +60,7 @@ public class TestMethodTransformerDefinitionConversations extends BaseTransforme
 
 		StoreInstruction store = (StoreInstruction) data.getInstructions()[3];
 
-		assertEquals(info.getLocalForLabel(null, BuiltInTypes.SUBSTRING, 1), store.getVarIndex());
+		assertEquals(info.getLocalForLabel(null, SUBSTRING, 1), store.getVarIndex());
 
 	}
 
@@ -90,7 +89,7 @@ public class TestMethodTransformerDefinitionConversations extends BaseTransforme
 
 		StoreInstruction store = (StoreInstruction) data.getInstructions()[5];
 
-		assertEquals(info.getLocalForLabel(null, BuiltInTypes.SUBSTRING, 1), store.getVarIndex());
+		assertEquals(info.getLocalForLabel(null, SUBSTRING, 1), store.getVarIndex());
 
 	}
 
@@ -131,7 +130,7 @@ public class TestMethodTransformerDefinitionConversations extends BaseTransforme
 
 		StoreInstruction store = (StoreInstruction) data.getInstructions()[12];
 
-		assertEquals(info.getLocalForLabel(null, BuiltInTypes.SUBSTRING, 4), store.getVarIndex());
+		assertEquals(info.getLocalForLabel(null, SUBSTRING, 4), store.getVarIndex());
 
 	}
 
@@ -150,6 +149,6 @@ public class TestMethodTransformerDefinitionConversations extends BaseTransforme
 
 	@Override
 	protected Collection<TypeLabel> getTypeLabel() {
-		return Arrays.asList(BuiltInTypes.SUBSTRING);
+		return Arrays.asList(SUBSTRING);
 	}
 }

@@ -1,16 +1,28 @@
 package de.unifrankfurt.faststring.analysis.label;
 
 import java.util.Collection;
-import java.util.List;
 
 import com.google.common.collect.ImmutableList;
+import com.ibm.wala.types.ClassLoaderReference;
 import com.ibm.wala.types.MethodReference;
+import com.ibm.wala.types.TypeReference;
 
 import de.unifrankfurt.faststring.core.SubstringString;
-import de.unifrankfurt.faststring.core.label.SubstringStringType;
 
 public class MockLabel extends BaseTypeLabel {
 
+	public static final TypeLabel INSTANCE = new MockLabel();
+	
+	public static final TypeReference TYPE_STRING = TypeReference.findOrCreate(
+			ClassLoaderReference.Application, "Ljava/lang/String");
+
+	public static final MethodReference METHOD_SUBSTRING = MethodReference
+			.findOrCreate(TYPE_STRING, "substring", "(II)Ljava/lang/String;");
+	
+
+	public static final MethodReference METHOD_SUBSTRING_DEFAULT_START = MethodReference
+			.findOrCreate(TYPE_STRING, "substring", "(I)Ljava/lang/String;");
+	
 	@Override
 	public boolean canBeUsedAsParamFor(MethodReference method, int index) {
 		return false;
@@ -27,18 +39,8 @@ public class MockLabel extends BaseTypeLabel {
 	}
 
 	@Override
-	public ReceiverInfo getReceiverUseInfo(MethodReference method) {
-		return ReceiverInfo.NOT_USABLE_AS_RECEIVER;
-	}
-
-	@Override
-	public boolean canReturnedValueBeLabeled(MethodReference method) {
-		return false;
-	}
-
-	@Override
 	protected Collection<MethodReference> methods() {
-		return ImmutableList.of(SubstringStringType.METHOD_SUBSTRING, SubstringStringType.METHOD_SUBSTRING_DEFAULT_START);
+		return ImmutableList.of(METHOD_SUBSTRING, METHOD_SUBSTRING_DEFAULT_START);
 	}
 
 	@Override
@@ -68,12 +70,12 @@ public class MockLabel extends BaseTypeLabel {
 	}
 
 	@Override
-	public Class<?> getReturnType(MethodReference target) {
+	public String getReturnType(MethodReference target) {
 		return null;
 	}
 
 	@Override
-	public List<Class<?>> getParams(MethodReference target) {
+	public String getParams(MethodReference target) {
 		// TODO Auto-generated method stub
 		return null;
 	}

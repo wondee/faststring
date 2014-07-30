@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,10 +31,18 @@ public abstract class InstructionNode implements Labelable {
 
 	int storeIndex = -1;
 	int def = -1;
-	List<Integer> uses;
+	List<Integer> uses = ImmutableList.of();
 
-	public List<Integer> getConnectedRefs(TypeLabel label, int inV) {
-		return ImmutableList.of();
+	public final List<Integer> getConnectedRefs(int inV) {
+		Set<Integer> refs = Sets.newHashSet(uses);
+		
+		if (def != -1) {
+			refs.add(def);
+		}
+		
+		refs.remove(inV);
+		
+		return ImmutableList.copyOf(refs);
 	}
 
 	public boolean isCompatibleWith(TypeLabel label, int inV) {
@@ -209,6 +218,8 @@ public abstract class InstructionNode implements Labelable {
 		public void visitGet(GetNode getNode) {}
 
 		public void visitBranch(ConditionalBranchNode conditionalBranchNode) {}
+
+		public void visitBinaryOperator(BinaryOperation binaryOperation) {}
 
 	}
 

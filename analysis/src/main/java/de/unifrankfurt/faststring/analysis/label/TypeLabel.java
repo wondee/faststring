@@ -1,7 +1,6 @@
 package de.unifrankfurt.faststring.analysis.label;
 
 import java.util.Collection;
-import java.util.List;
 
 import com.ibm.wala.ssa.SSAInstruction;
 import com.ibm.wala.types.MethodReference;
@@ -65,23 +64,6 @@ public interface TypeLabel {
 	 */
 	Collection<Reference> findTypeUses(AnalyzedMethod ir);
 
-	/**
-	 * creates a {@link ReceiverInfo} object that holds information about the labeled references used as
-	 * a receiver for the given method
-	 *
-	 * @param method the {@link MethodReference} called on the labeled reference
-	 * @return the receiver info for that label
-	 */
-	ReceiverInfo getReceiverUseInfo(MethodReference method);
-
-	/**
-	 * checks if the given method returns a labeled reference
-	 *
-	 * @param method the called {@link MethodReference}
-	 * @return <code>true</code> if the method returns a labeled reference, <code>false</code> otherwise
-	 */
-	boolean canReturnedValueBeLabeled(MethodReference method);
-
 	Class<?> getOptimizedType();
 
 	String getCreationMethodName();
@@ -92,9 +74,10 @@ public interface TypeLabel {
 
 	String getToOriginalMethodName();
 
-	Class<?> getReturnType(MethodReference target);
+	String getReturnType(MethodReference target);
+	
 
-	List<Class<?>> getParams(MethodReference target);
+	String getParams(MethodReference target);
 
 
 }

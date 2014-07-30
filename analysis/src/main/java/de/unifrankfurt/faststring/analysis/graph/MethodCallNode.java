@@ -4,13 +4,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.ibm.wala.ssa.SSAInvokeInstruction;
 import com.ibm.wala.types.MethodReference;
 
-import de.unifrankfurt.faststring.analysis.label.ReceiverInfo;
 import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 import de.unifrankfurt.faststring.analysis.util.IRUtil;
 
@@ -30,7 +27,6 @@ public class MethodCallNode extends InstructionNode {
 			instruction.getDeclaredTarget(),
 			instruction.isStatic()
 		);
-
 	}
 
 	public MethodCallNode(int def, List<Integer> uses,
@@ -46,17 +42,8 @@ public class MethodCallNode extends InstructionNode {
 		return target;
 	}
 
-	private int getParam(int index) {
-		return uses.get((isStatic) ? index - 1 : index);
-	}
-
 	public void addLabelToUse(Integer valueNumber, TypeLabel label) {
 		labels.put(valueNumber, label);
-	}
-
-	@Override
-	public List<Integer> getConnectedRefs(TypeLabel label, int inV) {
-		return determineMethodCallType(inV).getConnectedRefs(label, inV);
 	}
 
 	@Override
@@ -84,24 +71,12 @@ public class MethodCallNode extends InstructionNode {
 	interface MethodCallType {
 		boolean isCompatibleWithActual(TypeLabel label);
 
-		List<Integer> getConnectedRefs(TypeLabel label, int inV);
-
 	}
 
 	private class Defintion implements MethodCallType {
 		@Override
 		public boolean isCompatibleWithActual(TypeLabel label) {
 			return label.canBeDefinedAsResultOf(target);
-		}
-		@Override
-		public List<Integer> getConnectedRefs(TypeLabel label, int inV) {
-			// TODO only returns receiver, maybe other params may also be interesting
-			if (label.canBeDefinedAsResultOf(target) && !isStatic) {
-
-				return Lists.newArrayList(uses.get(0));
-			} else {
-				return ImmutableList.of();
-			}
 		}
 
 	}
@@ -110,23 +85,6 @@ public class MethodCallNode extends InstructionNode {
 		@Override
 		public boolean isCompatibleWithActual(TypeLabel label) {
 			return label.canBeUsedAsReceiverFor(target);
-		}
-
-		@Override
-		public List<Integer> getConnectedRefs(TypeLabel label, int inV) {
-			ReceiverInfo receiverInfo = label.getReceiverUseInfo(target);
-
-			List<Integer> newRefs = Lists.newLinkedList();
-
-			if (def != -1 && receiverInfo.isDefLabelable()) {
-				newRefs.add(def);
-			}
-
-			for (Integer index : receiverInfo.getLabelableParams()) {
-				newRefs.add(getParam(index));
-			}
-
-			return newRefs;
 		}
 
 	}
@@ -142,15 +100,6 @@ public class MethodCallNode extends InstructionNode {
 		@Override
 		public boolean isCompatibleWithActual(TypeLabel label) {
 			return label.canBeUsedAsParamFor(target, index);
-		}
-
-		@Override
-		public List<Integer> getConnectedRefs(TypeLabel label, int inV) {
-			if (label.canReturnedValueBeLabeled(target)) {
-				return Lists.newArrayList(def);
-			} else {
-				return Lists.newArrayList();
-			}
 		}
 
 	}

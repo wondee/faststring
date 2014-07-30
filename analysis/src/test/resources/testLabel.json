@@ -1,0 +1,25 @@
+{
+	"name" : "SubstringString",
+	"originalType" : "java.lang.String",
+	"optimizedType" : "java.util.HashMap",
+	
+	"methodsDefs" : [
+		{ "id" : "substring_i", 	"desc" : { "name" : "substring", "signature" : "(I)Ljava/lang/String;" } },
+		{ "id" : "substring_ii", 	"desc" : { "name" : "substring", "signature" : "(II)Ljava/lang/String;" } },
+		{ "id" : "length", 			"desc" : { "name" : "length", "signature" : "()I" } },
+		{ "id" : "valueOf", 		"desc" : { "name" : "valueOf", "signature" : "(Ljava/lang/Object;)Ljava/lang/String;" } }
+	],
+	
+	"effectedMethods" : ["substring_i", "substring_ii"],
+	"supportedMethods" : ["length"],
+	"producingMethods" : ["substring_i", "substring_ii"],
+	
+	"optimizedParams" : {"length" : "L"},
+	
+	"compatibleLabels" : ["StringListBuilder"],
+	
+	"parameterUsage" : {"valueOf" : [0]},
+	
+	"staticFactory" : "valueOf",
+	"toOriginalMethod" : "toString" 
+}

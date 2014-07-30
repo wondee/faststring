@@ -13,7 +13,7 @@ import org.junit.Test;
 import de.unifrankfurt.faststring.analysis.graph.InstructionNode;
 import de.unifrankfurt.faststring.analysis.graph.Reference;
 import de.unifrankfurt.faststring.analysis.label.TypeLabel;
-import de.unifrankfurt.faststring.core.label.BuiltInTypes;
+import de.unifrankfurt.faststring.analysis.test.util.TestUtilities;
 import de.unifrankfurt.faststring.utils.BaseTransformerTest;
 
 public class TestLocateLocalInstructions extends BaseTransformerTest {
@@ -65,6 +65,6 @@ public class TestLocateLocalInstructions extends BaseTransformerTest {
 
 	@Override
 	protected Collection<TypeLabel> getTypeLabel() {
-		return Arrays.asList(BuiltInTypes.SUBSTRING);
+		return Arrays.asList(TestUtilities.loadTestLabel("SubstringString"));
 	}
 }

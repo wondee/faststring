@@ -65,7 +65,7 @@ public abstract class BaseTransformerTest extends BaseAnalysisTest {
 		return transform(info, false);
 	}
 
-	protected MethodData transform(TransformationInfo info, boolean printBefore)	throws InvalidClassFileException, IOException {
+	protected MethodData transform(TransformationInfo info, boolean printBefore) throws InvalidClassFileException, IOException {
 
 		MethodData methodData = getClassInstrumenter(getTestClass()).visitMethod(methodMap.get(info.getMethodName()));
 

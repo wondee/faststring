@@ -1,10 +1,5 @@
 package de.unifrankfurt.faststring.transform.patches;
 
-import java.util.List;
-
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-import com.google.common.collect.Iterables;
 import com.ibm.wala.shrikeBT.IInvokeInstruction.Dispatch;
 import com.ibm.wala.shrikeBT.InvokeInstruction;
 import com.ibm.wala.shrikeBT.LoadInstruction;
@@ -117,18 +112,18 @@ public class ConversationPatchFactory {
 
 		String methodSignature = invoke.getMethodSignature();
 
-		List<Class<?>> paramsClasses = to.getParams(node.getTarget());
+		String params = to.getParams(node.getTarget());
 
-		String params = (paramsClasses == null) ?
-				methodSignature.substring(0, methodSignature.indexOf(')') + 1) :
-				createParamsString(paramsClasses);
+		if (params == null)  {			
+			params = methodSignature.substring(0, methodSignature.indexOf(')') + 1);
+		} 
 
-
-		Class<?> returnTypeClass = to.getReturnType(node.getTarget());
-
-
-		String returnType = (returnTypeClass == null) ? "V" : Util.makeType(returnTypeClass);
-
+		String returnType = to.getReturnType(node.getTarget());
+		
+		if (returnType == null) {
+			returnType = "V";
+		}
+		
 		String newSignature = params + returnType;
 
 		final InvokeInstruction invokeOpt = InvokeInstruction.make(newSignature,
@@ -141,19 +136,6 @@ public class ConversationPatchFactory {
 			}
 		});
 
-	}
-
-
-	private String createParamsString(List<Class<?>> paramsClasses) {
-		Iterable<String> params = Iterables.transform(paramsClasses, new Function<Class<?>, String>() {
-
-			@Override
-			public String apply(Class<?> input) {
-				return 	Util.makeType(input);
-			}
-
-		});
-		return "(" + Joiner.on(",").join(params) + ")";
 	}
 
 

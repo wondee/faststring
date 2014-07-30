@@ -5,19 +5,20 @@ import static org.junit.Assert.assertThat;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.hamcrest.collection.IsEmptyIterable;
 import org.hamcrest.collection.IsIterableContainingInOrder;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import de.unifrankfurt.faststring.analysis.TargetApplication;
+import de.unifrankfurt.faststring.analysis.TypeLabelConfigParser;
+import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 
 public final class TestUtilities {
-
-//	private static final String TEST_RES = "../analysis-test/src/main/resources/";
-//	private static final String TEST_JAR_SCOPE_FILE = "testJarScope.txt";
 
 	private static final String TEST_EXCLUSION_FILE = "testExclusion.txt";
 	private static final String TEST_JAR_FILE = "target/test.jar";
@@ -73,4 +74,28 @@ public final class TestUtilities {
 
 		return name + "." + replaceInitChars(method);
 	}
+	
+	private static final Map<String, TypeLabel> labelCache = Maps.newHashMap();
+	
+	public static TypeLabel loadTestLabel(String name) {
+		TypeLabel label = labelCache.get(name);
+		
+		if (label == null) {
+			label = new TypeLabelConfigParser().parseFile("/" + name + ".type");
+			labelCache.put(name, label);
+		}
+		
+		return label;
+	}
+	
+	public static List<TypeLabel> loadTestLabels(String ... names) {
+		List<TypeLabel> labels = Lists.newLinkedList();
+		
+		for (String name : names) {
+			labels.add(loadTestLabel(name));
+		}
+		
+		return labels;
+	}
+	
 }

@@ -14,6 +14,7 @@ import com.ibm.wala.ssa.SSAGetInstruction;
 import com.ibm.wala.ssa.SSAInstruction;
 import com.ibm.wala.ssa.SSAInstruction.Visitor;
 import com.ibm.wala.ssa.SSAArrayLoadInstruction;
+import com.ibm.wala.ssa.SSABinaryOpInstruction;
 import com.ibm.wala.ssa.SSACheckCastInstruction;
 import com.ibm.wala.ssa.SSAConditionalBranchInstruction;
 import com.ibm.wala.ssa.SSAInvokeInstruction;
@@ -169,4 +170,9 @@ public class InstructionNodeFactory extends Visitor  {
 		res = new GetNode(instruction.getDef());
 	}
 
+	@Override
+	public void visitBinaryOp(SSABinaryOpInstruction instruction) {
+		res = new BinaryOperation(instruction.getDef(), IRUtil.getUses(instruction));
+	}
+	
 }

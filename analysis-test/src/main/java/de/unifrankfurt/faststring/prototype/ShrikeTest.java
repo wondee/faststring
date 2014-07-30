@@ -1,6 +1,5 @@
 package de.unifrankfurt.faststring.prototype;
 
-import java.util.Arrays;
 import java.util.Map;
 
 import com.google.common.collect.Maps;
@@ -12,7 +11,6 @@ import de.unifrankfurt.faststring.analysis.MethodAnalyzer;
 import de.unifrankfurt.faststring.analysis.TargetApplication;
 import de.unifrankfurt.faststring.analysis.test.util.TestUtilities;
 import de.unifrankfurt.faststring.analysis.util.StringUtil;
-import de.unifrankfurt.faststring.core.label.BuiltInTypes;
 import de.unifrankfurt.faststring.transform.JarManager;
 
 public class ShrikeTest {
@@ -34,7 +32,8 @@ public class ShrikeTest {
 
 			System.out.println("-- Class: " + clazz.getName());
 			for (IMethod m : clazz.getDeclaredMethods()) {
-				MethodAnalyzer analyzer = new MethodAnalyzer(targetApplication.findIRMethodForMethod(m), Arrays.asList(BuiltInTypes.SUBSTRING, BuiltInTypes.STRING_BUILDER));
+				MethodAnalyzer analyzer = new MethodAnalyzer(targetApplication.findIRMethodForMethod(m), 
+						TestUtilities.loadTestLabels("SubstringString", "StringListBuilder"));
 
 				AnalysisResult candidates = analyzer.analyze();
 

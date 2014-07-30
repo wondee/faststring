@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.google.common.collect.ImmutableList;
 
+@Deprecated
 public class ReceiverInfo {
 
 	private boolean defLabelable;

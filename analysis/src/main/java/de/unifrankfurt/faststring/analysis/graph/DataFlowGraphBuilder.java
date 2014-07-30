@@ -47,10 +47,10 @@ public class DataFlowGraphBuilder {
 	}
 
 	public DataFlowGraph createDataFlowGraph(TypeLabel label) {
-		return createDataFlowGraph(label.findTypeUses(method), Sets.newHashSet(label));
+		return createDataFlowGraph(label.findTypeUses(method));
 	}
 
-	public DataFlowGraph createDataFlowGraph(Collection<Reference> initialRefs, Collection<TypeLabel> labels) {
+	public DataFlowGraph createDataFlowGraph(Collection<Reference> initialRefs) {
 		LOG.trace("starting with {}", initialRefs);
 		Queue<Reference> refs = new UniqueQueue<Reference>(initialRefs);
 
@@ -70,7 +70,7 @@ public class DataFlowGraphBuilder {
 			LOG.trace("check uses");
 			checkUses(stringRef);
 			LOG.trace("adding new refs");
-			refs.addAll(findNewRefs(stringRef, refMap.keySet(), labels));
+			refs.addAll(findNewRefs(stringRef, refMap.keySet()));
 		}
 
 		DataFlowGraph graph = new DataFlowGraph(ImmutableMap.copyOf(refMap));
@@ -85,13 +85,13 @@ public class DataFlowGraphBuilder {
 	}
 
 
-	private Collection<Reference> findNewRefs(Reference ref, Set<Integer> contained, Collection<TypeLabel> labels) {
+	private Collection<Reference> findNewRefs(Reference ref, Set<Integer> contained) {
 		Set<Reference> newRefs = Sets.newHashSet();
 
-		for (TypeLabel label : labels) {
-			Set<Reference> refs = Sets.newHashSet(transform(filter(ref.getConnectedRefs(label), not(in(contained))), toReferences));
-			newRefs.addAll(refs);
-		}
+		
+		Set<Reference> refs = Sets.newHashSet(transform(filter(ref.getConnectedRefs(), not(in(contained))), toReferences));
+		newRefs.addAll(refs);
+	
 		return newRefs;
 
 	}

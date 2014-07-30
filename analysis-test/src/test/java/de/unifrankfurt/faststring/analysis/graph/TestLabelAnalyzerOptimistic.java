@@ -9,10 +9,15 @@ import org.junit.Test;
 
 import de.unifrankfurt.faststring.analysis.LabelAnalyzer;
 import de.unifrankfurt.faststring.analysis.OptimisticStrategy;
-import de.unifrankfurt.faststring.core.label.BuiltInTypes;
+import de.unifrankfurt.faststring.analysis.label.TypeLabel;
+import de.unifrankfurt.faststring.analysis.test.util.TestUtilities;
 
 @Ignore
 public class TestLabelAnalyzerOptimistic {
+	
+	private static final TypeLabel LABEL = TestUtilities.loadTestLabel("SubstringString");
+	
+	
 	@Test
 	public void testSimple() throws Exception {
 		DataFlowGraph graph = analyze(new DataFlowTestBuilder()
@@ -24,8 +29,8 @@ public class TestLabelAnalyzerOptimistic {
 		assertNotNull(graph.get(3).getLabel());
 		assertNotNull(graph.get(4).getLabel());
 		
-		assertTrue(graph.get(3).isDefinitionConversionToOpt(BuiltInTypes.SUBSTRING));
-		assertList(graph.get(4).getUseConversionsFromOpt(BuiltInTypes.SUBSTRING), 0);
+		assertTrue(graph.get(3).isDefinitionConversionToOpt(LABEL));
+		assertList(graph.get(4).getUseConversionsFromOpt(LABEL), 0);
 	}
 
 	@Test
@@ -45,8 +50,8 @@ public class TestLabelAnalyzerOptimistic {
 		assertNotNull(graph.get(4).getLabel());
 		assertNotNull(graph.get(5).getLabel());
 		
-		assertList(graph.get(1).getUseConversionsToOpt(BuiltInTypes.SUBSTRING), 0);
-		assertTrue(graph.get(2).isDefinitionConversionToOpt(BuiltInTypes.SUBSTRING));
+		assertList(graph.get(1).getUseConversionsToOpt(LABEL), 0);
+		assertTrue(graph.get(2).isDefinitionConversionToOpt(LABEL));
 	}
 	
 	@Test
@@ -68,9 +73,9 @@ public class TestLabelAnalyzerOptimistic {
 		assertNotNull(graph.get(5).getLabel());
 		assertNotNull(graph.get(6).getLabel());
 	
-		assertList(graph.get(1).getUseConversionsToOpt(BuiltInTypes.SUBSTRING), 0);
-		assertList(graph.get(2).getUseConversionsToOpt(BuiltInTypes.SUBSTRING), 0);
-		assertList(graph.get(6).getUseConversionsFromOpt(BuiltInTypes.SUBSTRING), 0);
+		assertList(graph.get(1).getUseConversionsToOpt(LABEL), 0);
+		assertList(graph.get(2).getUseConversionsToOpt(LABEL), 0);
+		assertList(graph.get(6).getUseConversionsFromOpt(LABEL), 0);
 	}
 
 	@Test

@@ -10,8 +10,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import de.unifrankfurt.faststring.core.label.BuiltInTypes;
-import de.unifrankfurt.faststring.core.label.SubstringStringType;
+import de.unifrankfurt.faststring.analysis.label.MockLabel;
 
 public class DataFlowTestBuilder {
 	
@@ -37,13 +36,13 @@ public class DataFlowTestBuilder {
 	}
 	
 	public DataFlowTestBuilder labelUse(int rec, int def) {
-		InstructionNode call = new MethodCallNode(def, Arrays.asList(rec), SubstringStringType.METHOD_SUBSTRING, false);
+		InstructionNode call = new MethodCallNode(def, Arrays.asList(rec), MockLabel.METHOD_SUBSTRING, false);
 				
 		addUse(rec, call);
 				
 		addDefinition(def, call);
 		
-		nodeMap.get(rec).setLabel(BuiltInTypes.SUBSTRING);
+		nodeMap.get(rec).setLabel(MockLabel.INSTANCE);
 		
 		return this;
 	}

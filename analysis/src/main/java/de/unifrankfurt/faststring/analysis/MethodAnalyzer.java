@@ -45,7 +45,7 @@ public class MethodAnalyzer {
 
 		LOG.debug("building graph");
 
-		DataFlowGraph graph = new DataFlowGraphBuilder(method).createDataFlowGraph(refs, labels);
+		DataFlowGraph graph = new DataFlowGraphBuilder(method).createDataFlowGraph(refs);
 
 		if (!graph.isEmpty()) {
 			LOG.debug("analyzing label");

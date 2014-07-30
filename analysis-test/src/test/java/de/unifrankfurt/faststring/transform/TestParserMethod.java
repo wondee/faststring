@@ -1,6 +1,6 @@
 package de.unifrankfurt.faststring.transform;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -10,7 +10,6 @@ import org.junit.Test;
 import com.ibm.wala.shrikeBT.MethodData;
 
 import de.unifrankfurt.faststring.analysis.label.TypeLabel;
-import de.unifrankfurt.faststring.core.label.BuiltInTypes;
 import de.unifrankfurt.faststring.utils.BaseTransformerTest;
 
 public class TestParserMethod extends BaseTransformerTest{
@@ -34,7 +33,7 @@ public class TestParserMethod extends BaseTransformerTest{
 
 	@Override
 	protected Collection<TypeLabel> getTypeLabel() {
-		return Arrays.asList(BuiltInTypes.SUBSTRING);
+		return Arrays.asList(SUBSTRING);
 	}
 	
 }
