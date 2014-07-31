@@ -4,6 +4,8 @@ import java.util.Collection;
 
 import com.ibm.wala.types.TypeReference;
 
+import de.unifrankfurt.faststring.analysis.label.TypeLabel;
+
 public class NewNode extends InstructionNode {
 
 	private TypeReference type;
@@ -35,5 +37,10 @@ public class NewNode extends InstructionNode {
 
 	public TypeReference getType() {
 		return type;
+	}
+
+	@Override
+	protected boolean isCompatibleWithActual(TypeLabel label, int inV) {
+		return true;
 	}
 }

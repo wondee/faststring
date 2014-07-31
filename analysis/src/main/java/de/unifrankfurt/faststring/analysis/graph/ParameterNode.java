@@ -5,7 +5,7 @@ import java.util.Collection;
 import com.google.common.collect.Sets;
 
 
-public class ParameterNode extends InstructionNode {
+public class ParameterNode extends NotLabelableNode {
 
 	private int index;
 

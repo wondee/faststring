@@ -5,6 +5,7 @@ import java.util.List;
 import com.google.common.collect.Lists;
 import com.ibm.wala.ssa.SSAPhiInstruction;
 
+import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 import de.unifrankfurt.faststring.analysis.util.IRUtil;
 
 public class PhiNode extends InstructionNode {
@@ -37,6 +38,18 @@ public class PhiNode extends InstructionNode {
 
 	public List<Integer> getUses() {
 		return uses;
+	}
+
+	@Override
+	protected boolean isDefCompatibleWithActual(TypeLabel label) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	protected boolean isIndexCompatibleWithActual(TypeLabel label, int i) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }

@@ -11,15 +11,19 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import de.unifrankfurt.faststring.analysis.label.MockLabel;
+import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 
 public class DataFlowTestBuilder {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(DataFlowTestBuilder.class);
 	
 	private Map<Integer, Reference> nodeMap;
+
+	private TypeLabel label;
 	
-	public DataFlowTestBuilder() {
+	public DataFlowTestBuilder(TypeLabel label) {
 		nodeMap = Maps.newHashMap();
+		this.label = label;
 	}
 	
 	public DataFlowTestBuilder phi(int def, Integer...uses) {
@@ -42,7 +46,7 @@ public class DataFlowTestBuilder {
 				
 		addDefinition(def, call);
 		
-		nodeMap.get(rec).setLabel(MockLabel.INSTANCE);
+		nodeMap.get(rec).setLabel(label);
 		
 		return this;
 	}

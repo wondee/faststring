@@ -1,6 +1,6 @@
 package de.unifrankfurt.faststring.analysis.graph;
 
-public class GetNode extends InstructionNode {
+public class GetNode extends NotLabelableNode {
 
 	public GetNode(int def) {
 		setDef(def);

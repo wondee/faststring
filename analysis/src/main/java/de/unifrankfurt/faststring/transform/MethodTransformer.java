@@ -21,7 +21,7 @@ import de.unifrankfurt.faststring.analysis.graph.PhiNode;
 import de.unifrankfurt.faststring.analysis.graph.Reference;
 import de.unifrankfurt.faststring.analysis.graph.ReturnNode;
 import de.unifrankfurt.faststring.analysis.label.TypeLabel;
-import de.unifrankfurt.faststring.transform.patches.ConversationPatchFactory;
+import de.unifrankfurt.faststring.transform.patches.ConversionPatchFactory;
 
 
 public class MethodTransformer {
@@ -45,11 +45,11 @@ public class MethodTransformer {
 
 		for (Reference ref : transformationInfo.getReferences()) {
 
-			createDefinitionConversations(ref.getDefinition(), ref);
+			createDefinitionConversions(ref.getDefinition(), ref);
 
 			for (InstructionNode use : ref.getUses()) {
 				createUseOptimization(ref, use);
-				createUseConversations(ref, use);
+				createUseConversions(ref, use);
 			}
 
 		}
@@ -69,8 +69,8 @@ public class MethodTransformer {
 		}
 	}
 
-	private void createUseConversations(Reference ref, InstructionNode use) {
-		if (!use.isCompatibleWith(ref)) {
+	private void createUseConversions(Reference ref, InstructionNode use) {
+		if (use.needsConversionTo(ref)) {
 			UseConverter converter = new UseConverter(ref.getLabel(), use.getLabel());
 			Collection<Integer> locals = use.getLocals(ref.valueNumber());
 
@@ -94,12 +94,12 @@ public class MethodTransformer {
 	private void createUseOptimization(Reference ref, InstructionNode use) {
 		if (use.getLabel()!= null) {
 			use.visit(new Optimizer(ref.valueNumber(),
-					new ConversationPatchFactory(transformationInfo, editor, use.getLabel())));
+					new ConversionPatchFactory(transformationInfo, editor, use.getLabel())));
 		}
 	}
 
-	private void createDefinitionConversations(InstructionNode instructionNode, Reference ref) {
-		if (!instructionNode.isCompatibleWith(ref)) {
+	private void createDefinitionConversions(InstructionNode instructionNode, Reference ref) {
+		if (instructionNode.needsConversionTo(ref)) {
 			Converter converter = new DefinitionConverter(instructionNode.getLabel(), ref.getLabel());
 			Collection<Integer> locals = instructionNode.getLocals(ref.valueNumber());
 			if (!locals.isEmpty()) {
@@ -118,10 +118,10 @@ public class MethodTransformer {
 
 	private abstract class Converter extends Visitor {
 		int local = -1;
-		ConversationPatchFactory patchFactory;
+		ConversionPatchFactory patchFactory;
 
 		public Converter(TypeLabel from, TypeLabel to) {
-			this.patchFactory = new ConversationPatchFactory(transformationInfo, editor, from, to);
+			this.patchFactory = new ConversionPatchFactory(transformationInfo, editor, from, to);
 		}
 
 		void setLocal(int local) {

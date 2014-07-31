@@ -20,7 +20,7 @@ public class TestLabelAnalyzerOptimistic {
 	
 	@Test
 	public void testSimple() throws Exception {
-		DataFlowGraph graph = analyze(new DataFlowTestBuilder()
+		DataFlowGraph graph = analyze(new DataFlowTestBuilder(LABEL)
 			.parameterDefinition(3)
 			.labelUse(3, 4)
 			.return_(4)
@@ -35,7 +35,7 @@ public class TestLabelAnalyzerOptimistic {
 
 	@Test
 	public void testPhi() throws Exception {
-		DataFlowGraph graph = analyze(new DataFlowTestBuilder()
+		DataFlowGraph graph = analyze(new DataFlowTestBuilder(LABEL)
 			.parameterDefinition(1)
 			.parameterDefinition(2)
 			.labelUse(2, 3)
@@ -57,7 +57,7 @@ public class TestLabelAnalyzerOptimistic {
 	@Test
 	public void testPhiWithLoop() throws Exception {
 		DataFlowGraph graph = analyze(
-				new DataFlowTestBuilder()
+				new DataFlowTestBuilder(LABEL)
 			.parameterDefinition(1)
 			.parameterDefinition(2)
 			.phi(3, 2, 5)
@@ -81,7 +81,7 @@ public class TestLabelAnalyzerOptimistic {
 	@Test
 	public void testMultipleInvokes() throws Exception {
 		DataFlowGraph graph = analyze(
-				new DataFlowTestBuilder()
+				new DataFlowTestBuilder(LABEL)
 			.parameterDefinition(1)
 			
 			.labelUse(1, 2)

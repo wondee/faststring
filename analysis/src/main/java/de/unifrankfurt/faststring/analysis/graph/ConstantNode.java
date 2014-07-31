@@ -2,7 +2,7 @@ package de.unifrankfurt.faststring.analysis.graph;
 
 
 
-public class ConstantNode extends InstructionNode {
+public class ConstantNode extends NotLabelableNode {
 
 	private Object value;
 

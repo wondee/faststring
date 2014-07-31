@@ -16,7 +16,7 @@ import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 import de.unifrankfurt.faststring.transform.TransformationInfo;
 
 
-public class ConversationPatchFactory {
+public class ConversionPatchFactory {
 
 	private MethodEditor editor;
 	private TransformationInfo info;
@@ -24,7 +24,7 @@ public class ConversationPatchFactory {
 	private TypeLabel to;
 
 
-	public ConversationPatchFactory(TransformationInfo transformationInfo, MethodEditor editor, TypeLabel from, TypeLabel to) {
+	public ConversionPatchFactory(TransformationInfo transformationInfo, MethodEditor editor, TypeLabel from, TypeLabel to) {
 		this.info = transformationInfo;
 		this.editor = editor;
 		this.from = from;
@@ -33,13 +33,13 @@ public class ConversationPatchFactory {
 	}
 
 
-	public ConversationPatchFactory(TransformationInfo transformationInfo, MethodEditor editor, TypeLabel label) {
+	public ConversionPatchFactory(TransformationInfo transformationInfo, MethodEditor editor, TypeLabel label) {
 		this(transformationInfo, editor, null, label);
 	}
 
 
 	public void createConversationAtStart(int local) {
-		editor.insertAtStart(new LoadFromLocalConversationPatch(from, to, local, info.getLocalForLabel(from, to, local)));
+		editor.insertAtStart(new LoadFromLocalConversionPatch(from, to, local, info.getLocalForLabel(from, to, local)));
 	}
 
 	public void createConversationAfter(int local, int bcIndex) {
@@ -49,10 +49,10 @@ public class ConversationPatchFactory {
 	}
 
 
-	private ConversationToLabelPatch createPatch(int local) {
+	private ConversionToLabelPatch createPatch(int local) {
 		return (local != -1) ?
-				new OnStackConversationPatch(from, to, info.getLocalForLabel(from, to, local)) :
-				new ConversationToLabelPatch(from, to);
+				new OnStackConversionPatch(from, to, info.getLocalForLabel(from, to, local)) :
+				new ConversionToLabelPatch(from, to);
 	}
 
 	public void createConversationBefore(int bcIndex) {

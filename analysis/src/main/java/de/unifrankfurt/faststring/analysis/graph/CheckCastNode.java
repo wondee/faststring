@@ -1,6 +1,6 @@
 package de.unifrankfurt.faststring.analysis.graph;
 
-public class CheckCastNode extends InstructionNode {
+public class CheckCastNode extends NotLabelableNode {
 
 	public CheckCastNode(int def) {
 		setDef(def);

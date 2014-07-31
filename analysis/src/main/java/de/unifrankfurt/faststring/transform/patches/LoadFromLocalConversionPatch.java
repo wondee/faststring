@@ -5,11 +5,11 @@ import com.ibm.wala.shrikeBT.Util;
 
 import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 
-public class LoadFromLocalConversationPatch extends PushCreateAndStoreToLocalConversionPatch {
+public class LoadFromLocalConversionPatch extends PushCreateAndStoreToLocalConversionPatch {
 
 	private LoadInstruction loadOriginalToStack;
 
-	public LoadFromLocalConversationPatch(TypeLabel from, TypeLabel label, int orgLocal, int optLocal) {
+	public LoadFromLocalConversionPatch(TypeLabel from, TypeLabel label, int orgLocal, int optLocal) {
 		super(from, label, optLocal);
 		loadOriginalToStack = LoadInstruction.make(Util.makeType(originalType), orgLocal);
 	}

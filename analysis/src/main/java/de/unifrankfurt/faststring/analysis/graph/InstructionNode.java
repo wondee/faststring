@@ -50,7 +50,7 @@ public abstract class InstructionNode implements Labelable {
 			if (this.label == null) {
 				return true;
 			} else {
-				return isCompatibleWithNullLabel(label, inV);
+				return false;
 			}
 		} else {
 			if (this.label == null) {
@@ -62,13 +62,9 @@ public abstract class InstructionNode implements Labelable {
 		}
 	}
 
-	protected boolean isCompatibleWithNullLabel(TypeLabel label, int inV) {
-		return false;
-	}
-
-	protected boolean isCompatibleWithActual(TypeLabel label, int inV) {
-		return this.label == label;
-	}
+	protected abstract boolean isDefCompatibleWithActual(TypeLabel label);
+	
+	protected abstract boolean isIndexCompatibleWithActual(TypeLabel label, int i);
 
 	public void setByteCodeIndex(int index) {
 		this.byteCodeIndex = index;
@@ -145,6 +141,10 @@ public abstract class InstructionNode implements Labelable {
 	public int getDef() {
 		return def;
 	}
+	
+	public List<Integer> getUses() {
+		return uses;
+	}
 
 	public void addLoad(int index, int load) {
 		LOG.trace("adding load {}, for index {}", load, index);
@@ -153,9 +153,26 @@ public abstract class InstructionNode implements Labelable {
 		if (old != null && old != load) {
 			throw new IllegalStateException(String.format("old value was removed from loadMap index %index old %d new %d", index, old, load));
 		}
+	}
+	
+	public boolean canDefBelabeled(TypeLabel label) {
+		if (label == null) {
+			return false;
+		} else {
+			return isDefCompatibleWithActual(label);
+		}
+	}
+	
 
+	public boolean canUseBeLabeled(int i, TypeLabel label) {
+		if (label == null) {
+			return false;
+		} else {
+			return isIndexCompatibleWithActual(label, i);
+		}
 	}
 
+	
 	/*
 	 * (non-Javadoc)
 	 *
@@ -178,6 +195,7 @@ public abstract class InstructionNode implements Labelable {
 		return label;
 	}
 
+	
 	public abstract void visit(Visitor visitor);
 
 	/*
@@ -195,10 +213,6 @@ public abstract class InstructionNode implements Labelable {
 	@Override
 	public boolean isSameLabel(Labelable other) {
 		return isLabel(other.getLabel());
-	}
-
-	public boolean isCompatibleWith(Reference ref) {
-		return isCompatibleWith(ref.getLabel(), ref.valueNumber());
 	}
 
 	public static class Visitor {
@@ -221,6 +235,15 @@ public abstract class InstructionNode implements Labelable {
 
 		public void visitBinaryOperator(BinaryOperation binaryOperation) {}
 
+	}
+
+	public boolean needsConversionTo(Reference ref) {
+		if (isSameLabel(ref)) {
+			return true;
+		}
+
+		return isCompatibleWithActual(label, ref.valueNumber());
+		
 	}
 
 

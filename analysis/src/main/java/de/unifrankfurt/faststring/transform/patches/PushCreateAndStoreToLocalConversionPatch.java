@@ -6,7 +6,7 @@ import com.ibm.wala.shrikeBT.Util;
 import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 
 
-public abstract class PushCreateAndStoreToLocalConversionPatch extends ConversationToLabelPatch {
+public abstract class PushCreateAndStoreToLocalConversionPatch extends ConversionToLabelPatch {
 	
 	private final StoreInstruction storeToOptLocal;
 

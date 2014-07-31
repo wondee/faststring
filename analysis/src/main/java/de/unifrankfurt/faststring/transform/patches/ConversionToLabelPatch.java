@@ -5,7 +5,7 @@ import com.ibm.wala.shrikeBT.Util;
 
 import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 
-public class ConversationToLabelPatch extends BasePatch {
+public class ConversionToLabelPatch extends BasePatch {
 
 	final Class<?> originalType;
 	final Class<?> optimizedType;
@@ -13,7 +13,7 @@ public class ConversationToLabelPatch extends BasePatch {
 	final InvokeInstruction invokeStaticFactory;
 
 	
-	public ConversationToLabelPatch(TypeLabel from, TypeLabel to) {
+	public ConversionToLabelPatch(TypeLabel from, TypeLabel to) {
 		if (to != null) {
 			originalType = to.getOriginalType();
 			optimizedType = to.getOptimizedType();

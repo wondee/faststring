@@ -14,6 +14,7 @@ import com.google.common.collect.Lists;
 
 import de.unifrankfurt.faststring.analysis.graph.DataFlowGraph;
 import de.unifrankfurt.faststring.analysis.graph.InstructionNode;
+import de.unifrankfurt.faststring.analysis.graph.NotLabelableNode;
 import de.unifrankfurt.faststring.analysis.graph.PhiNode;
 import de.unifrankfurt.faststring.analysis.graph.Reference;
 import de.unifrankfurt.faststring.analysis.label.TypeLabel;
@@ -73,42 +74,67 @@ public class LabelAnalyzer extends BaseQueueProcessingStrategy<Reference>{
 
 		List<InstructionNode> os = Lists.newLinkedList();
 
-		os.add(ref.getDefinition());
+		InstructionNode definition = ref.getDefinition();
+		os.add(definition);
+		
+		if (definition instanceof PhiNode) {
+			processPhi(ref, refQueue,(PhiNode) definition);
+		} else {
+			if (!(definition instanceof NotLabelableNode)) {
+				definition.canDefBelabeled(label)
+			}
+		}
+		
+		
+		
 		os.addAll(ref.getUses());
 
 		for (InstructionNode o : os) {
 
 			if (o instanceof PhiNode) {
-				PhiNode phi = (PhiNode) o;
-
-				if (!phis.contains(phi)) {
-
-					phis.add(phi);
-					Collection<Integer> connectedRefs = phi.getConnectedRefs(ref.valueNumber());
-
-					Collection<Reference> refs = Collections2.transform(connectedRefs,
-							valueNumberToReference);
-
-					refQueue.addAll(refs);
-				}
+				processPhi(ref, refQueue,(PhiNode) o);
 			} else {
 				final TypeLabel label = ref.getLabel();
 
-				if (label != null && o.isCompatibleWith(label, ref.valueNumber())) {
-					o.setLabel(label);
-					LOG.trace("inspecting {}", o);
-					for (Integer connectedRefId : o.getConnectedRefs(ref.valueNumber())) {
-						Reference connectedRef = graph.get(connectedRefId);
-						if (connectedRef.getLabel() == null) {
-							LOG.trace("setting label to {}", connectedRef);
-							connectedRef.setLabel(label);
-
-							refQueue.add(connectedRef);
+				if (!(o instanceof NotLabelableNode)) {
+					
+					if (label != null && o.isCompatibleWith(label, ref.valueNumber())) {
+						o.setLabel(label);
+						LOG.trace("inspecting {}", o);
+						
+						if (o.canDefBelabeled(label)) {
+							Reference def = graph.get(o.getDef());
+							def.setLabel(label);
+							refQueue.add(def);
+							
 						}
+						for (int i = 0; i < o.getUses().size(); i++) {
+							if (o.canUseBeLabeled(i, label)) {
+								Reference use = graph.get(o.getUses().get(0));
+								use.setLabel(label);
+								refQueue.add(use);
+							}							
+						}
+						
 					}
-
 				}
+				
 			}
+		}
+	}
+
+	private void processPhi(Reference ref, Queue<Reference> refQueue, PhiNode o) {
+		PhiNode phi = (PhiNode) o;
+
+		if (!phis.contains(phi)) {
+
+			phis.add(phi);
+			Collection<Integer> connectedRefs = phi.getConnectedRefs(ref.valueNumber());
+
+			Collection<Reference> refs = Collections2.transform(connectedRefs,
+					valueNumberToReference);
+
+			refQueue.addAll(refs);
 		}
 	}
 

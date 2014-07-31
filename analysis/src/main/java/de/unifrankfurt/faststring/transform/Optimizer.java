@@ -3,15 +3,15 @@ package de.unifrankfurt.faststring.transform;
 import de.unifrankfurt.faststring.analysis.graph.InstructionNode;
 import de.unifrankfurt.faststring.analysis.graph.MethodCallNode;
 import de.unifrankfurt.faststring.analysis.label.TypeLabel;
-import de.unifrankfurt.faststring.transform.patches.ConversationPatchFactory;
+import de.unifrankfurt.faststring.transform.patches.ConversionPatchFactory;
 
 class Optimizer extends InstructionNode.Visitor {
 
 	private int v;
 
-	private ConversationPatchFactory patchFactory;
+	private ConversionPatchFactory patchFactory;
 
-	public Optimizer(int v, ConversationPatchFactory patchFactory) {
+	public Optimizer(int v, ConversionPatchFactory patchFactory) {
 		this.v = v;
 		this.patchFactory = patchFactory;
 	}

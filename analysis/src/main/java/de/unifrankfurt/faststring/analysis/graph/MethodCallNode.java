@@ -52,6 +52,17 @@ public class MethodCallNode extends InstructionNode {
 
 	}
 
+	@Override
+	protected boolean isDefCompatibleWithActual(TypeLabel label) {
+		return new Defintion().isCompatibleWithActual(label);
+	}
+
+	@Override
+	protected boolean isIndexCompatibleWithActual(TypeLabel label, int i) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
 	private MethodCallType determineMethodCallType(int inV) {
 		if (inV == def) {
 			return new Defintion();
