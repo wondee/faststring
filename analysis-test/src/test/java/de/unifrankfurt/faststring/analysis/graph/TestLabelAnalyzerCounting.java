@@ -1,8 +1,9 @@
 package de.unifrankfurt.faststring.analysis.graph;
 
-import static de.unifrankfurt.faststring.analysis.test.util.TestUtilities.assertList;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
@@ -27,8 +28,11 @@ public class TestLabelAnalyzerCounting {
 		assertNotNull(graph.get(3).getLabel());
 		assertNotNull(graph.get(4).getLabel());
 
-		assertTrue(graph.get(3).isDefinitionConversionToOpt(LABEL));
-		assertList(graph.get(4).getUseConversionsFromOpt(LABEL), 0);
+		assertTrue(graph.get(3).isLabel(LABEL));
+		assertFalse(graph.get(3).getDefinition() instanceof LabelableNode);
+
+		assertTrue(graph.get(4).isLabel(LABEL));
+		assertFalse(graph.get(4).getUses().get(0) instanceof LabelableNode);
 	}
 
 	@Test
@@ -46,9 +50,15 @@ public class TestLabelAnalyzerCounting {
 		assertNotNull(graph.get(4).getLabel());
 		assertNotNull(graph.get(5).getLabel());
 
-		assertList(graph.get(1).getUseConversionsToOpt(LABEL), 0);
-		assertTrue(graph.get(2).isDefinitionConversionToOpt(LABEL));
-		assertFalse(graph.get(2).isDefinitionConversionFromOpt(LABEL));
+		
+		
+		assertTrue(graph.get(1).isLabel(null));
+		assertThat(graph.get(1).getUses().get(0), instanceOf(LabelableNode.class));
+		assertTrue(((LabelableNode)graph.get(1).getUses().get(0)).isLabel(LABEL));
+		
+		assertTrue(graph.get(2).isLabel(LABEL));
+		assertFalse(graph.get(2).getDefinition() instanceof LabelableNode);
+		
 	}
 
 	@Test
@@ -70,9 +80,17 @@ public class TestLabelAnalyzerCounting {
 		assertNotNull(graph.get(5).getLabel());
 		assertNotNull(graph.get(6).getLabel());
 
-		assertList(graph.get(1).getUseConversionsToOpt(LABEL), 0);
-		assertList(graph.get(2).getUseConversionsToOpt(LABEL), 0);
-		assertList(graph.get(6).getUseConversionsFromOpt(LABEL), 0);
+		assertTrue(graph.get(1).isLabel(null));
+		assertThat(graph.get(1).getUses().get(0), instanceOf(LabelableNode.class));
+		assertTrue(((LabelableNode)graph.get(1).getUses().get(0)).isLabel(LABEL));
+		
+		assertTrue(graph.get(2).isLabel(null));
+		assertThat(graph.get(2).getUses().get(0), instanceOf(LabelableNode.class));
+		assertTrue(((LabelableNode)graph.get(2).getUses().get(0)).isLabel(LABEL));
+		
+//		assertTrue(graph.get(1).isLabel(LABEL));
+//		assertFalse(graph.get(1).getUses().get(0) instanceof LabelableNode);
+		
 	}
 
 	private DataFlowGraph analyze(DataFlowGraph graph) {

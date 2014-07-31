@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.ibm.wala.ssa.SSAInvokeInstruction;
 import com.ibm.wala.types.MethodReference;
@@ -12,7 +13,7 @@ import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 import de.unifrankfurt.faststring.analysis.util.IRUtil;
 
 
-public class MethodCallNode extends InstructionNode {
+public class MethodCallNode extends LabelableNode {
 
 	private MethodReference target;
 	private boolean isStatic;
@@ -47,21 +48,42 @@ public class MethodCallNode extends InstructionNode {
 	}
 
 	@Override
-	protected boolean isCompatibleWithActual(TypeLabel label, int inV) {
-		return determineMethodCallType(inV).isCompatibleWithActual(label);
-
+	public boolean canUseAt(TypeLabel label, int i) {
+		if (i == 0 && !isStatic) {
+			return label.canBeUsedAsReceiverFor(target);
+		} else {			
+			return label.canBeUsedAsParamFor(target, i);
+		}
+		
+	}
+	
+	@Override
+	public boolean canProduce(TypeLabel label) {
+		return label.canBeDefinedAsResultOf(target);
 	}
 
 	@Override
-	protected boolean isDefCompatibleWithActual(TypeLabel label) {
-		return new Defintion().isCompatibleWithActual(label);
+	public List<Integer> getLabelableRefs(TypeLabel label) {
+		List<Integer> refs = Lists.newLinkedList();
+		
+		if (label.canBeDefinedAsResultOf(target)) {
+			refs.add(def);
+		}
+		
+		if (!isStatic && label.canBeUsedAsReceiverFor(target)) {
+			refs.add(uses.get(0));
+		}
+		
+		for (int i = (isStatic) ? 0 : 1; i < uses.size(); i++) {
+			if (label.canBeUsedAsParamFor(target, i)) {
+				refs.add(uses.get(i));
+			}
+		}
+		
+		return refs;
 	}
 
-	@Override
-	protected boolean isIndexCompatibleWithActual(TypeLabel label, int i) {
-		// TODO Auto-generated method stub
-		return false;
-	}
+	
 	
 	private MethodCallType determineMethodCallType(int inV) {
 		if (inV == def) {

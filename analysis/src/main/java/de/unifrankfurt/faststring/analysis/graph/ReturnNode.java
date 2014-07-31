@@ -5,7 +5,7 @@ import java.util.Collection;
 
 import com.google.common.base.Preconditions;
 
-public class ReturnNode extends NotLabelableNode {
+public class ReturnNode extends InstructionNode {
 
 	public ReturnNode(int result) {
 		Preconditions.checkArgument(result > 0);

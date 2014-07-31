@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import com.ibm.wala.shrikeBT.Util;
 import com.ibm.wala.types.MethodReference;
@@ -61,7 +60,8 @@ public class TypeLabelConfig extends BaseTypeLabel {
 
 	@Override
 	public boolean compatibleWith(TypeLabel label) {
-		Preconditions.checkNotNull(label);
+		if (label == null) return false;
+		
 		return compatibleLabels.contains(label.toString());
 	}
 

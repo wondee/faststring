@@ -10,11 +10,10 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
-import com.google.common.collect.Lists;
 
 import de.unifrankfurt.faststring.analysis.graph.DataFlowGraph;
 import de.unifrankfurt.faststring.analysis.graph.InstructionNode;
-import de.unifrankfurt.faststring.analysis.graph.NotLabelableNode;
+import de.unifrankfurt.faststring.analysis.graph.LabelableNode;
 import de.unifrankfurt.faststring.analysis.graph.PhiNode;
 import de.unifrankfurt.faststring.analysis.graph.Reference;
 import de.unifrankfurt.faststring.analysis.label.TypeLabel;
@@ -71,54 +70,52 @@ public class LabelAnalyzer extends BaseQueueProcessingStrategy<Reference>{
 
 	@Override
 	public void process(Reference ref, Queue<Reference> refQueue) {
-
-		List<InstructionNode> os = Lists.newLinkedList();
-
-		InstructionNode definition = ref.getDefinition();
-		os.add(definition);
+		LOG.trace("queue: {}, ref: {}", GraphUtil.extractIntsFromStringReferences(refQueue), ref);
 		
-		if (definition instanceof PhiNode) {
-			processPhi(ref, refQueue,(PhiNode) definition);
-		} else {
-			if (!(definition instanceof NotLabelableNode)) {
-				definition.canDefBelabeled(label)
-			}
-		}
+		InstructionNode defNode = ref.getDefinition();
+		TypeLabel label = ref.getLabel();
 		
-		
-		
-		os.addAll(ref.getUses());
-
-		for (InstructionNode o : os) {
-
-			if (o instanceof PhiNode) {
-				processPhi(ref, refQueue,(PhiNode) o);
+		if (ref.getLabel() != null) {
+			
+			if (defNode instanceof PhiNode) {
+				processPhi(ref, refQueue,(PhiNode) defNode);
 			} else {
-				final TypeLabel label = ref.getLabel();
-
-				if (!(o instanceof NotLabelableNode)) {
-					
-					if (label != null && o.isCompatibleWith(label, ref.valueNumber())) {
-						o.setLabel(label);
-						LOG.trace("inspecting {}", o);
-						
-						if (o.canDefBelabeled(label)) {
-							Reference def = graph.get(o.getDef());
-							def.setLabel(label);
-							refQueue.add(def);
-							
-						}
-						for (int i = 0; i < o.getUses().size(); i++) {
-							if (o.canUseBeLabeled(i, label)) {
-								Reference use = graph.get(o.getUses().get(0));
-								use.setLabel(label);
-								refQueue.add(use);
-							}							
-						}
-						
+				if (defNode instanceof LabelableNode) {
+					LabelableNode labelable = (LabelableNode) defNode; 
+	
+					if (labelable.canProduce(label)) {
+						labelConnectedRefs(label, refQueue, labelable);
 					}
 				}
-				
+			}
+			
+			for (InstructionNode useNode : ref.getUses()) {
+				if (useNode instanceof PhiNode) {
+					processPhi(ref, refQueue,(PhiNode) useNode);
+				} else {
+					if (useNode instanceof LabelableNode) {
+						LabelableNode labelable = (LabelableNode) useNode; 
+						for (int i : labelable.getIndicesForV(ref.valueNumber())) {
+							if (labelable.canUseAt(label, i)) {
+								labelConnectedRefs(label, refQueue, labelable);		
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	private void labelConnectedRefs(TypeLabel label , Queue<Reference> refQueue, LabelableNode node) {
+		node.setLabel(label);
+		List<Integer> connectedRefs = node.getLabelableRefs(label);
+		
+		for (int v : connectedRefs) {
+			Reference ref = graph.get(v);
+			
+			if (ref.getLabel() == null) {
+				ref.setLabel(label);
+				refQueue.add(ref);
 			}
 		}
 	}

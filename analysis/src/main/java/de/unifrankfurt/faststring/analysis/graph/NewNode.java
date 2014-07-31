@@ -1,12 +1,14 @@
 package de.unifrankfurt.faststring.analysis.graph;
 
 import java.util.Collection;
+import java.util.List;
 
+import com.google.common.collect.ImmutableList;
 import com.ibm.wala.types.TypeReference;
 
 import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 
-public class NewNode extends InstructionNode {
+public class NewNode extends LabelableNode {
 
 	private TypeReference type;
 	private int ctorCallIndex;
@@ -40,7 +42,17 @@ public class NewNode extends InstructionNode {
 	}
 
 	@Override
-	protected boolean isCompatibleWithActual(TypeLabel label, int inV) {
+	public boolean canProduce(TypeLabel label) {
+		return true;
+	}
+
+	@Override
+	public List<Integer> getLabelableRefs(TypeLabel label) {
+		return ImmutableList.of();
+	}
+
+	@Override
+	public boolean canUseAt(TypeLabel label, int i) {
 		return true;
 	}
 }

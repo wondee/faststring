@@ -1,5 +1,8 @@
 package de.unifrankfurt.faststring.transform.patches;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.ibm.wala.shrikeBT.IInvokeInstruction.Dispatch;
 import com.ibm.wala.shrikeBT.InvokeInstruction;
 import com.ibm.wala.shrikeBT.LoadInstruction;
@@ -18,6 +21,8 @@ import de.unifrankfurt.faststring.transform.TransformationInfo;
 
 public class ConversionPatchFactory {
 
+	private static final Logger LOG = LoggerFactory.getLogger(ConversionPatchFactory.class);
+	
 	private MethodEditor editor;
 	private TransformationInfo info;
 	private TypeLabel from;
@@ -71,6 +76,8 @@ public class ConversionPatchFactory {
 
 
 	public void replaceLoad(int local, Integer loadIndex, TypeLabel label) {
+		LOG.trace("replaceLoad({},{},{})", local, loadIndex, label);
+		
 		final String type = Util.makeType(label.getOptimizedType());
 
 		if (loadIndex != null) {

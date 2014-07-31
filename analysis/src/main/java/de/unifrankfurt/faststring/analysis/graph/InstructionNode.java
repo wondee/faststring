@@ -14,14 +14,12 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import de.unifrankfurt.faststring.analysis.label.TypeLabel;
-
-public abstract class InstructionNode implements Labelable {
+public abstract class InstructionNode {
 
 	private static final Logger LOG = LoggerFactory
 			.getLogger(InstructionNode.class);
 
-	private TypeLabel label;
+	
 	private int byteCodeIndex = -1;
 
 	Map<Integer, Collection<Integer>> localMap = Maps.newHashMap();
@@ -34,37 +32,42 @@ public abstract class InstructionNode implements Labelable {
 	List<Integer> uses = ImmutableList.of();
 
 	public final List<Integer> getConnectedRefs(int inV) {
-		Set<Integer> refs = Sets.newHashSet(uses);
-		
-		if (def != -1) {
-			refs.add(def);
-		}
+		Set<Integer> refs = getConnectedRefs();
 		
 		refs.remove(inV);
 		
 		return ImmutableList.copyOf(refs);
 	}
 
-	public boolean isCompatibleWith(TypeLabel label, int inV) {
-		if (label == null) {
-			if (this.label == null) {
-				return true;
-			} else {
-				return false;
-			}
-		} else {
-			if (this.label == null) {
-				return isCompatibleWithActual(label, inV);
-			} else {
-				return this.label.compatibleWith(label);
-			}
 
+	public Set<Integer> getConnectedRefs() {
+		Set<Integer> refs = Sets.newHashSet(uses);
+		
+		if (def != -1) {
+			refs.add(def);
 		}
+		return refs;
 	}
 
-	protected abstract boolean isDefCompatibleWithActual(TypeLabel label);
-	
-	protected abstract boolean isIndexCompatibleWithActual(TypeLabel label, int i);
+
+//	public boolean isCompatibleWith(TypeLabel label, int inV) {
+//		if (label == null) {
+//			if (this.label == null) {
+//				return true;
+//			} else {
+//				return false;
+//			}
+//		} else {
+//			if (this.label == null) {
+//				return isCompatibleWithActual(label, inV);
+//			} else {
+//				return this.label.compatibleWith(label);
+//			}
+//
+//		}
+//	}
+
+
 
 	public void setByteCodeIndex(int index) {
 		this.byteCodeIndex = index;
@@ -155,66 +158,9 @@ public abstract class InstructionNode implements Labelable {
 		}
 	}
 	
-	public boolean canDefBelabeled(TypeLabel label) {
-		if (label == null) {
-			return false;
-		} else {
-			return isDefCompatibleWithActual(label);
-		}
-	}
-	
-
-	public boolean canUseBeLabeled(int i, TypeLabel label) {
-		if (label == null) {
-			return false;
-		} else {
-			return isIndexCompatibleWithActual(label, i);
-		}
-	}
-
-	
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * de.unifrankfurt.faststring.analysis.graph.Labelable#setLabel(de.unifrankfurt
-	 * .faststring.analysis.label.TypeLabel)
-	 */
-	@Override
-	public void setLabel(TypeLabel label) {
-		this.label = label;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see de.unifrankfurt.faststring.analysis.graph.Labelable#getLabel()
-	 */
-	@Override
-	public TypeLabel getLabel() {
-		return label;
-	}
-
-	
 	public abstract void visit(Visitor visitor);
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * de.unifrankfurt.faststring.analysis.graph.Labelable#isLabel(de.unifrankfurt
-	 * .faststring.analysis.label.TypeLabel)
-	 */
-	@Override
-	public boolean isLabel(TypeLabel label) {
-		return this.label == label;
-	}
-
-	@Override
-	public boolean isSameLabel(Labelable other) {
-		return isLabel(other.getLabel());
-	}
-
+	
 	public static class Visitor {
 
 		public void visitConstant(ConstantNode node) {}
@@ -236,15 +182,5 @@ public abstract class InstructionNode implements Labelable {
 		public void visitBinaryOperator(BinaryOperation binaryOperation) {}
 
 	}
-
-	public boolean needsConversionTo(Reference ref) {
-		if (isSameLabel(ref)) {
-			return true;
-		}
-
-		return isCompatibleWithActual(label, ref.valueNumber());
-		
-	}
-
 
 }

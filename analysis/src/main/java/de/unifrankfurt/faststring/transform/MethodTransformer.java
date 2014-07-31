@@ -14,6 +14,7 @@ import de.unifrankfurt.faststring.analysis.graph.ConstantNode;
 import de.unifrankfurt.faststring.analysis.graph.InstructionNode;
 import de.unifrankfurt.faststring.analysis.graph.InstructionNode.Visitor;
 import de.unifrankfurt.faststring.analysis.graph.GetNode;
+import de.unifrankfurt.faststring.analysis.graph.LabelableNode;
 import de.unifrankfurt.faststring.analysis.graph.MethodCallNode;
 import de.unifrankfurt.faststring.analysis.graph.NewNode;
 import de.unifrankfurt.faststring.analysis.graph.ParameterNode;
@@ -45,11 +46,21 @@ public class MethodTransformer {
 
 		for (Reference ref : transformationInfo.getReferences()) {
 
-			createDefinitionConversions(ref.getDefinition(), ref);
-
+			InstructionNode definition = ref.getDefinition();
+			
+			if (definition instanceof LabelableNode) {
+				createDefinitionConversions((LabelableNode) definition, ref);
+			} else {
+				createDefinitionConversions(definition, ref);
+			}
 			for (InstructionNode use : ref.getUses()) {
-				createUseOptimization(ref, use);
-				createUseConversions(ref, use);
+				
+				if (use instanceof LabelableNode) {
+					createUseOptimization(ref, use);
+					createUseConversions(ref, (LabelableNode) use);
+				} else {
+					createUseConversions(ref, use);
+				}
 			}
 
 		}
@@ -68,52 +79,83 @@ public class MethodTransformer {
 			throw new IllegalStateException(e);
 		}
 	}
+	
+
 
 	private void createUseConversions(Reference ref, InstructionNode use) {
+		if (ref.getLabel() != null) {
+			
+			UseConverter converter = new UseConverter(ref.getLabel(), null);
+			convertUses(ref, use, converter);
+		}
+	}
+
+	private void createUseConversions(Reference ref, LabelableNode use) {
 		if (use.needsConversionTo(ref)) {
+			
 			UseConverter converter = new UseConverter(ref.getLabel(), use.getLabel());
-			Collection<Integer> locals = use.getLocals(ref.valueNumber());
-
-			for (int index : use.getIndicesForV(ref.valueNumber())) {
-				if (!locals.isEmpty()) {
-					for (Integer local : locals) {
-						converter.setLocal(transformationInfo.getLocalForLabel(null, ref.getLabel(), local), index);
-	//					converter.setLocal(local);
-						use.visit(converter);
-
-					}
-				} else {
-					converter.setLocal(-1);
-					use.visit(converter);
-				}
-			}
+			convertUses(ref, use, converter);
 		}
 
 	}
 
-	private void createUseOptimization(Reference ref, InstructionNode use) {
-		if (use.getLabel()!= null) {
-			use.visit(new Optimizer(ref.valueNumber(),
-					new ConversionPatchFactory(transformationInfo, editor, use.getLabel())));
-		}
-	}
+	private void convertUses(Reference ref, InstructionNode use, UseConverter converter) {
+		Collection<Integer> locals = use.getLocals(ref.valueNumber());
 
-	private void createDefinitionConversions(InstructionNode instructionNode, Reference ref) {
-		if (instructionNode.needsConversionTo(ref)) {
-			Converter converter = new DefinitionConverter(instructionNode.getLabel(), ref.getLabel());
-			Collection<Integer> locals = instructionNode.getLocals(ref.valueNumber());
+		for (int index : use.getIndicesForV(ref.valueNumber())) {
 			if (!locals.isEmpty()) {
 				for (Integer local : locals) {
-					converter.setLocal(local);
-					instructionNode.visit(converter);
+					converter.setLocal(transformationInfo.getLocalForLabel(null, ref.getLabel(), local), index);
+					use.visit(converter);
 
 				}
 			} else {
 				converter.setLocal(-1);
-				instructionNode.visit(converter);
+				use.visit(converter);
 			}
 		}
+	}
 
+	private void createUseOptimization(Reference ref, InstructionNode use) {
+		if (use instanceof LabelableNode) {
+			
+			TypeLabel label = ((LabelableNode)use).getLabel();
+			if (label != null) {
+				use.visit(new Optimizer(ref.valueNumber(),
+						new ConversionPatchFactory(transformationInfo, editor, label)));
+			}
+		}
+		
+	}
+
+	private void createDefinitionConversions(InstructionNode definition, Reference ref) {
+		if (ref.getLabel() != null) {
+			Converter converter = new DefinitionConverter(null, ref.getLabel());
+			convertDefinitions(definition, ref, converter);
+		}
+		
+	}
+	
+	private void createDefinitionConversions(LabelableNode instructionNode, Reference ref) {
+		if (instructionNode.needsConversionTo(ref)) {
+			Converter converter = new DefinitionConverter(instructionNode.getLabel(), ref.getLabel());
+			convertDefinitions(instructionNode, ref, converter);
+		}
+
+	}
+
+	private void convertDefinitions(InstructionNode instructionNode, Reference ref, Converter converter) {
+		Collection<Integer> locals = instructionNode.getLocals(ref.valueNumber());
+		if (!locals.isEmpty()) {
+			for (Integer local : locals) {
+				converter.setLocal(local);
+				instructionNode.visit(converter);
+
+			}
+		} else {
+			converter.setLocal(-1);
+			instructionNode.visit(converter);
+		}
 	}
 
 	private abstract class Converter extends Visitor {

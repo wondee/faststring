@@ -1,5 +1,8 @@
 package de.unifrankfurt.faststring.transform;
 
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
@@ -8,6 +11,9 @@ import java.util.Collection;
 import org.junit.Test;
 
 import com.ibm.wala.shrikeBT.MethodData;
+import com.ibm.wala.shrikeBT.NewInstruction;
+import com.ibm.wala.shrikeBT.StoreInstruction;
+import com.ibm.wala.shrikeBT.Util;
 
 import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 import de.unifrankfurt.faststring.analysis.util.StringUtil;
@@ -24,6 +30,15 @@ public class TestStringBuilderLabel extends BaseTransformerTest {
 		
 		assertTrue(data.getHasChanged());
 		
+		assertThat(data.getInstructions()[5], instanceOf(NewInstruction.class));
+		assertThat(data.getInstructions()[8], instanceOf(StoreInstruction.class));
+		
+		NewInstruction newIns = (NewInstruction) data.getInstructions()[5];
+		StoreInstruction store = (StoreInstruction) data.getInstructions()[8];
+		
+		assertEquals(Util.makeType(STRING_BUILDER.getOptimizedType()), newIns.getType());
+		assertEquals(info.getLocalForLabel(null, STRING_BUILDER, 2), store.getVarIndex());
+		
 	}
 	
 	@Test
@@ -35,6 +50,12 @@ public class TestStringBuilderLabel extends BaseTransformerTest {
 		
 		assertTrue(data.getHasChanged());
 		
+		assertThat(data.getInstructions()[10], instanceOf(NewInstruction.class));
+		
+		NewInstruction newIns = (NewInstruction) data.getInstructions()[10];
+		
+		assertEquals(Util.makeType(STRING_BUILDER.getOptimizedType()), newIns.getType());
+		
 	}
 	
 	@Test
@@ -45,6 +66,15 @@ public class TestStringBuilderLabel extends BaseTransformerTest {
 		MethodData data = transform(info);
 		
 		assertTrue(data.getHasChanged());
+		
+		assertThat(data.getInstructions()[5], instanceOf(NewInstruction.class));
+		assertThat(data.getInstructions()[8], instanceOf(StoreInstruction.class));
+		
+		NewInstruction newIns = (NewInstruction) data.getInstructions()[5];
+		StoreInstruction store = (StoreInstruction) data.getInstructions()[8];
+		
+		assertEquals(Util.makeType(STRING_BUILDER.getOptimizedType()), newIns.getType());
+		assertEquals(info.getLocalForLabel(null, STRING_BUILDER, 2), store.getVarIndex());
 		
 	}
 	

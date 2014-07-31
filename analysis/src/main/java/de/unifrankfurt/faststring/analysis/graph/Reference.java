@@ -1,16 +1,13 @@
 package de.unifrankfurt.faststring.analysis.graph;
 
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 
@@ -65,41 +62,6 @@ public class Reference implements Labelable {
 
 	void setUses(List<InstructionNode> uses) {
 		this.uses = ImmutableList.copyOf(uses);
-	}
-
-
-	public boolean isDefinitionConversionToOpt(TypeLabel label) {
-		return isLabel(label) && !definition.isLabel(label);
-	}
-
-	public boolean isDefinitionConversionFromOpt(TypeLabel label) {
-		return !isLabel(label) && definition.isLabel(label);
-	}
-
-	public Collection<Integer> getUseConversionsFromOpt(TypeLabel label) {
-		Set<Integer> convs = Sets.newHashSet();
-		
-		for (int i = 0; i < uses.size(); i++) {
-			InstructionNode use = uses.get(i);
-			if (isLabel(label) && !use.isLabel(label)) {
-				convs.add(i);
-			}
-		}
-		
-		return convs;
-	}
-
-	public Collection<Integer> getUseConversionsToOpt(TypeLabel label) {
-		Set<Integer> convs = Sets.newHashSet();
-		
-		for (int i = 0; i < uses.size(); i++) {
-			InstructionNode use = uses.get(i);
-			if (!isLabel(label) && use.isLabel(label)) {
-				convs.add(i);
-			}
-		}
-		
-		return convs;
 	}
 
 	void setUsesMutable(LinkedList<InstructionNode> uses) {

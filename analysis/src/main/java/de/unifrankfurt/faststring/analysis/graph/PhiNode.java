@@ -8,7 +8,7 @@ import com.ibm.wala.ssa.SSAPhiInstruction;
 import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 import de.unifrankfurt.faststring.analysis.util.IRUtil;
 
-public class PhiNode extends InstructionNode {
+public class PhiNode extends LabelableNode {
 
 
 	public PhiNode(SSAPhiInstruction instruction) {
@@ -41,13 +41,18 @@ public class PhiNode extends InstructionNode {
 	}
 
 	@Override
-	protected boolean isDefCompatibleWithActual(TypeLabel label) {
+	public boolean canProduce(TypeLabel label) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	protected boolean isIndexCompatibleWithActual(TypeLabel label, int i) {
+	public List<Integer> getLabelableRefs(TypeLabel label) {
+		return getConnctedRefs();
+	}
+
+	@Override
+	public boolean canUseAt(TypeLabel label, int i) {
 		// TODO Auto-generated method stub
 		return false;
 	}
