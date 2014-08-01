@@ -72,15 +72,12 @@ public class MethodTransformer {
 					createUseConversions(ref, use);
 				}
 			}
-			
-			
 
 		}
 		
 		for (LabelableNode node : labelableNodes) {
 			createUseOptimization(node);
 		}
-		
 		
 		try {
 			Verifier verifier = new Verifier(methodData);
