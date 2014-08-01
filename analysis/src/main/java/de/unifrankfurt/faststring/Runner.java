@@ -29,6 +29,7 @@ import de.unifrankfurt.faststring.analysis.AnalysisResult;
 import de.unifrankfurt.faststring.analysis.AnalyzedMethod;
 import de.unifrankfurt.faststring.analysis.MethodAnalyzer;
 import de.unifrankfurt.faststring.analysis.TargetApplication;
+import de.unifrankfurt.faststring.analysis.TypeLabelConfigParser;
 import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 import de.unifrankfurt.faststring.transform.JarManager;
 
@@ -145,25 +146,12 @@ public class Runner {
 
 		@Override
 		public TypeLabel convert(String string) {
-
+			TypeLabelConfigParser parser = new TypeLabelConfigParser();
 			try {
-				Class<?> c = Class.forName(string);
-
-				if (TypeLabel.class.isAssignableFrom(c)) {
-					LOG.info("using typelabel: {}", c.getName());
-					TypeLabel label = (TypeLabel) c.newInstance();
-
-					return label;
-				} else {
-					LOG.error(
-							"class is not implementing the TypeLabel interface: {}",
-							c.getName());
-				}
-
-			} catch (ClassNotFoundException e) {
+				TypeLabel label = parser.parseFile(string + ".type");
+				return label;
+			} catch (Exception e) {
 				LOG.error("could not load type label", string, e);
-			} catch (InstantiationException | IllegalAccessException e) {
-				LOG.error("could not initiate type label", string, e);
 			}
 
 			return null;
