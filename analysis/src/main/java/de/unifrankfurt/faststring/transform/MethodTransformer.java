@@ -10,6 +10,7 @@ import com.google.common.collect.Sets;
 import com.ibm.wala.shrikeBT.MethodData;
 import com.ibm.wala.shrikeBT.MethodEditor;
 import com.ibm.wala.shrikeBT.analysis.Analyzer.FailureException;
+import com.ibm.wala.shrikeBT.analysis.ClassHierarchyProvider;
 import com.ibm.wala.shrikeBT.analysis.Verifier;
 
 import de.unifrankfurt.faststring.analysis.graph.ConstantNode;
@@ -34,10 +35,13 @@ public class MethodTransformer {
 	MethodEditor editor;
 	TransformationInfo transformationInfo;
 
-	public MethodTransformer(MethodData methodData, TransformationInfo transformationInfo) {
+	private ClassHierarchyProvider store;
+
+	public MethodTransformer(MethodData methodData, TransformationInfo transformationInfo, ClassHierarchyProvider store) {
 		this.methodData = methodData;
 		this.transformationInfo = transformationInfo;
 		this.editor = new MethodEditor(methodData);
+		this.store = store;
 	}
 
 	public void transformMethod() {
@@ -81,7 +85,7 @@ public class MethodTransformer {
 		try {
 			Verifier verifier = new Verifier(methodData);
 
-			// TODO set classhierachieprovider
+			verifier.setClassHierarchy(store);
 			
 			verifier.verify();
 			editor.applyPatches();

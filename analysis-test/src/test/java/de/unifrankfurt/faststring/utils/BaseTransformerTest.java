@@ -73,12 +73,13 @@ public abstract class BaseTransformerTest extends BaseAnalysisTest {
 			LOG.debug("code before transformation: \n{}", printBytecode(methodData));
 		}
 
-		new MethodTransformer(methodData, info).transformMethod();
+		new MethodTransformer(methodData, info, getStore()).transformMethod();
 
 		LOG.debug("transformed code: \n{}", printBytecode(methodData));
 
 		return methodData;
 	}
+
 
 	private String printBytecode(MethodData methodData) throws IOException {
 		StringWriter writer = new StringWriter();

@@ -11,6 +11,7 @@ import com.google.common.collect.ImmutableSet.Builder;
 import com.ibm.wala.classLoader.IBytecodeMethod;
 import com.ibm.wala.classLoader.IClass;
 import com.ibm.wala.classLoader.IMethod;
+import com.ibm.wala.classLoader.ShrikeClass;
 import com.ibm.wala.ipa.callgraph.AnalysisCache;
 import com.ibm.wala.ipa.callgraph.AnalysisOptions;
 import com.ibm.wala.ipa.callgraph.AnalysisScope;
@@ -18,6 +19,8 @@ import com.ibm.wala.ipa.callgraph.impl.Everywhere;
 import com.ibm.wala.ipa.cha.ClassHierarchy;
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
 import com.ibm.wala.shrikeBT.IInstruction;
+import com.ibm.wala.shrikeBT.analysis.ClassHierarchyStore;
+import com.ibm.wala.shrikeBT.shrikeCT.CTUtils;
 import com.ibm.wala.shrikeCT.InvalidClassFileException;
 import com.ibm.wala.ssa.DefUse;
 import com.ibm.wala.ssa.IR;
@@ -37,6 +40,9 @@ public final class TargetApplication {
 
 	private ImmutableSet<IClass> applicationClasses;
 
+
+	private ClassHierarchyStore store;
+	
 //	private static final int LIMIT_SECONDS = 3;
 //	private ExecutorService executor = Executors.newFixedThreadPool(1);
 
@@ -70,14 +76,28 @@ public final class TargetApplication {
 	private void initApplicationClasses() {
 		Builder<IClass> builder = new ImmutableSet.Builder<IClass>();
 
+		store = new ClassHierarchyStore();
+		
 		for (IClass cl : classHierarchy) {
 			if (scope.isApplicationLoader(cl.getClassLoader())) {
 
 				LOG.info("application class found: {}", cl.getName());
 
 				builder.add(cl);
-
 			}
+			
+			
+			if (cl instanceof ShrikeClass) {
+				try {
+					CTUtils.addClassToHierarchy(store, ((ShrikeClass) cl).getReader());
+				} catch (InvalidClassFileException e) {
+					LOG.warn("could not add {} to class hierachy", cl);
+				}
+				
+			} else {
+				LOG.warn("{} is no ShrikeClass but a {}", cl, cl.getClass());
+			}
+			
 		}
 
 		applicationClasses = builder.build();
@@ -127,4 +147,12 @@ public final class TargetApplication {
 		return classHierarchy;
 	}
 
+	public ClassHierarchyStore getClassHierarchyStore() {
+		if (store == null) {
+			throw new IllegalStateException("initApplicationClasses() was not called before"); 
+		}
+		
+		return store;
+	}
+	
 }

@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import com.ibm.wala.shrikeBT.Disassembler;
 import com.ibm.wala.shrikeBT.MethodData;
-import com.ibm.wala.shrikeBT.analysis.Analyzer.FailureException;
+import com.ibm.wala.shrikeBT.analysis.ClassHierarchyStore;
 import com.ibm.wala.shrikeBT.shrikeCT.ClassInstrumenter;
 import com.ibm.wala.shrikeBT.shrikeCT.OfflineInstrumenter;
 import com.ibm.wala.shrikeCT.InvalidClassFileException;
@@ -28,22 +28,24 @@ public class JarManager {
 	private String baseName;
 	private Map<String, AnalysisResult> analysisResult;
 
+	private ClassHierarchyStore store;
 
-	public JarManager(String folderName, String jarBaseName, Map<String, AnalysisResult> analysisResult) {
 
-		baseName = folderName + jarBaseName;
-		this.analysisResult = analysisResult;
-
+	public static JarManager createForJar(String folderName, String jarBaseName, Map<String, AnalysisResult> analysisResult) {
+		return new JarManager(folderName + jarBaseName, analysisResult, null);
 	}
-
-
-
-	public JarManager(String jarFile, Map<String, AnalysisResult> analysisResult) {
+	
+	public static JarManager createForJar(String jarFile, Map<String, AnalysisResult> analysisResult, ClassHierarchyStore store) {
 		int lastDot = jarFile.lastIndexOf('.');
+		
+		return new JarManager(jarFile.substring(0, lastDot), analysisResult, store);
+	}
+	
 
-		baseName = jarFile.substring(0, lastDot);
-
+	private JarManager(String baseName, Map<String, AnalysisResult> analysisResult, ClassHierarchyStore store) {
+		this.baseName = baseName;
 		this.analysisResult = analysisResult;
+		this.store = store;
 	}
 
 
@@ -55,20 +57,13 @@ public class JarManager {
 			instrumenter.setOutputJar(new File(baseName + "-opt.jar"));
 			iterateClasses(instrumenter);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InvalidClassFileException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (FailureException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new IllegalArgumentException(e);
 		}
+
 	}
 
 
-	private void iterateClasses(OfflineInstrumenter instrumenter)
-			throws IOException, InvalidClassFileException, FailureException {
+	private void iterateClasses(OfflineInstrumenter instrumenter) throws IOException {
 
 		instrumenter.beginTraversal();
 		instrumenter.setPassUnmodifiedClasses(true);
@@ -78,32 +73,36 @@ public class JarManager {
 
 			for (int i = 0; i < ci.getReader().getMethodCount(); i++) {
 
-				MethodData methodData = ci.visitMethod(i);
-
-
-				String signature = (ci.getReader().getName()).replace('/', '.') + "." + methodData.getName() + methodData.getSignature();
-
-				AnalysisResult result = analysisResult.get(signature);
-				if (result != null) {
-
-					Path outFile = Paths.get("faststring-output/", signature.replace('/', '.'));
-
-					BufferedWriter writer = Files.newBufferedWriter(outFile, Charset.defaultCharset());
-
-					writer.write("--- old code " + System.getProperty("line.separator"));
-					new Disassembler(methodData).disassembleTo(writer);
-
-					new MethodTransformer(methodData, new TransformationInfo(result)).transformMethod();
-
-					writer.write("--- new code " + System.getProperty("line.separator"));
-					new Disassembler(methodData).disassembleTo(writer);
-
-					writer.flush();
-					writer.close();
-
-					instrumenter.outputModifiedClass(ci, ci.emitClass());
-				} else {
-					LOG.debug("no analysis results found for {}", signature);
+				try {
+					MethodData methodData = ci.visitMethod(i);
+	
+	
+					String signature = (ci.getReader().getName()).replace('/', '.') + "." + methodData.getName() + methodData.getSignature();
+	
+					AnalysisResult result = analysisResult.get(signature);
+					if (result != null) {
+	
+						Path outFile = Paths.get("faststring-output/", signature.replace('/', '.'));
+	
+						BufferedWriter writer = Files.newBufferedWriter(outFile, Charset.defaultCharset());
+	
+						writer.write("--- old code " + System.getProperty("line.separator"));
+						new Disassembler(methodData).disassembleTo(writer);
+	
+						new MethodTransformer(methodData, new TransformationInfo(result), store).transformMethod();
+	
+						writer.write("--- new code " + System.getProperty("line.separator"));
+						new Disassembler(methodData).disassembleTo(writer);
+	
+						writer.flush();
+						writer.close();
+	
+						instrumenter.outputModifiedClass(ci, ci.emitClass());
+					} else {
+						LOG.debug("no analysis results found for {}", signature);
+					}
+				} catch (InvalidClassFileException e) {
+					LOG.error("could not process method", e);
 				}
 
 			}

@@ -15,6 +15,7 @@ import com.ibm.wala.classLoader.IMethod;
 import com.ibm.wala.classLoader.ShrikeClass;
 import com.ibm.wala.ipa.cha.ClassHierarchy;
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
+import com.ibm.wala.shrikeBT.analysis.ClassHierarchyProvider;
 import com.ibm.wala.shrikeBT.shrikeCT.ClassInstrumenter;
 import com.ibm.wala.shrikeCT.InvalidClassFileException;
 import com.ibm.wala.ssa.DefUse;
@@ -139,5 +140,10 @@ public abstract class BaseAnalysisTest {
 		} catch (InvalidClassFileException e) {
 			throw new IllegalStateException(e);
 		}
+	}
+	
+
+	protected static ClassHierarchyProvider getStore() {
+		return targetApplication.getClassHierarchyStore();
 	}
 }

@@ -24,8 +24,6 @@ public class TransformationInfo {
 
 	private Set<Integer> effectedVars;
 
-//	private Multimap<Integer, Use> bc2Use;
-
 	public TransformationInfo(AnalysisResult result) {
 		methodName = result.getMethodName();
 		references = result.getRefs();

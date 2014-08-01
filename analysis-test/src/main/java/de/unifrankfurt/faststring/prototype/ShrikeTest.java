@@ -48,7 +48,7 @@ public class ShrikeTest {
 		System.out.println("the analysis results are:");
 		System.out.println(StringUtil.toStringMap(analysisResult));
 
-		new JarManager("../analysis-test/target/", "test", analysisResult).process();
+		JarManager.createForJar("../analysis-test/target/", "test", analysisResult).process();
 
 	}
 

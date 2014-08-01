@@ -81,7 +81,7 @@ public class Runner {
 			Files.write(outputFile, analysisResult.keySet(), Charset.defaultCharset());
 
 			LOG.info("finished analyzing; starting transforming");
-			new JarManager(jarFile, analysisResult).process();
+			JarManager.createForJar(jarFile, analysisResult, targetApplication.getClassHierarchyStore()).process();
 
 		} catch (ClassHierarchyException e) {
 			throw new RuntimeException(e);
