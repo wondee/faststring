@@ -1,22 +1,23 @@
 package de.unifrankfurt.faststring.transform;
 
 import java.util.Collection;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Sets;
 import com.ibm.wala.shrikeBT.MethodData;
 import com.ibm.wala.shrikeBT.MethodEditor;
 import com.ibm.wala.shrikeBT.analysis.Analyzer.FailureException;
 import com.ibm.wala.shrikeBT.analysis.Verifier;
 
 import de.unifrankfurt.faststring.analysis.graph.ConstantNode;
+import de.unifrankfurt.faststring.analysis.graph.GetNode;
 import de.unifrankfurt.faststring.analysis.graph.InstructionNode;
 import de.unifrankfurt.faststring.analysis.graph.InstructionNode.Visitor;
-import de.unifrankfurt.faststring.analysis.graph.GetNode;
 import de.unifrankfurt.faststring.analysis.graph.LabelableNode;
 import de.unifrankfurt.faststring.analysis.graph.MethodCallNode;
-import de.unifrankfurt.faststring.analysis.graph.NewNode;
 import de.unifrankfurt.faststring.analysis.graph.ParameterNode;
 import de.unifrankfurt.faststring.analysis.graph.PhiNode;
 import de.unifrankfurt.faststring.analysis.graph.Reference;
@@ -44,27 +45,39 @@ public class MethodTransformer {
 
 		editor.beginPass();
 
+		Set<LabelableNode> labelableNodes = Sets.newHashSet();
+		
 		for (Reference ref : transformationInfo.getReferences()) {
 
 			InstructionNode definition = ref.getDefinition();
 			
 			if (definition instanceof LabelableNode) {
-				createDefinitionConversions((LabelableNode) definition, ref);
+				LabelableNode node = (LabelableNode) definition;
+				labelableNodes.add(node);
+				createDefinitionConversions(node, ref);
 			} else {
 				createDefinitionConversions(definition, ref);
 			}
 			for (InstructionNode use : ref.getUses()) {
 				
 				if (use instanceof LabelableNode) {
-					createUseOptimization(ref, use);
-					createUseConversions(ref, (LabelableNode) use);
+					LabelableNode node = (LabelableNode) use;
+					labelableNodes.add(node);
+					createUseConversions(ref, node);
 				} else {
 					createUseConversions(ref, use);
 				}
 			}
+			
+			
 
 		}
-
+		
+		for (LabelableNode node : labelableNodes) {
+			createUseOptimization(node);
+		}
+		
+		
 		try {
 			Verifier verifier = new Verifier(methodData);
 
@@ -115,13 +128,12 @@ public class MethodTransformer {
 		}
 	}
 
-	private void createUseOptimization(Reference ref, InstructionNode use) {
+	private void createUseOptimization(InstructionNode use) {
 		if (use instanceof LabelableNode) {
 			
 			TypeLabel label = ((LabelableNode)use).getLabel();
 			if (label != null) {
-				use.visit(new Optimizer(ref.valueNumber(),
-						new ConversionPatchFactory(transformationInfo, editor, label)));
+				use.visit(new Optimizer(new ConversionPatchFactory(transformationInfo, editor, label)));
 			}
 		}
 		
@@ -212,11 +224,6 @@ public class MethodTransformer {
 		@Override
 		public void visitReturn(ReturnNode node) {
 			throw new UnsupportedOperationException("a return does not have a definition");
-		}
-
-		@Override
-		public void visitNew(NewNode newNode) {
-			patchFactory.replaceNew(newNode);
 		}
 
 	}

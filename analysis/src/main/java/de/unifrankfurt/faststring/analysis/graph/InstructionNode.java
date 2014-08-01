@@ -182,5 +182,25 @@ public abstract class InstructionNode {
 		public void visitBinaryOperator(BinaryOperation binaryOperation) {}
 
 	}
+	
+	public static class MustCallVisitor extends Visitor {
+		public void visitConstant(ConstantNode node) { throw new UnsupportedOperationException(); }
+
+		public void visitMethodCall(MethodCallNode node) { throw new UnsupportedOperationException(); }
+
+		public void visitParameter(ParameterNode node) { throw new UnsupportedOperationException(); }
+
+		public void visitPhi(PhiNode node) { throw new UnsupportedOperationException(); }
+
+		public void visitReturn(ReturnNode node) { throw new UnsupportedOperationException(); }
+
+		public void visitNew(NewNode newNode) { throw new UnsupportedOperationException(); }
+
+		public void visitGet(GetNode getNode) { throw new UnsupportedOperationException(); }
+
+		public void visitBranch(ConditionalBranchNode conditionalBranchNode) { throw new UnsupportedOperationException(); }
+
+		public void visitBinaryOperator(BinaryOperation binaryOperation) { throw new UnsupportedOperationException(); }
+	}
 
 }

@@ -2,32 +2,31 @@ package de.unifrankfurt.faststring.transform;
 
 import de.unifrankfurt.faststring.analysis.graph.InstructionNode;
 import de.unifrankfurt.faststring.analysis.graph.MethodCallNode;
+import de.unifrankfurt.faststring.analysis.graph.NewNode;
 import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 import de.unifrankfurt.faststring.transform.patches.ConversionPatchFactory;
 
-class Optimizer extends InstructionNode.Visitor {
-
-	private int v;
+class Optimizer extends InstructionNode.MustCallVisitor {
 
 	private ConversionPatchFactory patchFactory;
 
-	public Optimizer(int v, ConversionPatchFactory patchFactory) {
-		this.v = v;
+	public Optimizer(ConversionPatchFactory patchFactory) {
 		this.patchFactory = patchFactory;
 	}
 
 	@Override
 	public void visitMethodCall(MethodCallNode node) {
+		updateLoads(node);
+		updateStores(node);
 
-		if (node.isReceiver(v)) {
-
-			updateLoads(node);
-			updateStores(node);
-
-			patchFactory.replaceMethodCall(node);
-
-		}
+		patchFactory.replaceMethodCall(node);
 	}
+	
+	@Override
+	public void visitNew(NewNode newNode) {
+		patchFactory.replaceNew(newNode);
+	}
+	
 	private void updateStores(MethodCallNode node) {
 		TypeLabel defLabel = node.getDefLabel();
 		if (defLabel != null) {
