@@ -5,11 +5,12 @@
 	"methodsDefs" : [
 		{ "id" : "append", 			"desc" : { "name" : "append", "signature" : "(Ljava/lang/String;)Ljava/lang/StringBuilder;" } },
 		{ "id" : "ctor_default", 	"desc" : { "name" : "<init>", "signature" : "()V" } },
-		{ "id" : "ctor_string", 	"desc" : { "name" : "<init>", "signature" : "(Ljava/lang/String;)V" } }
+		{ "id" : "ctor_string", 	"desc" : { "name" : "<init>", "signature" : "(Ljava/lang/String;)V" } },
+		{ "id" : "toString", 		"desc" : { "name" : "toString", "signature" : "()Ljava/lang/String;" } }
 	],
 	
 	"effectedMethods" : ["append"],
-	"supportedMethods" : ["ctor_default", "ctor_string"],
+	"supportedMethods" : ["ctor_default", "ctor_string", "toString"],
 	"producingMethods" : ["append"],
 	
 	"compatibleLabels" : ["SubstringString"],
