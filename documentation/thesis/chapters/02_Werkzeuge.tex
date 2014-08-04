@@ -59,11 +59,28 @@ Methode, welcher wiederrum aus Basic Blocks zusammengesetzt ist. Ein Basic Block
 von aufeinander Folgende Instruktionen, welche in jedem Fall nach einander ausgeführt werden.
 \\
 Die Variablen innerhalb des IRs nennt WALA \textit{value numbers}. Diese beziehen sich immer auf eine 
-Referenz, allerdings kann eine Referenz sich auf mehrere tatsächliche value numbers in der IR beziehen.
+Referenz, allerdings kann sich eine Referenz sich auf mehrere tatsächliche value numbers in der IR beziehen.
+Dies folgt aus der SSA Form, wird eine Variable im Bytecode zweimal ein Wert zugewiesen, wird diese 
+doppelte Zuweisung in der SSA Form durch das Einführen einer neuen value number entfernt. Die Operationen
+werden auch nur mit Bezug auf die value numbers beschrieben.   
+\\ 
+Da die Zwischendarstellung vom Stack abstrahieren soll, werden auch alle Operationen, die den Stack betreffen
+(wie z.B. \texttt{LOAD}, \texttt{STORE}, \texttt{PUSH} oder \texttt{POP}) nicht nicht mit in diese 
+Repräsentation übernommen. Dabei werden die Bytecode Indices der überig gebliebenen Instruktionen 
+berücksichtigt und alle anderen Stellen in dem beinhaltenden Array mit \texttt{null} Werten aufgefüllt.
 \\
-% phis
-% instruktionen
-% Symboltable!
+Die Verwaltung der value numbers wird von einem Typ namens \texttt{SymbolTable} übernommen. Es kommt bei der
+IR Erstellung zum Einsatz, wenn bei der Simulation des Bytecodes neue Variablen verwendet werden, um neue 
+value numbers zu erzeugen.
+\\
+Aufgrund der SSA Form der IR lässt sich für jede value number genau eine Definition bestimmen. Zu diesem 
+Zweck bietet WALA den Typ \texttt{DefUse} an, welcher für jedes IR-Objekt erstellt werden kann. Er ermöglicht
+einen einfachen Zugriff aus die Instruktionen, die eine value number definiert (\textit{def}; z.B. als 
+Rückgabe aus einem Methodenaufruf), und eine Menge an Instruktionen, die die entsprechende value number 
+verwenden (\textit{use}; z.B. als Rückgabewert in einem \texttt{RETURN} Statement).
+\\   
+
+% TODO phis
 
 \subsubsection{Anpassungen}
 
