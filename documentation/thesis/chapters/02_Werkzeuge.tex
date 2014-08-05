@@ -1,17 +1,19 @@
 \chapter{Werkzeuge}
 
 In den folgenden Abschnitten sollen die verwendeten Werkzeuge kurz vorgestellt werden. Dabei handelt es 
-sich zum einen um den Java Bytecode, als auch um die Software Bibliothek \textit{WALA}, auf deren API das 
+sich sowohl um den Java Bytecode, als auch um die Software Bibliothek \textit{WALA}, auf deren API das 
 von mir entwickelte System basiert. 
 
 \section{Java Bytecode}
 
-Die Plattformunabhängigkeit, die in Java geschriebenen Programmen zugesprochen wird, ist vorallem mit der 
-Rolle der Java  Virtual Machine zu erklären. Java Programme werden in einen Zwischencode, den Java Bytecode, 
-übersetzt, welcher von der System spezifischen JVM ausgeführt wird. Dabei ist Programmiersprache Java nicht 
-die einzige in Bytecode übersetzbare Sprache. Es existieren neben den bekanntesten Scala, Jython, Groovy,
-JavaScript noch viele weitere. Einmal in Bytecode übersetzt in diesen Sprachen geschriebene Programme auf 
-jeder der Java Spezifikation entsprechenden JVM auführen. 
+Die Plattformunabhängigkeit, die in Java geschriebenen Programmen zugesprochen wird, 
+ist vor allem mit der Rolle der Java Virtual Machine zu erklären. Java Programme werden 
+in einen Zwischencode, den Java Bytecode, übersetzt, welcher von der System spezifischen 
+JVM ausgeführt wird. Dabei ist Programmiersprache Java nicht die einzige in Bytecode 
+übersetzbare Sprache. Es existieren neben den bekanntesten Scala, Jython, Groovy,
+JavaScript noch viele weitere. Einmal in Bytecode übersetzt können, in diesen Sprachen 
+geschriebene, Programme auf jeder, der Java Spezifikation entsprechenden, JVM ausgeführt 
+werden. 
 
 Bytecode ist eine Sammlung von Instruktionen welche durch \textit{opcodes} von 2 Byte Länge definiert 
 werden. Zusätzlich können noch 1 bis $n$ Parameter verwendet werden. Die Sprache ist Stack-orientiert, das 
@@ -41,21 +43,21 @@ folgende Kategorien einordnen:
 
 \section{WALA}
 
-Bei \textit{WALA} handelt es sich um die "T.J. Watson Library for Analysis". Eine von ehemals von IBM 
+Bei \textit{WALA} handelt es sich um die "T.J. Watson Library for Analysis". Eine ehemals von IBM 
 entwickelte Bibliothek für die statische Codeanalyse von Java- und JavaScript Programmen. Das Framework 
 übernimmt dabei das Einlesen von \textit{class} Dateien und stellt eine Repräsentation, die sogenannte 
 \textit{Intermediate Representation}, des Bytecodes zur Verfügung. Diese IR stellt die zentrale 
-Datenstruktur dar und soll in diesem Abschnitt detailiert beschrieben werden.
+Datenstruktur dar und soll in diesem Abschnitt detailliert beschrieben werden.
 
 Für die Manipulation des Bytecodes existiert innerhalb des Frameworks ein Unterprojekt, das diese Aufgabe 
 übernimmt: Shrike. Im Zweiten Abschnitt soll diese API kurz vorgestellt werden.  
 
 \subsection{IR}
 
-Die \textit{Intermediate Representation} (IR) eine Abstraktion zum Stack basierten Bytecode. Ein IR ist
+Die \textit{Intermediate Representation} (IR) ist eine Abstraktion zum Stack basierten Bytecode. Ein IR ist
 in Single Static Assignment Form, welche sich dadurch auszeichnet, dass jeder Variablen immer genau 
-\textbf{einmal} ein Wert zugewiesen wird. Zusätzlich besteht die IR aus dem Kontroll Fluß Graphen der 
-Methode, welcher wiederrum aus Basic Blocks zusammengesetzt ist. Ein Basic Block ist eine Zusammenfassung 
+\textbf{einmal} ein Wert zugewiesen wird. Zusätzlich besteht die IR aus dem Kontrollflussgraphen der 
+Methode, welcher wiederum aus Basic Blocks zusammengesetzt ist. Ein Basic Block ist eine Zusammenfassung 
 von aufeinander Folgende Instruktionen, welche in jedem Fall nach einander ausgeführt werden.
 
 Die Variablen innerhalb des IRs nennt WALA \textit{value numbers}. Diese beziehen sich immer auf eine 
@@ -66,7 +68,7 @@ werden auch nur mit Bezug auf die value numbers beschrieben.
  
 Da die Zwischendarstellung vom Stack abstrahieren soll, werden auch alle Operationen, die den Stack betreffen
 (wie z.B. \texttt{LOAD}, \texttt{STORE}, \texttt{PUSH} oder \texttt{POP}) nicht nicht mit in diese 
-Repräsentation übernommen. Dabei werden die Bytecode Indices der überig gebliebenen Instruktionen 
+Repräsentation übernommen. Dabei werden die Bytecode Indices der übrig gebliebenen Instruktionen 
 berücksichtigt und alle anderen Stellen in dem beinhaltenden Array mit \texttt{null} Werten aufgefüllt.
 Instruktionen werden von Objekten vom Typ \texttt{SSAInstruction} und dessen Untertypen dargestellt.
 
@@ -93,7 +95,7 @@ für die Erzeugung einer value number für eine Konstante der eingebaute caching
 
 Darüber hinaus war für die \textit{Transformation} die Information nötig, an welcher Stelle im Bytecode eine
 entsprechende Konstante erzeugt wird (z.B. mittels \texttt{LCD}). Um dies zu Erreichen wurde dieser Bytecode 
-Index während dem Durchlaufen der Instrukionen innerhalb der \texttt{SymbolTable} gespeichert, sodass er 
+Index während dem Durchlaufen der Instruktionen innerhalb der \texttt{SymbolTable} gespeichert, sodass er 
 beim Klienten des IRs zur Verfügung steht.
 
 Da diese Änderungen nicht in den Haupt Branch von WALA eingepflegt werden durften, benötigt das System den 

@@ -7,15 +7,15 @@ Der zweite Abschnitt beschreibt den eigentlichen Algorithmus.
 \section{Datenstrukturen}
 
 Für den Algorithmus wurden zwei Grundlegende Datenstrukturen entworfen. Der 
-\textit{Datenflußgraph} repräsentiert den Datenfluß der Referenzen innerhalb 
+\textit{Datenflussgraph} repräsentiert den Datenfluss der Referenzen innerhalb 
 einer Methode und wird im ersten Abschnitt vorgestellt. Zu optimierende Referenzen
 werden in diesem Graphen mit sogenannten \textit{Labels} versehen. Dieser Datentyp
-woll im zweiten Abschnitt beschrieben werden.
+soll im zweiten Abschnitt beschrieben werden.
 
-\subsection{Datenfluß Graph}
+\subsection{Datenfluss Graph}
 
-Eine auf einem IR basierende Methode wird vom System mittels eines Datenfluß
-graphen repräsentiert. Dieser wird vor der eigentlichen Analyse aus einer gegeben
+Eine auf einem IR basierende Methode wird vom System mittels eines Datenflussgraphen 
+repräsentiert. Dieser wird vor der eigentlichen Analyse aus einer gegeben
 Methode und einer Menge an initialen Referenzen vom \texttt{DataFlowGraphBuilder}
 erzeugt. Der Graph ist gerichtet und setzt sich aus zwei verschiedenen Knoten zusammen:
 
@@ -24,10 +24,10 @@ erzeugt. Der Graph ist gerichtet und setzt sich aus zwei verschiedenen Knoten zu
 	\item \texttt{InstructionNode}: eine Instruktion aus dem IR
 \end{itemize}
 
-Sei im Folgenden der Datenflußgraph $G = (V, E)$, $R$ die Menge aller \texttt{Reference} 
+Sei im Folgenden der Datenflussgraph $G = (V, E)$, $R$ die Menge aller \texttt{Reference} 
 Knoten und $I$ die Menge aller \texttt{InstructionNode}s. 
 \\
-Im Graph gilt $\forall (x,y) \in V,  (x \in R \wedge y \in I) \vee (x \in I \wedge y \in X)$.
+Im Graph gilt $\forall (x, y) \in V,  (x \in R \wedge y \in I) \vee (x \in I \wedge y \in X)$.
 Eine Kante $i \in I, r \in R, (i, r)$ beschreibt eine \textit{Definition}, die aussagt, 
 dass die Referenz $r$ durch die Instruktion $i$ definiert wird. Ein Kante 
 $i \in I, r \in R, (r, i)$ ist eine \textit{Benutzung} (im folgenden \textit{Use}
@@ -37,7 +37,7 @@ genannt).
 die Erstellung von \texttt{InstructionNode} Objekten steht die 
 \texttt{InstructionNodeFactory} zur Verfügung, die für eine gegebene 
 \texttt{SSAInstruction} eine entsprechende \texttt{InstructionNode} erstellt. Um
-für diesselbe \texttt{SSAInstruction} immer dasselbe \texttt{InstructionNode} 
+für dieselbe \texttt{SSAInstruction} immer dasselbe \texttt{InstructionNode} 
 Objekt zu garantieren verwendet die Factory einen internen Cache, der eine 
 Abbildung $SSAInstruction \rightarrow InstructionNode$ verwaltet und für jede 
 \texttt{SSAInstruction} prüft ob für diese bereits eine \texttt{InstructionNode} 
@@ -45,12 +45,12 @@ erstellt wurde.
 
 Die Erstellung eines \texttt{DataFlowGraph}s beginnt immer mit einer Menge an 
 initialen \texttt{Reference} Objekten. Ausgehend von dieser Startmenge werden über 
-das \texttt{DefUse}-Object des betroffenen IRs die Definition und alle Uses in den 
-Datenflußgraphen eingefügt. Algorithmus \ref{alg:dfg} beschreibt die Erstellung des 
+das \texttt{DefUse}-Objekt des betroffenen IRs die Definition und alle Uses in den 
+Datenflussgraphen eingefügt. Algorithmus \ref{alg:dfg} beschreibt die Erstellung des 
 Graphen.
 
 \begin{algorithm}[H]
-	\caption{Erstellung des Datenflußgraphen}\label{alg:dfg}
+	\caption{Erstellung des Datenflussgraphen}\label{alg:dfg}
 	\begin{algorithmic}[1]
 		\STATE $q \gets$ \texttt{new Queue($initialReferences$)}
 		\STATE $g \gets$ \texttt{new DataFlowGraph()}
@@ -84,11 +84,11 @@ die diese Instruktion erzeugt und eine Liste von Uses, die Nummern der Referenze
 die es benutzt. Darüber hinaus noch Informationen zu Bytecode Spezifika, die 
 im Kapitel \textit{Transformation} betrachtet werden.
 
-Für verschiedene \texttt{SSAInstruction} typen existieren entsprechende 
+Für verschiedene \texttt{SSAInstruction} Typen existieren entsprechende 
 \texttt{InstructionNode} Subtypen. Allerdings gibt es auch Typen die nicht
 einer \texttt{SSAInstruction} zugeordnet werden können. Im Folgenden sollen die
 wichtigsten Knotentypen vorgestellt werden. Es existieren darüber hinaus weitere
-für die das System zur Zeit keine Unterstützung bietet, da es ausschliesslich für 
+für die das System zur Zeit keine Unterstützung bietet, da es ausschließlich für 
 String Typen und komplexe Objekte ausgelegt ist.
 
 \subsubsection{MethodCallNode}
@@ -101,14 +101,14 @@ aufgerufene Methode.
 \subsubsection{ContantNode}
 
 Dieser Knoten Typ stellt eine Konstanten Definition dar. Er besitzt ausschließlich 
-die Defintion, welcher Referenz diese Konstante zugewiesen wird. Für diesen Typ
+die Definition, welcher Referenz diese Konstante zugewiesen wird. Für diesen Typ
 existiert keine entsprechende \texttt{SSAInstruction}.
 
 \subsubsection{ParameterNode}
 
 Die \texttt{ParameterNode} stellt eine Definition eines Parameters der Methode dar.
 Wird eine Variable innerhalb der Methode als Parameter in der Methoden Signatur
-deklariert, wird deren Definition als \texttt{ParameterNode} im Datenflußgraphen
+deklariert, wird deren Definition als \texttt{ParameterNode} im Datenflussgraphen
 repräsentiert. Für diesen Typ existiert keine entsprechende \texttt{SSAInstruction}.
 
 \subsubsection{NewNode}
@@ -131,7 +131,7 @@ Referenz als Definition und 2 bis $n$ Uses.
 \subsection{Label}
 
 Das \textit{Label} entspricht einer Markierung, mit der Knoten in einem 
-Datenflußgraphen versehen werden können. Dabei steht ein Label (oder 
+Datenflussgraphen versehen werden können. Dabei steht ein Label (oder 
 \texttt{TypeLabel}, wie der Datentyp im System heißt) für einen Optimierten Typ.
 Die Semantik hinter einem markierten Knoten ist, dass diese Referenz bzw. Instruktion
 durch den entsprechenden Optimierten Typ ersetzt werden kann.
