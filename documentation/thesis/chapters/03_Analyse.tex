@@ -1,15 +1,206 @@
 \chapter{Analyse}
 
 Das Folgende Kapitel beschreibt den Analyse Algorithmus, des von mir entworfenen Systems.
-Im ersten Abschnitt soll die Idee hinter der Analyse beschrieben werden. Darauf folgend
-wird die Datenstruktur beschrieben, auf der der Algorithmus arbeitet. Im dritten Abschnitt
-soll das Prinzip des \textit{Labels} präsentiert wird und im vierten Abschnitt schliesslich 
-der der eigentliche Algorithmus vorgestellt werden. 
+Im ersten Abschnitt sollen die verwendeten Datenstrukturen vorgestellt und beschrieben werden.
+Der zweite Abschnitt beschreibt den eigentlichen Algorithmus.
 
-\section{Idee}
+\section{Datenstrukturen}
 
-\section{Datenfluß Graph}
+Für den Algorithmus wurden zwei Grundlegende Datenstrukturen entworfen. Der 
+\textit{Datenflußgraph} repräsentiert den Datenfluß der Referenzen innerhalb 
+einer Methode und wird im ersten Abschnitt vorgestellt. Zu optimierende Referenzen
+werden in diesem Graphen mit sogenannten \textit{Labels} versehen. Dieser Datentyp
+woll im zweiten Abschnitt beschrieben werden.
 
-\section{Label}
+\subsection{Datenfluß Graph}
 
-\section{Bestimmung des Bereichs}
+Eine auf einem IR basierende Methode wird vom System mittels eines Datenfluß
+graphen repräsentiert. Dieser wird vor der eigentlichen Analyse aus einer gegeben
+Methode und einer Menge an initialen Referenzen vom \texttt{DataFlowGraphBuilder}
+erzeugt. Der Graph ist gerichtet und setzt sich aus zwei verschiedenen Knoten zusammen:
+
+\begin{itemize}
+	\item \texttt{Reference}: eine value number aus dem IR
+	\item \texttt{InstructionNode}: eine Instruktion aus dem IR
+\end{itemize}
+
+Sei im Folgenden der Datenflußgraph $G = (V, E)$, $R$ die Menge aller \texttt{Reference} 
+Knoten und $I$ die Menge aller \texttt{InstructionNode}s. 
+\\
+Im Graph gilt $\forall (x,y) \in V,  (x \in R \wedge y \in I) \vee (x \in I \wedge y \in X)$.
+Eine Kante $i \in I, r \in R, (i, r)$ beschreibt eine \textit{Definition}, die aussagt, 
+dass die Referenz $r$ durch die Instruktion $i$ definiert wird. Ein Kante 
+$i \in I, r \in R, (r, i)$ ist eine \textit{Benutzung} (im folgenden \textit{Use}
+genannt). 
+
+\texttt{Reference} Knoten werden für jede betroffene value number erzeugt. Für
+die Erstellung von \texttt{InstructionNode} Objekten steht die 
+\texttt{InstructionNodeFactory} zur Verfügung, die für eine gegebene 
+\texttt{SSAInstruction} eine entsprechende \texttt{InstructionNode} erstellt. Um
+für diesselbe \texttt{SSAInstruction} immer dasselbe \texttt{InstructionNode} 
+Objekt zu garantieren verwendet die Factory einen internen Cache, der eine 
+Abbildung $SSAInstruction \rightarrow InstructionNode$ verwaltet und für jede 
+\texttt{SSAInstruction} prüft ob für diese bereits eine \texttt{InstructionNode} 
+erstellt wurde.
+
+Die Erstellung eines \texttt{DataFlowGraph}s beginnt immer mit einer Menge an 
+initialen \texttt{Reference} Objekten. Ausgehend von dieser Startmenge werden über 
+das \texttt{DefUse}-Object des betroffenen IRs die Definition und alle Uses in den 
+Datenflußgraphen eingefügt. Algorithmus \ref{alg:dfg} beschreibt die Erstellung des 
+Graphen.
+
+\begin{algorithm}[H]
+	\caption{Erstellung des Datenflußgraphen}\label{alg:dfg}
+	\begin{algorithmic}[1]
+		\STATE $q \gets$ \texttt{new Queue($initialReferences$)}
+		\STATE $g \gets$ \texttt{new DataFlowGraph()}
+		\WHILE {\texttt{not $q$.isEmpty()}}
+			\STATE $r \gets q$\texttt{.remove()}
+			\IF {\texttt{not $g$.contains()}}
+
+				\STATE $def \gets$ \texttt{$defUse$.getDef($r$)}
+				\STATE $uses \gets$ \texttt{$defUse$.getUses($r$)}
+
+				\STATE \texttt{$newInd$.add($def$)}
+				\STATE \texttt{$newInd$.add($uses$)}
+
+				\STATE \texttt{$r$.setDef(factory.create($def$))}
+
+				\FOR{\texttt{$ins \in defUse$.getUses($r$)}}
+					\STATE \texttt{$r$.addUse(factory.create($ins$))}
+				\ENDFOR
+				\FOR{$ins \in newIns$}
+					\STATE \texttt{$q$.add($ins$.getConnectedRefs())}
+				\ENDFOR
+				\STATE \texttt{$g$.add($r$))}
+			\ENDIF
+		\ENDWHILE
+		\RETURN $g$
+	\end{algorithmic}
+\end{algorithm}
+
+Jede \texttt{InstructionNode} besitzt eine Definition, die Nummer der Referenz 
+die diese Instruktion erzeugt und eine Liste von Uses, die Nummern der Referenzen 
+die es benutzt. Darüber hinaus noch Informationen zu Bytecode Spezifika, die 
+im Kapitel \textit{Transformation} betrachtet werden.
+
+Für verschiedene \texttt{SSAInstruction} typen existieren entsprechende 
+\texttt{InstructionNode} Subtypen. Allerdings gibt es auch Typen die nicht
+einer \texttt{SSAInstruction} zugeordnet werden können. Im Folgenden sollen die
+wichtigsten Knotentypen vorgestellt werden. Es existieren darüber hinaus weitere
+für die das System zur Zeit keine Unterstützung bietet, da es ausschliesslich für 
+String Typen und komplexe Objekte ausgelegt ist.
+
+\subsubsection{MethodCallNode}
+
+Eine \texttt{MethodCallNode} repräsentiert einen Methoden Aufruf. Es besitzt, wenn
+vorhanden, eine Definition, welche den Rückgabewert repräsentiert, einen Receiver, 
+wenn es keine statische Methode ist und eine Liste an Parametern. Zusätzlich die 
+aufgerufene Methode. 
+
+\subsubsection{ContantNode}
+
+Dieser Knoten Typ stellt eine Konstanten Definition dar. Er besitzt ausschließlich 
+die Defintion, welcher Referenz diese Konstante zugewiesen wird. Für diesen Typ
+existiert keine entsprechende \texttt{SSAInstruction}.
+
+\subsubsection{ParameterNode}
+
+Die \texttt{ParameterNode} stellt eine Definition eines Parameters der Methode dar.
+Wird eine Variable innerhalb der Methode als Parameter in der Methoden Signatur
+deklariert, wird deren Definition als \texttt{ParameterNode} im Datenflußgraphen
+repräsentiert. Für diesen Typ existiert keine entsprechende \texttt{SSAInstruction}.
+
+\subsubsection{NewNode}
+
+Dieser Typ entspricht einer \texttt{NEW} Anweisung, die ein neues Objekt eines 
+gegebenen Typen erstellt. Es besitzt eine Definition und den Typ des instanziierten
+Objekts. 
+
+\subsubsection{ReturnNode}
+
+\texttt{ReturnNode} Typen sind \texttt{RETURN} Anweisungen. Die besitzen 
+ausschließlich eine Referenz als Use. Diejenige Referenz, die sie aus der Methode 
+zurückgeben. Dieser Typ kann keine Definition darstellen.
+
+\subsubsection{PhiNode}
+
+Die \texttt{PhiNode} steht für eine $\phi$-Instruktion aus dem IR. Sie besitzt eine
+Referenz als Definition und 2 bis $n$ Uses.
+
+\subsection{Label}
+
+Das \textit{Label} entspricht einer Markierung, mit der Knoten in einem 
+Datenflußgraphen versehen werden können. Dabei steht ein Label (oder 
+\texttt{TypeLabel}, wie der Datentyp im System heißt) für einen Optimierten Typ.
+Die Semantik hinter einem markierten Knoten ist, dass diese Referenz bzw. Instruktion
+durch den entsprechenden Optimierten Typ ersetzt werden kann.
+
+Es kann nicht für alle \texttt{InstructionNode}s ein Label gesetzt werden. Genauer
+gesagt lassen sich ausschließlich für die Knotentypen \texttt{MethodCallNode}, 
+\texttt{NewNode} und \texttt{PhiNode} ein Label setzen, da sich nur diese 
+Instruktionen in einen optimierten Typ umwandeln lassen.
+
+Das \texttt{TypeLabel} beinhaltet alle Regeln, die für die Verwendung eines
+Optimierten Typen existieren. Dazu gehören
+
+\begin{itemize}
+	\item der Originale, sowie der Optimierte Typ
+	\item die Methoden für die Optimierungen im optimierten Typ angeboten werden
+	\item alle Methoden die darüber hinaus vom Optimierten Typ unterstützt werden
+	\item Methoden, die den optimierten Typ als Rückgabewert zurückgeben
+	\item kompatible Label
+\end{itemize}
+
+Dabei ist diese Liste bereits eine Abstraktion zu den Methoden, die das Interface 
+besitzt. Im System lassen sich Label Definition auf 2 Arten erstellen:
+
+\begin{enumerate} 
+	\item Durch das Implementieren des Interfaces \texttt{TypeLabel}
+	\item Durch das Erstellen einer \texttt{.type} Datei
+\end{enumerate}
+
+Zwar unterstützt das Kommandozeilen Tool zur Zeit nur die zweite Variante,
+programmatisch lässt sich allerdings auch die erste Alternative umsetzen. Im 
+Folgenden sollen die beiden Möglichkeiten zur Definition eines \texttt{TypeLabel}s
+betrachtet werden.
+
+\subsubsection{Das TypeLabel Interface}
+
+Das Interface beinhaltet alle Methoden, die der Analyse- und Transformationsprozess
+benötigt. In diesem Kapitel sollen zunächst nur die Methode betrachtet werden, die
+für den Analyse Algorithmus verwendet werden. 
+
+\begin{description}
+	\item[\texttt{canBeUsedAsReceiverFor(MethodReference)}] Legt fest, ob eine 
+	markierte Referenz als Receiver für den übergebenen Methodenaufruf dienen kann.
+	\item[\texttt{canBeUsedAsParamFor(MethodReference,int)}] Bestimmt, ob eine 
+	markierte Referenz als Parameter in dem gegebenen Methodenaufruf an der 
+	entsprechenden Stelle (der \texttt{int} Parameter) verwendet werden kann.
+	\item[\texttt{canBeDefinedAsResultOf(MethodReference)}] Sagt aus, ob die 
+	gegebene Methode einen optimierten Typ zurückgeben kann. Dies impliziert, dass
+	der Methodenaufruf selber auch markiert ist.
+	\item[\texttt{findTypeUses(AnalyzedMethod)}] Gibt eine Menge an \texttt{Reference}
+	Objekten zurück, auf denen innerhalb der gegebenen Methode eine der von 
+	der Optimierung betroffenen Methode aufgerufen wird. Für diesen Algorithmus 
+	existiert bereits eine Implementierung in der Klasse \texttt{BaseTypeLabel}.
+	\item[\texttt{compatibleWith(TypeLabel)}] Gibt an, ob das übergebene Label 
+	kompatibel mit diesem Label ist.
+\end{description}
+
+Alle diese Methoden werden von den \texttt{InstructionNode} Implementierungen 
+verwendet. Wie genau das passiert wird im Abschnitt \textit{Algorithmus} beschrieben.
+
+\subsubsection{Das .type Dateiformat}
+
+Da das implementieren des Interfaces eher komplex ist, wurde für die einfachere 
+Definition eines Types ein Datei Format entwickelt, welches von der Komplexität des
+Interfaces abstrahieren soll. In dieser werden nicht die Regeln selbst, sondern 
+die Fakten beschrieben, aus denen die Regeln hergeleitet werden können, beschrieben.
+
+Aus einer Datei im \texttt{type} Format wird mittels eines internen Parsers ein
+\texttt{TypeLabelConfig} Objekt erzeugt. 
+
+\section{Algorithmus}
+
+\subsection{Ziel}
