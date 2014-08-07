@@ -251,8 +251,69 @@ werden im Folgenden beschrieben:
 
 \section{Algorithmus}
 
-In diesem Abschnitt 
+In diesem Abschnitt soll die Idee hinter dem Analyse Algorithmus sowie dessen
+Implementierung vorgestellt werden. Hierzu wird zunächst das Konzept der "Bubble"
+erläutert um danach die Umsetzung dieses Konzepts im eigentlich Algorithmus zu 
+betrachten.
+
+\subsection{Motivation}
+
+Optimierte Referenzen sind im Falle von String Objekten nicht kompatibel mit den 
+Originalen. So treten Probleme in den Folgenden Szenarien auf:
+
+\begin{description}
+	\item[Referenz als Methoden Parameter] Die Signatur der 
+	optimierten Methode, wird nicht verändert, da es dazu führen würde, dass
+	Klienten Code, der diese Methode weiterhin mit dem originalen Typ aufruft, 
+	nicht mehr kompilieren würde.
+	\item[Referenz als Rückgabewert] Ein ähnliches Problem existiert, wenn die 
+	Referenz zurückgegeben wird. Die Signatur der Methode definiert den Originalen
+	Typ als Rückgabetyp und das zurückgeben eines anderen Typs als eben dieser 
+	definierte würde zu Laufzeitfehlern führen.
+	\item[Methodenaufruf auf Referenz] Wird diese optimierte Referenz als Empfänger 
+	von einer Methode verwendet, die nicht zu den optimierten oder unterstützen
+	Methoden dieses optimierten Typs gehört, würde es zu Laufzeitfehlern kommen, 
+	da diese aufzurufende Methode nicht im optimierten Typ vorhanden ist. 
+	\item[Feld Zugriff (\texttt{GETFIELD}, \texttt{PUTFIELD})] Wird die optimierte 
+	Referenz in ein oder aus einem Feld innerhalb eines Objektes (oder in ein 
+	statisches Feld einer Klasse) gesetzt, stimmt auch in diesem Szenario der Typ
+	des optimierten und des originalen Objekts nicht überein.
+	\item[Array Zugriff] Bei dem Zugriff auf ein Array, sowohl lesend als auch 
+	schreibend, existiert eine Unstimmigkeit mit dem Typ des Arrays.
+	\item[Referenz Aufruf Parameter] Wird die Referenz als Parameter für einen
+	Methoden Aufruf verwendet und diese Methode ist nicht in der Label Definition
+	als Methode deklariert, die mit einem optimierten Typ umgehen kann, dann 
+	erwartet diese Methode den originalen Typ und nicht den optimierten.
+\end{description}
+
+Erweitert allerdings der optimierte Typ seinen originalen Typ so wäre, durch den 
+Polymorphismus, der optimierte Typ genauso wie der originale verwendbar. Allerdings 
+ist der Typ \texttt{java.lang.String} final, was bedeutet, dass von diesem Typ nicht 
+abgeleitet werden kann. Darüber hinaus bieten sich Ableitungen für Optimierungen nicht
+an, da das dynamische dispatchen zusätzlichen Aufwand für die JVM darstellt, da 
+zunächst die Implementierung des Methode zu lokalisieren.
+
+Aus diesem Grund müssen in den Code Konvertierungen in und vom optimierten Typ 
+eingefügt werden. Eine Konvertierung zum optimierten Typ muss vor dem zu optimierenden
+Methodenaufruf erfolgen. Eine Umwandlung vom optimierten Typ allerdings muss vor einer 
+nicht kompatiblen Benutzung dieser Referenz erfolgen um bei dieser den originalen Typ 
+zu verwenden.
 
 \subsection{Die "Bubble"}
+
+Da Konvertierungen zusätzliche Laufzeit erfordern, muss es das Ziel sein die Anzahl 
+der durchgeführten Konvertierungen zu minimieren. Dies wird erreicht indem man den
+Bereich, in dem ein optimierter Typ statt des originalen innerhalb der Methode 
+verwendet maximiert. Dieser Bereich, in dem ein optimierter, statt des originalen, 
+Typs für eine Referenz verwendet wird, wird im Folgenden \textit{Bubble} genannt. 
+
+Die Bubble entsteht mittels der Markierung von Knoten im Datenflussgraphen. Es wird 
+für jede gegebene Instanz vom Typ \texttt{TypeLabel} eine Bubble auf dem Graphen 
+erzeugt. Dabei kann ein Knoten immer nur mit einem Label markiert sein, daher kann
+ein Knoten immer nur Teil einer Bubble sein.
+
+Ziel des Algorithmus ist es diese Bubble so groß wie zu definieren. Als Anfangszustand 
+werden alle zu optimierenden Methodenaufrufe mit dem zu verarbeitenden Label markiert.
+
 \subsection{Umsetzung des Algorithmus}
 \subsection{Umgang mit Phi-Knoten}

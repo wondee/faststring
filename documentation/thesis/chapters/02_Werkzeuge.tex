@@ -20,12 +20,15 @@ werden. Zusätzlich können noch 1 bis $n$ Parameter verwendet werden. Die Sprac
 bedeutet, dass von Operationen verwendete Parameter über einen internen Stack übergeben werden. Als Beispiel 
 dient der folgende Bytecode:
 
-\begin{lstlisting}[language=Bytecode]
-	ICONST 5 	// legt den konstanten int Wert 5 auf den Stack 
-	ILOAD 1		// läd die lokale integer Variable 1 und legt sie auf den Stack
-	IADD 		// addiert die ersten beiden Werte auf dem Stack und legt das Ergebnis auf den Stack
-	ISTORE 2	// speichert den Wert auf dem Stack in der Variable 2
-\end{lstlisting} 
+\begin{figure}[H]
+	\begin{lstlisting}[language=Bytecode]
+		ICONST 5 	// legt den konstanten int Wert 5 auf den Stack 
+		ILOAD 1		// läd die lokale integer Variable 1 und legt sie auf den Stack
+		IADD 		// addiert die ersten beiden Werte auf dem Stack und legt das Ergebnis auf den Stack
+		ISTORE 2	// speichert den Wert auf dem Stack in der Variable 2
+	\end{lstlisting} 
+	\caption{Java Bytecode Beispiel}
+\end{figure}
 
 Dabei existiert der Stack nur als Abstraktion für den eigentlichen Prozessor im Zielsystem. Wie die 
 jeweilige JVM den Stack in der Ziel Plattform umsetzt ist nicht definiert. Die Instruktionen lassen sich in 
@@ -81,11 +84,16 @@ Zweck bietet WALA den Typ \texttt{DefUse} an, welcher für jedes IR-Objekt erste
 einen einfachen Zugriff aus die Instruktionen, die eine value number definiert (\textit{def}; z.B. als 
 Rückgabe aus einem Methodenaufruf), und eine Menge an Instruktionen, die die entsprechende value number 
 verwenden (\textit{use}; z.B. als Rückgabewert in einem \texttt{RETURN} Statement).
-   
+
+Besitzt ein Block im Kontrollflussgraphen mehrere eingehende Kanten und werden aus diesen Vorgänger Blöcken
+Variablen mitgebracht die synonym in diesem Block verwendet werden, werden in SSA-Form sogenannte $\phi$ 
+Funktionen verwendet. Eine Instruktion der Form $v_3 = \phi(v_1, v_2)$ sagt aus, dass im Folgenden 
+die Referenz $v_3$ sowohl $v_1$, als auch $v_2$ sein kann. Da die statische Code Analyse nicht feststellen
+kann von welchem Block aus dieser Block betreten wurde, werden diese $\phi$-Funktionen verwendet, um
+die Zusammenführungen von mehreren Variablen aus Vorgängerblöcken darzustellen.
+
 Das IR und das dazugehörige DefUse Objekt werden in dem System internen Datentyp \texttt{AnalyzedMethod} 
 zusammengefasst.
-
-% TODO phis
 
 \subsubsection{Anpassungen}
 

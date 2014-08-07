@@ -1,10 +1,80 @@
 \chapter{Transformation}
 \label{ch:trans}
 
+In diesem Kapitel sollen die Überlegungen und der Prozess der Bytecode Transformation,
+auf Basis der Resultate aus dem Analyse Prozess, vorgestellt werden. Es wird zunächst 
+auf die Beschaffung der nötigen Informationen eingegangen, um im Anschluss die Regeln,
+nach denen Bytecode generiert oder manipuliert wird, erläutert.
+
+Ziel der Transformation ist es zum Einen an den Grenzen der Bubble Konvertierungen zwischen den
+Originalen und den Optimalen Typen in den Sourcecode einzufügen. Zum Anderen müssen Uses
+markierte Uses in entsprechende optimierte Versionen umgewandelt werden.  
+
 \section{Lokale Variablen}
 \label{sec:locals}
+
+\subsection{Optimierte Variablen}
+
+Um originale lokale Variablen im Bytecode nicht mit den optimierten Versionen zu 
+überschreiben wurde eine Abbildung geschaffen, die jeder lokalen Variable ein Tupel 
+zuweist. $l \rightarrow (L,l')$, wobei $l$ die originale lokale, $L$ ein Label und 
+$l'$ die optimierte Variable für das Label $L$ darstellt. So ist sichergestellt, dass
+optimierte und die entsprechende originale Referenz in zwei verschiedenen Lokalen 
+geführt werden. Darüber hinaus ist diese Trennung wichtig, da die JVM die Plätze für
+lokale Variablen typisiert und daher nicht an verschiedenen Stellen im Programm 
+verschiedene Typen in derselben lokalen Variable gespeichert werden können.
+
+\subsection{Variablen zu Value Numbers}
+
+Da der IR mit den beinhalteten value numbers eine Abstraktion des eigentlichen Bytecodes
+darstellt, fehlt auch jeglicher Bezug zu den eigentlichen lokalen Variablen, die von
+einer spezifischen value number dargestellt wird. Darüber hinaus muss für Definition
+einer Instruktion das \texttt{STORE} (schreit die auf dem Stack liegende Referenz in 
+die gegebene lokale Variable) und für alle Uses die \texttt{LOAD}s (ließt die 
+gegebene lokale Variable) im Bytecode lokalisiert werden. Diese Informationen sind nötig,
+da im Falle von Optimierungen, die für die entsprechende Instruktion erzeugt werden, 
+die optimierten statt die originalen Referenzen geladen werden müssen.
+
+Diese Informationen werden in der \texttt{InstructionNode} gehalten. Beim erzeugen 
+eines solchen Objekts wird in der \texttt{InstructionNodeFactory} zum einen versucht
+die lokalen zu den verwendeten value numbers zu erschließen und zum anderen die auf 
+Position im Bytecode zu schließen an der die entsprechenden Werte auf den Stack gelegt 
+werden.
+
+Der IR, der aus einer class-Datei erzeugt wird besitzt ein privates Feld \texttt{localMap}
+vom Typ \texttt{com.ibm.wala.ssa.IR.SSA2LocalMap}, welche in ihrer einzigen Implementierung
+(der \texttt{com.ibm.wala.ssa.SSABuilder.SSA2LocalMap}) eine private Methode mit 
+Signatur \texttt{int[] findLocalsForValueNumber(int, int)}, welche für eine gegebenen 
+Bytecode Index und value number alle möglichen lokalen Variablen für diese value number 
+an der gegebenen Stelle zurückgibt. Um diese Methode trotz aller Zugriffsbeschränkungen 
+aufzurufen wurde eine Methode in \textit{Groovy} geschrieben um auf diese Methode 
+zuzugreifen. Beim Suchen nach lokalen Variablen muss unterschieden werden zwischen 
+value numbers als Definition und als Use. Das folgende Beispiel beschreibt das Problem 
+bei Definitionen:
+
+\begin{figure}[H]
+	\begin{lstlisting}[language=Bytecode]
+		INVOKEVIRTUAL org/example/SomeType.f()I // index 1
+		ISTORE 5								// index 2
+	\end{lstlisting}
+	\caption{Lokale Variable für Definition}
+\end{figure}
+
+Die lokale Variable der Definition der \texttt{INVOKEVIRTUAL} Instruktion ist zum
+Zeitpunkt des Methodenaufrufs noch nicht bekannt. Erst im Index 2 wird dieser Wert der 
+lokalen Variablen 5 zugewiesen.
+
+% Eine Referenz die aus einer Instruktion als Resultat erzeugt wird, Sollen nun für eine value numbers einer Instruktion die lokalen Variablen gefunden werden, wird wie in Algorithmus \ref{alg:local} veranschaulicht alle Bytecode Indices in allen vorherigen Blöcke verwendet.
+
+% localMap
+% loadMap
+% storeMap
 
 \section{Bytecode Generierung}
 
 \subsection{Informationen des TypeLabels}
 \label{ssec:infoLabel}
+
+\subsection{Konvertierung}
+
+\subsection{Optimierung}
