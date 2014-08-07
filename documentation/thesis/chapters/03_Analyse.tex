@@ -6,7 +6,7 @@ Der zweite Abschnitt beschreibt den eigentlichen Algorithmus.
 
 \section{Datenstrukturen}
 
-Für den Algorithmus wurden zwei Grundlegende Datenstrukturen entworfen. Der 
+Für den Algorithmus wurden zwei grundlegende Datenstrukturen entworfen. Der 
 \textit{Datenflussgraph} repräsentiert den Datenfluss der Referenzen innerhalb 
 einer Methode und wird im ersten Abschnitt vorgestellt. Zu optimierende Referenzen
 werden in diesem Graphen mit sogenannten \textit{Labels} versehen. Dieser Datentyp
@@ -82,7 +82,7 @@ Graphen.
 Jede \texttt{InstructionNode} besitzt eine Definition, die Nummer der Referenz 
 die diese Instruktion erzeugt und eine Liste von Uses, die Nummern der Referenzen 
 die es benutzt. Darüber hinaus noch Informationen zu Bytecode Spezifika, die 
-im Kapitel \textit{Transformation} betrachtet werden.
+im Kapitel \ref{sec:locals} betrachtet werden.
 
 Für verschiedene \texttt{SSAInstruction} Typen existieren entsprechende 
 \texttt{InstructionNode} Subtypen. Allerdings gibt es auch Typen die nicht
@@ -169,11 +169,12 @@ betrachtet werden.
 
 Das Interface beinhaltet alle Methoden, die der Analyse- und Transformationsprozess
 benötigt. In diesem Kapitel sollen zunächst nur die Methode betrachtet werden, die
-für den Analyse Algorithmus verwendet werden. 
+für den Analyse Algorithmus verwendet werden, die Übrigen werden im Abschnitt 
+\ref{ssec:infoLabel} betrachtet. 
 
 \begin{description}
 	\item[\texttt{canBeUsedAsReceiverFor(MethodReference)}] Legt fest, ob eine 
-	markierte Referenz als Receiver für den übergebenen Methodenaufruf dienen kann.
+	markierte Referenz als Empfänger für den übergebenen Methodenaufruf dienen kann.
 	\item[\texttt{canBeUsedAsParamFor(MethodReference,int)}] Bestimmt, ob eine 
 	markierte Referenz als Parameter in dem gegebenen Methodenaufruf an der 
 	entsprechenden Stelle (der \texttt{int} Parameter) verwendet werden kann.
@@ -193,14 +194,65 @@ verwendet. Wie genau das passiert wird im Abschnitt \textit{Algorithmus} beschri
 
 \subsubsection{Das .type Dateiformat}
 
-Da das implementieren des Interfaces eher komplex ist, wurde für die einfachere 
+Da das Implementieren des Interfaces eher komplex ist, wurde für die einfachere 
 Definition eines Types ein Datei Format entwickelt, welches von der Komplexität des
 Interfaces abstrahieren soll. In dieser werden nicht die Regeln selbst, sondern 
-die Fakten beschrieben, aus denen die Regeln hergeleitet werden können, beschrieben.
+die Fakten beschrieben, aus denen die Regeln für den Algorithmus hergeleitet werden 
+können, beschrieben.
 
 Aus einer Datei im \texttt{type} Format wird mittels eines internen Parsers ein
-\texttt{TypeLabelConfig} Objekt erzeugt. 
+\texttt{TypeLabelConfig} Objekt erzeugt, welches als \texttt{TypeLabel} Objekt für
+den Algorithmus fungiert.
+
+Für die inhaltliche Struktur der Datei wurde JSON (JavaScript Object Notation) 
+gewählt eine Darstellung anzubieten, die sowohl für Menschen als auch für das 
+Programm leicht zu lesen und zu verstehen ist. Die Attribute innerhalb der Datei 
+werden im Folgenden beschrieben:
+
+\begin{description}
+	\item[name] Der Name des Labels
+	\item[originalType] Der voll qualifizierte Name des zu ersetzenden Typs
+	\item[optimizedType] Der voll qualifizierte Name des zu optimierten Typs
+	\item[methodDefs] Liste von Methoden, diesen wird eine ID vergeben um sie im 
+	folgenden über diese ID zu referenzieren. Ein Eintrag in dieser Liste setzt
+	sich zusammen aus:
+	\begin{description}
+		\item[id] eine eindeutige ID für die diese Methode
+		\item[desc] die Beschreibung dieser Methode. Dies ist ein eigenes Objekt 
+		und besteht aus den Attributen:
+		\begin{description}
+			\item[name] der Name der Methode
+			\item[signature] der Signatur der Methode. Zusammengesetzt aus der
+			Parameterliste und der Rückgabewert. Die Typen müssen dabei in der 
+			internen JVM Form angegeben werden. (Beispiel: "\texttt{(I)Ljava/lang/String;}"
+			, ein Parameter vom Typ \texttt{int} und Rückgabewert vom Typ
+			\texttt{java.lang.String})
+		\end{description}	
+	\end{description}
+	\item[effectedMethods] Liste von Methoden IDs. Für diese Methoden existieren 
+	optimierte Varianten in dem optimierten Typen.
+	\item[supportedMethods] Liste von Methoden IDs. Diese Methoden werden auch vom
+	optimierten Typ unterstützt. Es handelt sich bei diesen aber nicht um Optimierungen.
+	\item[producingMethods] Liste von Methoden IDs. Alle diesen Methoden erzeugen 
+	in ihrer optimierten Variante optimierte Typen.
+	\item[compatibleLabel] Liste von Strings. Alle Labels die mit diesem Label
+	kompatibel sind.
+	\item[parameterUsage] Ein Objekt. Dabei ist jeder key die ID einer Methode 
+	und der entsprechende value eine Liste von Ganzzahlen. Ein Eintrag bedeutet, 
+	dass diese Methode mit einem Optimierten Typ als Parameter mit diesem Index 
+	umgehen kann. 
+	\item[staticFactory] Ein String. Der Name einer statischen Factory Methode mit 
+	einem Übergabeparameter vom Typ des Originalen Typs. Diese muss einen entsprechenden
+	Optimierten Typ zurückgeben.
+	\item[toOriginalType] Ein String, Der Name einer Methode ohne Parameter, die
+	aus dem optimierten Objekt, ein entsprechendes vom Originalen Typ zurückgibt.
+
+\end{description}
 
 \section{Algorithmus}
 
-\subsection{Ziel}
+In diesem Abschnitt 
+
+\subsection{Die "Bubble"}
+\subsection{Umsetzung des Algorithmus}
+\subsection{Umgang mit Phi-Knoten}
