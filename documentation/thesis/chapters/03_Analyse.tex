@@ -316,4 +316,37 @@ Ziel des Algorithmus ist es diese Bubble so groß wie zu definieren. Als Anfangs
 werden alle zu optimierenden Methodenaufrufe mit dem zu verarbeitenden Label markiert.
 
 \subsection{Umsetzung des Algorithmus}
+
+Als Eingabe für den Algorithmus dient ein Objekt vom Typ \texttt{DataFlowGraph}, der 
+den bereits beschriebenen Datenflussgraphen darstellt, mit initial markierten
+\texttt{Reference}s. Die Implementierung ist in der Klasse \texttt{LabelAnalyzer}
+zu finden. 
+
+Ausgehend von den initial markierten Knoten, wir die Definition sowie alle Uses betrachtet,
+ob diese für dieses Label
+
+Algorithmus \ref{alg:analyze} beschreibt die Implementierung der Vererbung 
+des Labels.
+
+\begin{algorithm}[H]
+	\caption{Vererbung des Labels}\label{alg:analyze}
+	\begin{algorithmic}[1]
+		\STATE $q \gets$ \texttt{new Queue($initialReferences$)}
+		\STATE $g \gets$ \texttt{new DataFlowGraph()}
+		\WHILE {\texttt{not $q$.isEmpty()}}
+			\STATE $r \gets q$\texttt{.remove()}
+			\IF {\texttt{not $g$.contains()}}
+
+				\STATE $def \gets$ \texttt{$defUse$.getDef($r$)}
+			\ENDIF
+		\ENDWHILE
+		\RETURN $g$
+	\end{algorithmic}
+\end{algorithm}
+
+\subsection{Umgang mit mehreren Labels}
+
 \subsection{Umgang mit Phi-Knoten}
+
+$\phi$-Instruktionen innerhalb des Datenflussgraphen erfordern, aufgrund ihrer Eigenheiten,
+eine besondere Behandlung.  

@@ -29,8 +29,8 @@ verschiedene Typen in derselben lokalen Variable gespeichert werden können.
 Da der IR mit den beinhalteten value numbers eine Abstraktion des eigentlichen Bytecodes
 darstellt, fehlt auch jeglicher Bezug zu den eigentlichen lokalen Variablen, die von
 einer spezifischen value number dargestellt wird. Darüber hinaus muss für Definition
-einer Instruktion das \texttt{STORE} (schreit die auf dem Stack liegende Referenz in 
-die gegebene lokale Variable) und für alle Uses die \texttt{LOAD}s (ließt die 
+einer Instruktion das \texttt{STORE} (schreibt die auf dem Stack liegende Referenz in 
+die gegebene lokale Variable) und für alle Uses entsprechende \texttt{LOAD}s (ließt die 
 gegebene lokale Variable) im Bytecode lokalisiert werden. Diese Informationen sind nötig,
 da im Falle von Optimierungen, die für die entsprechende Instruktion erzeugt werden, 
 die optimierten statt die originalen Referenzen geladen werden müssen.
@@ -48,9 +48,9 @@ Signatur \texttt{int[] findLocalsForValueNumber(int, int)}, welche für eine geg
 Bytecode Index und value number alle möglichen lokalen Variablen für diese value number 
 an der gegebenen Stelle zurückgibt. Um diese Methode trotz aller Zugriffsbeschränkungen 
 aufzurufen wurde eine Methode in \textit{Groovy} geschrieben um auf diese Methode 
-zuzugreifen. Beim Suchen nach lokalen Variablen muss unterschieden werden zwischen 
-value numbers als Definition und als Use. Das folgende Beispiel beschreibt das Problem 
-bei Definitionen:
+zuzugreifen. Beim Suchen nach lokalen Variablen muss zwischen value numbers als Definition 
+und als Use unterschieden werden. Das folgende Beispiel beschreibt das Problem bei 
+Definitionen:
 
 \begin{figure}[H]
 	\begin{lstlisting}[language=Bytecode]
@@ -64,11 +64,51 @@ Die lokale Variable der Definition der \texttt{INVOKEVIRTUAL} Instruktion ist zu
 Zeitpunkt des Methodenaufrufs noch nicht bekannt. Erst im Index 2 wird dieser Wert der 
 lokalen Variablen 5 zugewiesen.
 
-% Eine Referenz die aus einer Instruktion als Resultat erzeugt wird, Sollen nun für eine value numbers einer Instruktion die lokalen Variablen gefunden werden, wird wie in Algorithmus \ref{alg:local} veranschaulicht alle Bytecode Indices in allen vorherigen Blöcke verwendet.
+Um nun die Stellen zu finden an denen Variablen auf den Stack gelegt oder vom Stack 
+gepoppt werden wurde eine einfache Stacksimulation eingeführt, wie sie in Algorithmus
+\ref{alg:stack} zu sehen ist.
 
-% localMap
-% loadMap
-% storeMap
+\begin{algorithm}[H]
+	\caption{Simulation des Stacks}\label{alg:stack}
+	\begin{algorithmic}[1]
+		\STATE $size \gets$ Höhe des Stacks zum Zeitpunkt der Instruktion 
+		\STATE $index \gets$ Index der betroffenen Referenz innerhalb des Stacks
+		\STATE $bcIndex \gets$ Bytecode Index der betroffenen Instruktion
+		\WHILE {\texttt{$actBlock$.getPredNodes() $= 1$}}
+			\STATE \texttt{$actBlock \gets callGraph$.getBlockFor($bcIndex$)}
+
+			\WHILE {\texttt{$bcIndex > actBlock$.getFirstInstructionIndex()}}
+				\STATE $bcIndex \gets bcIndex - 1$
+				\STATE $instruction \gets instructions[bcIndex]$
+				\IF{\texttt{$instruction$.getPushedCount() $ > 0$}}
+					\STATE $size \gets size - 1$
+					\IF {index == size}
+						\RETURN $bcIndex$ 
+					\ENDIF
+				\ENDIF
+				\STATE \texttt{$size \gets size + instruction$.getPoppedCount()}
+			\ENDWHILE	
+		\ENDWHILE
+		\RETURN $-1$ // kein Index gefunden
+	\end{algorithmic}
+\end{algorithm}
+
+Dieser Algorithmus funktioniert für Definitionen, also das Suchen von \texttt{STORE}
+Instruktionen, ähnlich. Der Unterschied liegt dabei ausschließlich im Inkrementieren 
+(statt Dekrementieren) der $bcIndex$ Variable und dem umgekehrten Verhalten beim 
+\textit{push} bzw. \textit{pop} von Werten auf bzw. vom Stack.
+
+Diese Informationen werden in dem entsprechenden \texttt{InstructionNode} Objekt
+gespeichert. Zu diesem Zweck besitzt dieser Typ drei Abbildungen ($\mathbb{N} \rightarrow 
+\mathbb{N}$), die zum Zeitpunkt der Erstellung befüllt werden:
+
+\begin{description}
+	\item [\texttt{localMap}] bildet eine value number auf eine lokale Variable ab
+	\item [\texttt{loadMap}] bildet eine lokale Variable auf einen Bytecode Index ab, an 
+	dem diese Variable auf den Stack geladen wurde
+	\item [\texttt{storeMap}] bildet eine lokale Variable auf einen Bytecode Index ab, an
+	dem \texttt{STORE} diese Referenz in die entsprechende Variable schreibt
+\end{description} 
 
 \section{Bytecode Generierung}
 
