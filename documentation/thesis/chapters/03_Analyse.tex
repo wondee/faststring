@@ -322,9 +322,6 @@ den bereits beschriebenen Datenflussgraphen darstellt, mit initial markierten
 \texttt{Reference}s. Die Implementierung ist in der Klasse \texttt{LabelAnalyzer}
 zu finden. 
 
-Ausgehend von den initial markierten Knoten, wir die Definition sowie alle Uses betrachtet,
-ob diese für dieses Label
-
 Algorithmus \ref{alg:analyze} beschreibt die Implementierung der Vererbung 
 des Labels.
 
@@ -335,18 +332,50 @@ des Labels.
 		\STATE $g \gets$ \texttt{new DataFlowGraph()}
 		\WHILE {\texttt{not $q$.isEmpty()}}
 			\STATE $r \gets q$\texttt{.remove()}
-			\IF {\texttt{not $g$.contains()}}
-
+			\IF {$r$ nicht markiert}
 				\STATE $def \gets$ \texttt{$defUse$.getDef($r$)}
+				\IF {$def$ ist eine \texttt{PhiNode}} 
+					\STATE \texttt{$phis$.add($def$)}
+				\ELSE
+					\IF {$def$ ist vom Typ \texttt{Labelable}}
+						\STATE \texttt{processInstruction($def$)}
+					\ENDIF
+				\ENDIF
+				\FOR {$use$ \bf{in} \texttt{$defUse$.getUses($r$)}}
+					\IF {$use$ ist eine \texttt{PhiInstruction}} 
+						\STATE \texttt{$phis$.add($use$)}
+					\ELSE
+						\IF {$use$ ist vom Typ \texttt{Labelable}}
+							\STATE \texttt{processInstruction($use$)}
+						\ENDIF
+					\ENDIF
+				\ENDFOR
+
 			\ENDIF
 		\ENDWHILE
 		\RETURN $g$
 	\end{algorithmic}
 \end{algorithm}
 
+Es werden ausgehend von den bereits markierten Referenzen alle verbundenen Instruktionen
+(die Definition und alle Uses) betrachtet. Diese werden, soweit sie keine \texttt{PhiNode}s
+sind, mittels der Funktion \texttt{processInstruction} behandelt. Diese Funktion setzt
+für den gegebenen Instruktions-Knoten das aktuell verarbeitete Label, wenn es bisher 
+noch nicht markiert wurde. Wird dieser Knoten markiert, werden über Methode 
+\texttt{getLabelableRefs} im Typ \texttt{InstructionNode} alle mit diesem Knoten 
+verbundenen Referenzen gesucht. Im Abschnitt \ref{ssec:labelRefs} wird diese Methode 
+vorgestellt. Stellt die betrachtete Instruktion eine $\phi$-Instruktion dar, wird 
+diese separat betrachtet und wird in einer temporären Sammlung \texttt{phis} hinzugefügt.
+Die Verarbeitung von $\phi$-Knoten innerhalb des Graphen wird im Abschnitt \ref{ssec:phis}
+betrachtet.
+
+\subsection{getLabelableRefs}\label{ssec:labelRefs}
+
+Bei der Methode im Typ 
+
 \subsection{Umgang mit mehreren Labels}
 
-\subsection{Umgang mit Phi-Knoten}
+\subsection{Umgang mit Phi-Knoten}\label{ssec:phis}
 
 $\phi$-Instruktionen innerhalb des Datenflussgraphen erfordern, aufgrund ihrer Eigenheiten,
 eine besondere Behandlung.  
