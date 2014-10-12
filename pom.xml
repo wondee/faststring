@@ -1,25 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  
+
     <groupId>de.unifrankfurt.faststring</groupId>
     <artifactId>faststring</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>system for optimize string manipulation operations</name>
-  
+
     <modules>
         <module>core</module>
         <module>benchmarks</module>
 		<module>analysis</module>
 		<module>analysis-test</module>
 		<module>test-classes</module>
-    </modules>
-	
+    	<module>jmh-benchmarks</module>
+  </modules>
+
 	<properties>
 		<maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
 	</properties>
-	
+
 	<build>
 		<pluginManagement>
 			<plugins>
@@ -31,7 +33,7 @@
 			</plugins>
 		</pluginManagement>
 	</build>
-	
+
     <dependencies>
 		<dependency>
 			<groupId>junit</groupId>
@@ -45,13 +47,13 @@
 			<artifactId>guava</artifactId>
 			<version>17.0</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 			<version>1.7.7</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>

@@ -47,4 +47,25 @@ public class TransformationUseTestClass {
 		return a.intern();
 	}
 
+	public void startsWith() {
+		String a = "abc";
+
+		if (a.startsWith("ab")) {
+			a.substring(2);
+		}
+	}
+
+	public void substringConversation() {
+		"Hallo".startsWith("abc".substring(2));
+	}
+
+	public void lengthCharAt() {
+	    String s = Double.toString(2.56);
+	    int len = s.length();
+
+	    s.charAt(len - 2);
+
+	    s.substring(2);
+	}
+
 }

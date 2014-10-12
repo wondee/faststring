@@ -71,33 +71,33 @@ public class LabelAnalyzer extends BaseQueueProcessingStrategy<Reference>{
 	@Override
 	public void process(Reference ref, Queue<Reference> refQueue) {
 		LOG.trace("queue: {}, ref: {}", GraphUtil.extractIntsFromStringReferences(refQueue), ref);
-		
+
 		InstructionNode defNode = ref.getDefinition();
 		TypeLabel label = ref.getLabel();
-		
+
 		if (ref.getLabel() != null) {
-			
+
 			if (defNode instanceof PhiNode) {
 				processPhi(ref, refQueue,(PhiNode) defNode);
 			} else {
 				if (defNode instanceof LabelableNode) {
-					LabelableNode labelable = (LabelableNode) defNode; 
-	
+					LabelableNode labelable = (LabelableNode) defNode;
+
 					if (labelable.canProduce(label)) {
 						labelConnectedRefs(label, refQueue, labelable);
 					}
 				}
 			}
-			
+
 			for (InstructionNode useNode : ref.getUses()) {
 				if (useNode instanceof PhiNode) {
 					processPhi(ref, refQueue,(PhiNode) useNode);
 				} else {
 					if (useNode instanceof LabelableNode) {
-						LabelableNode labelable = (LabelableNode) useNode; 
+						LabelableNode labelable = (LabelableNode) useNode;
 						for (int i : labelable.getIndicesForV(ref.valueNumber())) {
 							if (labelable.canUseAt(label, i)) {
-								labelConnectedRefs(label, refQueue, labelable);		
+								labelConnectedRefs(label, refQueue, labelable);
 							}
 						}
 					}
@@ -109,10 +109,10 @@ public class LabelAnalyzer extends BaseQueueProcessingStrategy<Reference>{
 	private void labelConnectedRefs(TypeLabel label , Queue<Reference> refQueue, LabelableNode node) {
 		node.setLabel(label);
 		List<Integer> connectedRefs = node.getLabelableRefs(label);
-		
+
 		for (int v : connectedRefs) {
 			Reference ref = graph.get(v);
-			
+
 			if (ref.getLabel() == null) {
 				ref.setLabel(label);
 				refQueue.add(ref);

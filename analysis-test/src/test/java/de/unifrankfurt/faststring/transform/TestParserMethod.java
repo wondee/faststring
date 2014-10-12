@@ -33,7 +33,7 @@ public class TestParserMethod extends BaseTransformerTest{
 
 	@Override
 	protected Collection<TypeLabel> getTypeLabel() {
-		return Arrays.asList(SUBSTRING);
+		return Arrays.asList(SUBSTRING, STRING_BUILDER);
 	}
-	
+
 }

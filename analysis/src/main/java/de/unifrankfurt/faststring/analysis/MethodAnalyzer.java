@@ -33,7 +33,7 @@ public class MethodAnalyzer {
 	}
 
 	public AnalysisResult analyze() {
-		LOG.info("analyzing {}", method.getSignature());
+		LOG.debug("analyzing {}", method.getSignature());
 
 		Collection<Reference> refs = Sets.newHashSet();
 

@@ -1,15 +1,14 @@
 package de.unifrankfurt.faststring.transform;
 
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Test;
 
+import com.ibm.wala.shrikeBT.ConstantInstruction;
 import com.ibm.wala.shrikeBT.DupInstruction;
 import com.ibm.wala.shrikeBT.InvokeInstruction;
 import com.ibm.wala.shrikeBT.LoadInstruction;
@@ -18,6 +17,7 @@ import com.ibm.wala.shrikeBT.ReturnInstruction;
 import com.ibm.wala.shrikeBT.StoreInstruction;
 
 import de.unifrankfurt.faststring.analysis.label.TypeLabel;
+import de.unifrankfurt.faststring.analysis.util.StringUtil;
 import de.unifrankfurt.faststring.utils.BaseTransformerTest;
 
 public class TestMethodTransformerUseConversations extends BaseTransformerTest {
@@ -147,11 +147,60 @@ public class TestMethodTransformerUseConversations extends BaseTransformerTest {
 	}
 
 
+	@Test
+	public void testStartsWith() throws Exception {
+		TransformationInfo info = analyze("startsWith");
+
+		MethodData data = transform(info);
+
+		assertTrue(data.getHasChanged());
+
+		assertThat(data.getInstructions()[5], instanceOf(LoadInstruction.class));
+		assertThat(data.getInstructions()[6], instanceOf(InvokeInstruction.class));
+		assertThat(data.getInstructions()[7], instanceOf(ConstantInstruction.class));
+	}
+
+	@Test
+	public void testConversation() throws Exception {
+
+		TransformationInfo info = analyze("substringConversation");
+
+		System.out.println(StringUtil.toStringWithLineBreak(info.getReferences()));
+
+		MethodData data = transform(info);
+
+		assertTrue(data.getHasChanged());
+
+		assertThat(data.getInstructions()[1], instanceOf(ConstantInstruction.class));
+		assertThat(data.getInstructions()[2], instanceOf(InvokeInstruction.class));
+		assertThat(data.getInstructions()[4], instanceOf(InvokeInstruction.class));
+		assertThat(data.getInstructions()[5], instanceOf(InvokeInstruction.class));
+		assertThat(data.getInstructions()[6], instanceOf(InvokeInstruction.class));
+
+	}
+
+	@Test
+	public void testLengthCharAt() throws Exception {
+		TransformationInfo info = analyze("lengthCharAt");
+
+		System.out.println(StringUtil.toStringWithLineBreak(info.getReferences()));
+
+		MethodData data = transform(info, true);
+
+		assertTrue(data.getHasChanged());
+
+		assertThat(data.getInstructions()[6], instanceOf(LoadInstruction.class));
+
+		LoadInstruction load = (LoadInstruction) data.getInstructions()[6];
+
+		assertEquals(info.getLocalForLabel(null, SUBSTRING, 1), load.getVarIndex());
+	}
+
 	@Override
 	public String getTestClass() {
 		return TEST_CLASS;
 	}
-	
+
 
 	@Override
 	protected Collection<TypeLabel> getTypeLabel() {

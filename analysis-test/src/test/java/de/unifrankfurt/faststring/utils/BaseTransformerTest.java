@@ -1,7 +1,8 @@
 package de.unifrankfurt.faststring.utils;
 
+import static de.unifrankfurt.faststring.analysis.test.util.TestUtilities.toStringBytecode;
+
 import java.io.IOException;
-import java.io.StringWriter;
 import java.util.Collection;
 import java.util.Map;
 
@@ -10,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Maps;
-import com.ibm.wala.shrikeBT.Disassembler;
 import com.ibm.wala.shrikeBT.MethodData;
 import com.ibm.wala.shrikeBT.shrikeCT.ClassInstrumenter;
 import com.ibm.wala.shrikeCT.ClassReader;
@@ -70,22 +70,14 @@ public abstract class BaseTransformerTest extends BaseAnalysisTest {
 		MethodData methodData = getClassInstrumenter(getTestClass()).visitMethod(methodMap.get(info.getMethodName()));
 
 		if (printBefore) {
-			LOG.debug("code before transformation: \n{}", printBytecode(methodData));
+			LOG.debug("code before transformation: \n{}", toStringBytecode(methodData));
 		}
 
 		new MethodTransformer(methodData, info, getStore()).transformMethod();
 
-		LOG.debug("transformed code: \n{}", printBytecode(methodData));
+		LOG.debug("transformed code: \n{}", toStringBytecode(methodData));
 
 		return methodData;
-	}
-
-
-	private String printBytecode(MethodData methodData) throws IOException {
-		StringWriter writer = new StringWriter();
-		new Disassembler(methodData).disassembleTo("  ", writer);
-
-		return writer.toString();
 	}
 
 }

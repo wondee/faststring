@@ -8,15 +8,13 @@
 		{ "id" : "length", 			"desc" : { "name" : "length", "signature" : "()I" } },
 		{ "id" : "valueOf", 		"desc" : { "name" : "valueOf", "signature" : "(Ljava/lang/Object;)Ljava/lang/String;" } }
 	],
-	
+
 	"effectedMethods" : ["substring_i", "substring_ii"],
 	"supportedMethods" : ["length"],
 	"producingMethods" : ["substring_i", "substring_ii"],
-	
+
 	"compatibleLabels" : ["StringListBuilder"],
-	
-	"parameterUsage" : {"valueOf" : [0]},
-	
+
 	"staticFactory" : "valueOf",
-	"toOriginalMethod" : "toString" 
+	"toOriginalMethod" : "toString"
 }

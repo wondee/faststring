@@ -1,8 +1,6 @@
 package de.unifrankfurt.faststring;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -17,7 +15,6 @@ import com.beust.jcommander.IStringConverter;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.google.common.base.Predicates;
-import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -31,12 +28,13 @@ import de.unifrankfurt.faststring.analysis.MethodAnalyzer;
 import de.unifrankfurt.faststring.analysis.TargetApplication;
 import de.unifrankfurt.faststring.analysis.TypeLabelConfigParser;
 import de.unifrankfurt.faststring.analysis.label.TypeLabel;
+import de.unifrankfurt.faststring.analysis.util.FileUtil;
 import de.unifrankfurt.faststring.transform.JarManager;
 
 public class Runner {
 	private static final Logger LOG = LoggerFactory.getLogger(Runner.class);
 
-	@Parameter(names = "-labels", description = "The optimizing labels to be used", required = true, converter = TypeLabelCreator.class)
+	@Parameter(names = "-labels", description = "The optimizing labels to be used", variableArity = true, required = true, converter = TypeLabelCreator.class)
 	private List<TypeLabel> typeList;
 
 	@Parameter(names = "-jar", required = true)
@@ -61,27 +59,24 @@ public class Runner {
 		}
 
 		try {
-			TargetApplication targetApplication = new TargetApplication(
-					jarFile, exclusionFile);
+			TargetApplication targetApplication = new TargetApplication(jarFile, exclusionFile);
 
 			Map<String, AnalysisResult> analysisResult = Maps.newTreeMap();
-
+			int i = 1;
 			for (IClass clazz : targetApplication.getApplicationClasses()) {
+				LOG.info("analyzing class ({}/{}) {} ", i++, targetApplication.getApplicationClasses().size(),
+						clazz.getName());
 				processClass(filteredList, targetApplication, analysisResult, clazz);
 			}
 
 			LOG.info("creating outputfile");
 
-			Path outputPath = Paths.get("faststring-output/");
-
-			if (!Files.exists(outputPath)) {
-				Files.createDirectory(outputPath);
-			}
+			FileUtil.checkOutputPath("faststring-output/");
 
 			Path outputFile = Paths.get("faststring-output/_optimizedMethods");
 			Files.write(outputFile, analysisResult.keySet(), Charset.defaultCharset());
 
-			LOG.info("finished analyzing; starting transforming");
+			LOG.info("finished analyzing; starting transforming. {} results created", analysisResult.size());
 			JarManager.createForJar(jarFile, analysisResult, targetApplication.getClassHierarchyStore()).process();
 
 		} catch (ClassHierarchyException e) {
@@ -95,7 +90,7 @@ public class Runner {
 	private void processClass(List<TypeLabel> filteredList,
 			TargetApplication targetApplication,
 			Map<String, AnalysisResult> analysisResult, IClass clazz) {
-		LOG.info("analyzing class: {}", clazz.getName());
+
 		for (IMethod m : clazz.getDeclaredMethods()) {
 			try {
 				AnalyzedMethod method = targetApplication.findIRMethodForMethod(m);
@@ -112,33 +107,8 @@ public class Runner {
 					LOG.error("method is skipped");
 				}
 			} catch (Exception e) {
-				handleError(e, m);
+				FileUtil.handleError(e, m.getSignature());
 			}
-
-		}
-	}
-
-	private void handleError(Exception e, IMethod m) {
-		try {
-			LOG.error("method is skipped, because of error", e);
-
-			Path errorPath = Paths.get("faststring-errors/");
-			if (!Files.exists(errorPath)) {
-				Files.createDirectory(errorPath);
-			}
-
-			Path errorFile = Paths.get("faststring-errors/", m.getSignature().replace('/', '.'));
-
-			StringWriter stringWriter = new StringWriter();
-			PrintWriter writer = new PrintWriter(stringWriter);
-			e.printStackTrace(writer);
-
-			Iterable<String> stackTrace = Splitter.on(System.getProperty("line.separator")).split(stringWriter.toString());
-
-			Files.write(errorFile, stackTrace, Charset.defaultCharset());
-
-		} catch (IOException e1) {
-			e1.printStackTrace();
 		}
 	}
 
@@ -149,6 +119,7 @@ public class Runner {
 			TypeLabelConfigParser parser = new TypeLabelConfigParser();
 			try {
 				TypeLabel label = parser.parseFile(string + ".type");
+				LOG.info("found label {}", label);
 				return label;
 			} catch (Exception e) {
 				LOG.error("could not load type label", string, e);

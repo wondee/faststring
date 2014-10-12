@@ -51,12 +51,12 @@ public class MethodCallNode extends LabelableNode {
 	public boolean canUseAt(TypeLabel label, int i) {
 		if (i == 0 && !isStatic) {
 			return label.canBeUsedAsReceiverFor(target);
-		} else {			
+		} else {
 			return label.canBeUsedAsParamFor(target, i);
 		}
-		
+
 	}
-	
+
 	@Override
 	public boolean canProduce(TypeLabel label) {
 		return label.canBeDefinedAsResultOf(target);
@@ -65,26 +65,26 @@ public class MethodCallNode extends LabelableNode {
 	@Override
 	public List<Integer> getLabelableRefs(TypeLabel label) {
 		List<Integer> refs = Lists.newLinkedList();
-		
+
 		if (label.canBeDefinedAsResultOf(target)) {
 			refs.add(def);
 		}
-		
+
 		if (!isStatic && label.canBeUsedAsReceiverFor(target)) {
 			refs.add(uses.get(0));
 		}
-		
+
 		for (int i = (isStatic) ? 0 : 1; i < uses.size(); i++) {
 			if (label.canBeUsedAsParamFor(target, i)) {
 				refs.add(uses.get(i));
 			}
 		}
-		
+
 		return refs;
 	}
 
-	
-	
+
+
 	private MethodCallType determineMethodCallType(int inV) {
 		if (inV == def) {
 			return new Defintion();
@@ -179,4 +179,7 @@ public class MethodCallNode extends LabelableNode {
 		return uses.get(i);
 	}
 
+	public boolean isStatic() {
+		return isStatic;
+	}
 }

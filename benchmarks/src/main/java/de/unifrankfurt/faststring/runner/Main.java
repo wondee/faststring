@@ -30,8 +30,10 @@ public class Main {
 	//			ConcatBenchmark.class,
 	//			ReplaceCharBenchmark.class,
 	//			ReplaceRegexBenchmark.class,
+
 				ComplexExample.class
 
+//				ParserBenchmark.class
 				);
 
 

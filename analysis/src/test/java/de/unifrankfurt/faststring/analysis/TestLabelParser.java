@@ -13,33 +13,33 @@ public class TestLabelParser {
 
 	@Test
 	public void testParserFromFile() throws Exception {
-		
+
 		 TypeLabel label = new TypeLabelConfigParser().parseFile("src/test/resources/testLabel.json");
-		
+
 		 assertTrue (label.getOriginalType() == String.class);
 		 assertTrue (label.getOptimizedType() == HashMap.class);
-		 
+
 		 assertFalse (label.compatibleWith(label));
 	}
-	
-	
+
+
 	@Test
 	public void testParserFromClasspath() throws Exception {
-		
-		 TypeLabel label = new TypeLabelConfigParser().parseFile("/testLabel.json");
-		
+
+		 TypeLabel label = new TypeLabelConfigParser().parseFile("testLabel.json");
+
 		 assertTrue (label.getOriginalType() == String.class);
 		 assertTrue (label.getOptimizedType() == HashMap.class);
-		 
+
 	}
-	
+
 	@Test
 	public void testEmptyFileFromClasspath() throws Exception {
-		
-		 TypeLabel label = new TypeLabelConfigParser().parseFile("/testLabelEmpty.json");
-		
+
+		 TypeLabel label = new TypeLabelConfigParser().parseFile("testLabelEmpty.json");
+
 		 assertTrue (label.getOriginalType() == String.class);
 		 assertTrue (label.getOptimizedType() == HashMap.class);
-		 
+
 	}
 }

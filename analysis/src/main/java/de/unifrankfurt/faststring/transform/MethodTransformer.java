@@ -3,9 +3,6 @@ package de.unifrankfurt.faststring.transform;
 import java.util.Collection;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.collect.Sets;
 import com.ibm.wala.shrikeBT.MethodData;
 import com.ibm.wala.shrikeBT.MethodEditor;
@@ -29,8 +26,6 @@ import de.unifrankfurt.faststring.transform.patches.ConversionPatchFactory;
 
 public class MethodTransformer {
 
-	private static final Logger LOG = LoggerFactory.getLogger(MethodTransformer.class);
-
 	private MethodData methodData;
 	MethodEditor editor;
 	TransformationInfo transformationInfo;
@@ -45,16 +40,14 @@ public class MethodTransformer {
 	}
 
 	public void transformMethod() {
-		LOG.info("editing: {}", methodData.getName());
-
 		editor.beginPass();
 
 		Set<LabelableNode> labelableNodes = Sets.newHashSet();
-		
+
 		for (Reference ref : transformationInfo.getReferences()) {
 
 			InstructionNode definition = ref.getDefinition();
-			
+
 			if (definition instanceof LabelableNode) {
 				LabelableNode node = (LabelableNode) definition;
 				labelableNodes.add(node);
@@ -63,7 +56,7 @@ public class MethodTransformer {
 				createDefinitionConversions(definition, ref);
 			}
 			for (InstructionNode use : ref.getUses()) {
-				
+
 				if (use instanceof LabelableNode) {
 					LabelableNode node = (LabelableNode) use;
 					labelableNodes.add(node);
@@ -74,16 +67,16 @@ public class MethodTransformer {
 			}
 
 		}
-		
+
 		for (LabelableNode node : labelableNodes) {
 			createUseOptimization(node);
 		}
-		
+
 		try {
 			Verifier verifier = new Verifier(methodData);
 
 			verifier.setClassHierarchy(store);
-			
+
 			verifier.verify();
 			editor.applyPatches();
 			editor.endPass();
@@ -92,12 +85,12 @@ public class MethodTransformer {
 			throw new IllegalStateException(e);
 		}
 	}
-	
+
 
 
 	private void createUseConversions(Reference ref, InstructionNode use) {
 		if (ref.getLabel() != null) {
-			
+
 			UseConverter converter = new UseConverter(ref.getLabel(), null);
 			convertUses(ref, use, converter);
 		}
@@ -105,7 +98,7 @@ public class MethodTransformer {
 
 	private void createUseConversions(Reference ref, LabelableNode use) {
 		if (use.needsConversionTo(ref)) {
-			
+
 			UseConverter converter = new UseConverter(ref.getLabel(), use.getLabel());
 			convertUses(ref, use, converter);
 		}
@@ -123,7 +116,7 @@ public class MethodTransformer {
 
 				}
 			} else {
-				converter.setLocal(-1);
+				converter.setLocal(-1, index);
 				use.visit(converter);
 			}
 		}
@@ -131,13 +124,13 @@ public class MethodTransformer {
 
 	private void createUseOptimization(InstructionNode use) {
 		if (use instanceof LabelableNode) {
-			
+
 			TypeLabel label = ((LabelableNode)use).getLabel();
 			if (label != null) {
 				use.visit(new Optimizer(new ConversionPatchFactory(transformationInfo, editor, label)));
 			}
 		}
-		
+
 	}
 
 	private void createDefinitionConversions(InstructionNode definition, Reference ref) {
@@ -145,9 +138,9 @@ public class MethodTransformer {
 			Converter converter = new DefinitionConverter(null, ref.getLabel());
 			convertDefinitions(definition, ref, converter);
 		}
-		
+
 	}
-	
+
 	private void createDefinitionConversions(LabelableNode instructionNode, Reference ref) {
 		if (instructionNode.needsConversionTo(ref)) {
 			Converter converter = new DefinitionConverter(instructionNode.getLabel(), ref.getLabel());
@@ -238,7 +231,6 @@ public class MethodTransformer {
 			super(from, to);
 			this.from = from;
 		}
-
 		@Override
 		public void visitReturn(ReturnNode node) {
 			createConversation(node);
@@ -256,12 +248,17 @@ public class MethodTransformer {
 				int orgLocal = transformationInfo.getOrgLocalForLabel(from, local);
 				patchFactory.replaceLoad(orgLocal, node.getLoad(index), from);
 			}
-			patchFactory.createConversationBefore(node.getByteCodeIndex());
+			patchFactory.createConversationAfter(node.getLoad(index));
 		}
 
 		void setLocal(int local, int index) {
 			super.setLocal(local);
 			this.index = index;
+		}
+
+		@Override
+		void setLocal(int local) {
+			throw new UnsupportedOperationException();
 		}
 
 	}

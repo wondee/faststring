@@ -13,27 +13,27 @@ public class TypeLabelConfig extends BaseTypeLabel {
 	private String name;
 	private Class<?> originalType;
 	private Class<?> optimizedType;
-	
+
 	private Set<MethodReference> effectedMethods;
 	private Set<MethodReference> supportedMethods;
-	
+
 	private Set<MethodReference> producingMethods;
-	
+
 	private Map<MethodReference, String> paramDifference;
-	
+
 	private Map<MethodReference, Set<Integer>> paramUsage;
-	
+
 	private String toOrignalMethodName;
 	private String staticFactory;
-	
+
 	private Set<String> compatibleLabels;
-	
+
 	@Override
 	public boolean canBeUsedAsParamFor(MethodReference method, int index) {
 		if (paramUsage.containsKey(method)) {
 			return paramUsage.get(method).contains(index);
 		}
-		
+
 		return false;
 	}
 
@@ -61,7 +61,7 @@ public class TypeLabelConfig extends BaseTypeLabel {
 	@Override
 	public boolean compatibleWith(TypeLabel label) {
 		if (label == null) return false;
-		
+
 		return compatibleLabels.contains(label.toString());
 	}
 
@@ -101,5 +101,5 @@ public class TypeLabelConfig extends BaseTypeLabel {
 	public String toString() {
 		return name;
 	}
-	
+
 }

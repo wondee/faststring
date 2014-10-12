@@ -7,3 +7,5 @@
 /dacapoExclusions.txt
 /test-opt.jar
 /test.jar
+/faststring-errors/
+/run.sh

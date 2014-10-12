@@ -1,3 +1,36 @@
 \chapter{Einleitung}
 
-In dieser Arbeit soll untersucht werden, ob es möglich ist...
+Die Verwendung von optimierten Datentypen beim Entwickeln eines Programms ist schwierig. 
+Um eine Optimierung optimal einzusetzen, muss der Entwickler nicht nur deren API  
+kennen und nutzen. Zusätzlich muss der richtige Einsatzzweck der entsprechenden
+Optimierung auch bekannt und ebenso verwendet werden. Des weiteren sind ihnen die 
+ursprünglichen Datentypen eher vertraut als diejenigen Typen, die für ein spezielles 
+Problem entworfen worden sind. Daraus folgend ergibt sich das Problem spezielle 
+Optimierungen richtig im Quellcode zu verwenden. 
+
+Ähnliches gilt für den Code von bestehenden Altsystemen. Dabei ergibt sich allein 
+durch die Menge an Code die refaktorisiert werden müsste um eine oder mehrere
+Optimierungen einzufügen, ein nicht unerheblicher Aufwand.
+
+Ziel dieser Arbeit ist es daher zu untersuchen, ob sich Programme durch Auswahl und 
+Substitution von alternativen Datentypen automatisiert optimieren lassen. Diese 
+Untersuchung kann allerdings keine allumfassende Auswertung bereitstellen und wird 
+sich auf die Optimierung der Laufzeit des \texttt{java.lang.String} Datentyps der 
+\textit{Java} Plattform und der Programmiersprache \textit{Java} beschränken. Nach 
+der Auswertung soll eine Aussagedarüber möglich sein, ob diese Optimierungen möglich sind.
+
+Im Rahmen dieser Arbeit soll ein System erstellt werden, dass String Operationen in einem
+gegebenen Java Programm mit einer entsprechenden optimierten Version auf Basis des 
+Java Bytecodes ersetzt. Dabei soll das System anhand statischer Code Analyse die Stellen
+lokalisieren, an denen eine Optimierung angewendet werden kann, und mittels der Transformation des 
+Bytecodes des Programms diese Optimierungen anwenden. Als Ergebnis wird ein lauffähiges
+Programm erwartet, dass bei gleicher Eingabe eine geringere Ausführungszeit besitzt 
+als das originale Programm.
+
+In Kapitel 2 werden die Werkzeuge und Grundlagen beschrieben, auf denen das in dieser Arbeit
+entwickelte System aufbaut. Kapitel 3 erläutert den Analyse Prozess des Systems, indem
+die Datenstrukturen sowie der Algorithmus für die statische Code Analyse beschrieben wird.
+In Kapitel 4 wird basierend auf den Analyse Ergebnissen die Transformation des Bytecodes 
+beschrieben. Kapitel 5 widmet sich der Auswertung der Tests in Form von Benchmarks
+und begründet diese Ergebnisse. Kapitel 6 zieht ein Fazit und beschreibt mögliche
+Weiterentwicklungen des Systems.    

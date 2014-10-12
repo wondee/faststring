@@ -16,6 +16,7 @@ import com.google.common.collect.Sets;
 import com.google.common.primitives.Ints;
 import com.ibm.wala.classLoader.IBytecodeMethod;
 import com.ibm.wala.classLoader.ShrikeCTMethod;
+import com.ibm.wala.classLoader.ShrikeClass;
 import com.ibm.wala.shrikeBT.IInstruction;
 import com.ibm.wala.shrikeCT.InvalidClassFileException;
 import com.ibm.wala.ssa.DefUse;
@@ -166,7 +167,7 @@ public class AnalyzedMethod {
 
 		do {
 
-			for (int i = start; i >= block.getFirstInstructionIndex() && !locator.isFinished(); i--) {
+			for (int i = start; i >= block.getFirstInstructionIndex(); i--) {
 				IInstruction instruction = getBytecodeInstructions()[i];
 
 				boolean found = locator.processBackward(instruction);
@@ -214,7 +215,7 @@ public class AnalyzedMethod {
 		do {
 
 			int lastInstructionIndex = block.getLastInstructionIndex();
-			for (int i = start; i <= lastInstructionIndex && !locator.isFinished(); i++) {
+			for (int i = start; i <= lastInstructionIndex; i++) {
 				IInstruction instruction = getBytecodeInstructions()[i];
 
 				boolean found = locator.processForward(instruction);
@@ -382,6 +383,11 @@ public class AnalyzedMethod {
 
 	public Integer getConstantIndex(int v) {
 		return ir.getSymbolTable().getIndex(v);
+	}
+
+	public ShrikeClass getDeclaringClass() {
+		return (ShrikeClass) ir.getMethod().getDeclaringClass();
+
 	}
 
 

@@ -3,6 +3,7 @@ package de.unifrankfurt.faststring.transform;
 import de.unifrankfurt.faststring.analysis.graph.InstructionNode;
 import de.unifrankfurt.faststring.analysis.graph.MethodCallNode;
 import de.unifrankfurt.faststring.analysis.graph.NewNode;
+import de.unifrankfurt.faststring.analysis.graph.PhiNode;
 import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 import de.unifrankfurt.faststring.transform.patches.ConversionPatchFactory;
 
@@ -21,12 +22,17 @@ class Optimizer extends InstructionNode.MustCallVisitor {
 
 		patchFactory.replaceMethodCall(node);
 	}
-	
+
 	@Override
 	public void visitNew(NewNode newNode) {
 		patchFactory.replaceNew(newNode);
 	}
-	
+
+	@Override
+	public void visitPhi(PhiNode node) {
+		// nothing to do here...
+	}
+
 	private void updateStores(MethodCallNode node) {
 		TypeLabel defLabel = node.getDefLabel();
 		if (defLabel != null) {
@@ -42,7 +48,7 @@ class Optimizer extends InstructionNode.MustCallVisitor {
 
 	private void updateLoads(MethodCallNode node) {
 
-		for (int i = 0; i < node.getParams().size() + 1; i++) {
+		for (int i = 0; i < node.getUses().size(); i++) {
 			int v = node.getUse(i);
 
 			TypeLabel useLabel = node.getLabelForUse(v);

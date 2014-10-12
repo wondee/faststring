@@ -17,11 +17,15 @@ import com.ibm.wala.ssa.SSAArrayLoadInstruction;
 import com.ibm.wala.ssa.SSABinaryOpInstruction;
 import com.ibm.wala.ssa.SSACheckCastInstruction;
 import com.ibm.wala.ssa.SSAConditionalBranchInstruction;
+import com.ibm.wala.ssa.SSAGetCaughtExceptionInstruction;
+import com.ibm.wala.ssa.SSAInstanceofInstruction;
 import com.ibm.wala.ssa.SSAInvokeInstruction;
 import com.ibm.wala.ssa.SSANewInstruction;
 import com.ibm.wala.ssa.SSAPhiInstruction;
 import com.ibm.wala.ssa.SSAPutInstruction;
 import com.ibm.wala.ssa.SSAReturnInstruction;
+import com.ibm.wala.ssa.SSASwitchInstruction;
+import com.ibm.wala.ssa.SSAThrowInstruction;
 
 import de.unifrankfurt.faststring.analysis.AnalyzedMethod;
 import de.unifrankfurt.faststring.analysis.AnalyzedMethod.LocalInfo;
@@ -93,7 +97,9 @@ public class InstructionNodeFactory extends Visitor  {
 
 			LocalInfo store = method.getStoreFor(0, 1, (instruction instanceof SSAPhiInstruction) && index > 0 ? index - 1 : index);
 			if (store != null) {
-				result.addLocalVariableIndices(def, Arrays.asList(store.local()));
+				if (store.local() != -1) {
+					result.addLocalVariableIndices(def, Arrays.asList(store.local()));
+				}
 				result.setStore(store.local(), store.bcIndex());
 			}
 
@@ -111,8 +117,9 @@ public class InstructionNodeFactory extends Visitor  {
 			LOG.debug("determine load instruction for v={} at {}", v, instruction);
 			LocalInfo load = method.getLoadFor(i, vs.size(), index);
 			if (load != null) {
-				result.addLocalVariableIndices(v, Arrays.asList(load.local()));
-
+				if (load.local() != -1) {
+					result.addLocalVariableIndices(v, Arrays.asList(load.local()));
+				}
 				result.addLoad(i, load.bcIndex());
 			}
 		}
@@ -161,8 +168,7 @@ public class InstructionNodeFactory extends Visitor  {
 
 	@Override
 	public void visitCheckCast(SSACheckCastInstruction instruction) {
-		// TODO implement support
-		res = new CheckCastNode(instruction.getDef());
+		res = new ReturnNode(instruction.getDef());
 	}
 
 	@Override
@@ -174,5 +180,24 @@ public class InstructionNodeFactory extends Visitor  {
 	public void visitBinaryOp(SSABinaryOpInstruction instruction) {
 		res = new BinaryOperation(instruction.getDef(), IRUtil.getUses(instruction));
 	}
-	
+
+	@Override
+	public void visitSwitch(SSASwitchInstruction instruction) {
+		res = new ReturnNode(instruction.getUse(0));
+	}
+
+	@Override
+	public void visitInstanceof(SSAInstanceofInstruction instruction) {
+		res = new ReturnNode(instruction.getUse(0));
+	}
+
+	@Override
+	public void visitThrow(SSAThrowInstruction instruction) {
+		res = new ReturnNode(instruction.getUse(0));
+	}
+
+	@Override
+	public void visitGetCaughtException(SSAGetCaughtExceptionInstruction instruction) {
+		res = new GetNode(instruction.getDef());
+	}
 }

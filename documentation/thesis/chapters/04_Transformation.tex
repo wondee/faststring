@@ -7,7 +7,7 @@ auf die Beschaffung der nötigen Informationen eingegangen, um im Anschluss die 
 nach denen Bytecode generiert oder manipuliert wird, erläutert.
 
 Ziel der Transformation ist es zum Einen an den Grenzen der Bubble Konvertierungen zwischen den
-Originalen und den Optimalen Typen in den Sourcecode einzufügen. Zum Anderen müssen Uses
+Originalen und den optimierten Typen in den Sourcecode einzufügen. Zum Anderen müssen Uses
 markierte Uses in entsprechende optimierte Versionen umgewandelt werden.  
 
 \section{Lokale Variablen}
@@ -17,7 +17,7 @@ markierte Uses in entsprechende optimierte Versionen umgewandelt werden.
 
 Um originale lokale Variablen im Bytecode nicht mit den optimierten Versionen zu 
 überschreiben wurde eine Abbildung geschaffen, die jeder lokalen Variable ein Tupel 
-zuweist. $l \rightarrow (L,l')$, wobei $l$ die originale lokale, $L$ ein Label und 
+zuweist: $l \rightarrow (L,l')$, wobei $l$ die originale lokale, $L$ ein Label und 
 $l'$ die optimierte Variable für das Label $L$ darstellt. So ist sichergestellt, dass
 optimierte und die entsprechende originale Referenz in zwei verschiedenen Lokalen 
 geführt werden. Darüber hinaus ist diese Trennung wichtig, da die JVM die Plätze für
@@ -112,9 +112,174 @@ gespeichert. Zu diesem Zweck besitzt dieser Typ drei Abbildungen ($\mathbb{N} \r
 
 \section{Bytecode Generierung}
 
+Die Generierung von neuem und die Manipulation von bestehendem Bytecode wird von einer Instanz der
+Klasse \texttt{MethodTransformer} vorgenommen. Als Eingabe dient eine Instanz vom Typ 
+\texttt{TransformationInfo}, welche auf einem \texttt{AnalysisResult} basiert und 
+Informationen über die verwendeten lokalen Variablen zur Verfügung stellt. Diese Informationen
+sind zum einen die verwendeten Variablen, als auch die Abbildung von originalen Lokalen
+zu optimierten.
+
+Anhand dieser Informationen werden sowohl Konvertierungen als auch Optimierungen zu dem bestehenden
+Bytecode hinzugefügt. Eine Konvertierung beschreibt dabei eine Transformation von einem originalen 
+zu einem optimierten Typ bzw. von einem optimierten Typ zu einem originalen Typ. Eine Optimierung 
+hingegen ersetzt eine Instruktion mit einer optimierten Variante. Diese Mechanismen sollen in dem 
+folgenden Abschnitt vorgestellt werden.
+
 \subsection{Informationen des TypeLabels}
 \label{ssec:infoLabel}
 
+Um Optimierungen und Konvertierungen auf bestimmten Typen umzusetzen werden verschiedene 
+Informationen benötigt. Diese sind:
+
+\begin{itemize}
+	\item Wie der optimierte Type heißt
+	\item Wie ein optimierter Typ aus einem Originalen erzeugt wird
+	\item Wie die Signatur einer optimierten Variante einer Methode aussieht
+\end{itemize} 
+
+
+Diese Informationen werden über die \texttt{TypeLabel} Definitionen dem System zur Verfügung gestellt.
+Zu diesem Zweck enthält das \texttt{TypeLabel} Interface, zusätzlich zu denen in \ref{sssec:typeLabel} 
+vorgestellten, die folgenden Methoden: 
+
+\begin{description}
+	\item[\texttt{getOptimizedType()}] Gibt ein \texttt{Class} Objekt des optimierten Typs zurück
+	\item[\texttt{getOriginalType()}] Gibt ein \texttt{Class} Objekt des originalen Typs zurück
+	\item[\texttt{getCreationMethodName()}] Definiert den Namen der statischen Methode innerhalb des
+	optimierten Typs, die ein neues Objekt des optimierten Typs erzeugt
+	\item[\texttt{getToOriginalMethodName()}] Definiert den Namen der Methode, die auf einem Objekt
+	des optimierten Typen aufgerufen werden kann um eine äquivalente Instanz des originalen Typen
+	zu erzeugen
+	\item[\texttt{getReturnType(MethodReference)}] gibt den Rückgabe Typ der gegebenen Methode im optimierten
+	Typ zurück. Der Typ wird als \texttt{String} Repräsentation in der internen JVM Form zurück gegeben.
+	(Beispiel: \texttt{Ljava/lang/String;})
+	\item[\texttt{getParams(MethodReference}] gibt die Parameter der gegebenen Methode im optimierten
+	Typ zurück. Die Parameter werden als \texttt{String} konkatenierte Liste umgeben mit Klammern 
+	zurück gegeben. Die Typen der Parameter werden als interne JVM Form angegeben (Beispiel: (\texttt{II})).
+\end{description}
+
 \subsection{Konvertierung}
 
+Konvertierungen dienen der Kompatibilität zwischen Code innerhalb und außerhalb der "Bubble". 
+Dabei betreffen diese ausschließlich Referenzen im Datenflussgraphen. Formal lässt sich dieser
+Vorgang wie folgt beschreiben. Die Funktion $label:E \rightarrow L$, wobei $L$ die Menge aller in dem
+System vorhandenen Label ist und $E = R$ $\cup$ $I$, weißt jedem Knoten eine Label Markierung zu. Ein Knoten
+ohne Markierung bekommt das Label \textit{KEIN\_LABEL} zugewiesen. Bei der Entscheidung ob 
+zwischen einer Instruktion $i$ und einer Referenz $r$ eine Konvertierung nötig ist sind zwei 
+Entscheidungen zu treffen:
+
+\begin{enumerate}
+	\item Handelt es sich bei der Instruktion um eine \textit{labelable} Instruktion 
+	\item Ist es eine Def ($i \rightarrow r$) oder eine Use ($r \rightarrow i$) Kante innerhalb des
+	Graphen
+\end{enumerate} 
+
+Ist die betrachtete Instruktion ohnehin nicht in der Lage mit einem Label markiert zu werden, so
+muss nur die Referenz betrachtet werden und wenn $label(r) \neq$ \textit{KEIN\_LABEL}, dann muss eine 
+Konvertierung an dieser Kante eingeführt werden. 
+
+Handelt es sich bei der Instruktion allerdings um eine \textit{labelable} Instruktion, so trifft die Methode
+\texttt{needsConversationTo(Label)} (s. Algorithmus \ref{alg:nct}) des Objekts auf den die Kante zeigt die 
+Entscheidung ob eine Konvertierung nötig ist.    
+
+
+\begin{algorithm}[H]
+	\caption{needsConversationTo(Label)}\label{alg:nct}
+	\begin{algorithmic}[1]
+		\IF{\texttt{isSameLabel(label)}}
+			\RETURN \texttt{false}
+		\ENDIF
+		\IF{\texttt{label} $\neq$ \texttt{null}}
+			\RETURN $not$ \texttt{label.compatibleWith(this.label)}
+		\ELSE
+			\RETURN $not$ \texttt{this.label.compatibleWith(null)}
+		\ENDIF 
+	\end{algorithmic}
+\end{algorithm}
+
+Konvertierungen werden von Instanzen vom Typ \texttt{Converter} durchgeführt. Dabei wird zwischen Definitions-
+und Use-Konvertierungen unterschieden für jeweils eigene Implementierungen der \texttt{Converter} 
+Schnittstelle existieren. Der \texttt{Converter} nutzt dabei das \textit{Visitor} Muster, welches
+für die einzelnen Instruktionsknoten implementiert wurde. Die jeweiligen \textit{visit}-Methoden erstellen  
+auf der zur Verfügung gestellten \texttt{ConversionPatchFactory} die Shrike Patch Objekte um die Bytecode 
+Manipulationen durchzuführen. 
+
+Die \texttt{ConversionPatchFactory} dient der Erstellung von Shrike Patch Objekten und dem Hinzufügen dieser
+in den Bytecode der aktuell verarbeiteten Methode. Zusätzlich muss bei der Instanziierung eines Objektes 
+angegeben für welche Konvertierung diese Factory verwendet wird. Zu diesem Zweck besitzt der Typ zwei 
+Attribute vom Typ \texttt{TypeLabel}:
+
+\begin{description}
+	\item[\texttt{from}] Der Typ den ein Objekt vor der Konvertierung besitzt
+	\item[\texttt{to}] Der Typ in den ein Objekt konvertiert werden soll
+\end{description}
+
+Die Methoden, die zum Erzeugen eines Patches zur Verfügung stehen, sind die Folgenden:
+
+\begin{description}
+	\item{\texttt{createConversationAtStart(local)}} Erstellt eine Konvertierung am Anfang der Methode
+	für die gegebene lokale Variable
+	\item{\texttt{createConversationAfter(local, bcIndex)}} Erstellt eine Konvertierung nach dem gegebenen
+	Bytecode Index für die gegebene lokale Variable. Die Variablen Angabe kann auch weggelassen werden, 
+	dann wird der konvertierte Wert nicht in die entsprechende optimierte Variable gespeichert.
+	\item{\texttt{createConversationBefore(local, bcIndex)}}  Erstellt eine Konvertierung vor dem gegebenen
+	Bytecode Index für die gegebene lokale Variable. Die Variablen Angabe kann auch weggelassen werden, 
+	dann wird der konvertierte Wert nicht in die entsprechende optimierte Variable gespeichert.
+\end{description}
+
+Soll eine Konvertierung für eine Definition ohne eine gegebene lokale Variable durchgeführt werden, so 
+wird ausschließlich Methodenaufruf zur Konvertierung zum bzw. vom optimierten Typ aufgerufen. Wird eine 
+lokale Variable angegeben so wird zunächst die Referenz auf dem Stack mittels der \texttt{DUP} Anweisung 
+verdoppelt. Nach dem Aufruf der Konvertierung Methode wird die optimierte Referenz in die entsprechende 
+optimierte Variable gespeichert. Konvertierungen die am Anfang der Methode durchgeführt werden (was 
+ausschließlich für Konvertierungen die Übergabeparameter betreffen) verhalten sich genauso wie 
+Konvertierungen denen eine Variable mitgegeben wurde, mit dem Unterschied, dass anstatt der \texttt{DUP} 
+Anweisung ein \texttt{LOAD} für die entsprechende Variable verwendet wird um die Referenz für den 
+Methodenaufruf zu verwenden.
+
+Wird eine Konvertierung für einen Use benötigt, muss die originale Referenz bevor sie verwendet wird, wieder in
+den originalen Type umgewandelt werden. Daher wird an der Stelle nachdem die betroffene Referenz auf den Stack
+gelegt wurde der Methodenaufruf zum Umwandeln in den originalen Typ eingefügt. Ist die lokale Variable 
+allerdings bekannt, wird die \texttt{LOAD} Instruktion, die die originale Variable lädt ersetzt durch ein
+Laden der optimierten Variable um diese danach in einen originalen Typ zu konvertieren. 
+
 \subsection{Optimierung}
+
+Für jede \textit{labelable} Node wird, wenn sie mit einem Label markiert ist, eine Optimierung durchgeführt. 
+Dafür sind 3 Schritte notwendig, diese werden im Folgenden beschrieben.
+
+Primäres Ziel der Optimierungstransformation ist es, die originalen Methodenaufrufe durch die Optimierten zu 
+ersetzen. Wie in \ref{subs:conventions} beschrieben, wird für eine Methoden Optimierung immer derselbe Name 
+angenommen. In jedem Fall wird zunächst der Typ des Empfänger Objekts auf den des optimierten Typ gesetzt. 
+Ist für die Parameter Liste im optimierten Typ keine Alternative angegeben, wird diejenige der originalen 
+Methode verwendet. Der Rückgabe Typ wird ebenfalls durch das \textit{Typelabel} bestimmt. So wird das Ziel der 
+\texttt{INVOKE} Instruktion auf den optimierten Typ gesetzt.
+
+Um die Methode auf der optimierten Referenz aufrufen zu können, muss diese, statt der originalen Referenz, zum
+Zeitpunkt des Methoden Aufrufs auf dem Stack vorhanden sein. Darüber hinaus müssen, wenn es sich bei den 
+Parametern um gelabelte Referenzen handelt, auch die optimierten Parameter Referenzen, statt der originalen, 
+auf dem Stack liegen. Daher müssen für optimierte Referenzen die \texttt{LOAD} Anweisungen, die die Referenzen
+für den Methodenaufruf auf den Stack legen, die optimierte statt der originalen Variablen laden.
+
+Ist der Rückgabewert eines optimierten Methodenaufrufs ebenfalls markiert und wird mittels einer 
+\texttt{STORE} Anweisung in eine Variable gespeichert, so muss diese Anweisung die optimierte Referenz 
+in die entsprechende optimierte Variable speichern. Daher wird die entsprechende Anweisung 
+(wenn die Methode als \textit{producing} definiert ist) ersetzt durch eine \texttt{STORE} Anweisung, die 
+die zurückgegebene Referenz in die entsprechende optimierte Variable speichert.
+
+\section{Schwierigkeiten}
+
+\subsection{Innere Archive (JARs)}
+
+Um Klassen eines gegebenen Programms zu lesen und zu verarbeiten bietet WALAs Shrike die Klasse
+\texttt{OfflineInstrumenter} an. Diese Klasse erwartet eine JAR Datei und ermöglicht daraufhin
+eine Iteration über alle Klassen innerhalb dieses Archivs. 
+
+Befinden sich nun Klassen dieser Anwendung verpackt in einem Archivs innerhalb dieses Archivs,
+ist es dem \texttt{OfflineInstrumenter} nicht möglich diese Klassen zu finden und damit auch zu verarbeiten. 
+Daher ist das System nicht in der Lage Klassen die nicht innerhalb des zu verarbeitenden Java-Archivs zu finden 
+sind zu verarbeiten.
+
+\subsection{Typisierung von generiertem Bytecode} 
+
+Bei dem Erzeugen von Bytecode mit Shrike 

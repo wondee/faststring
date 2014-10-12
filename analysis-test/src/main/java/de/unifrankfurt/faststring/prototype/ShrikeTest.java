@@ -32,15 +32,19 @@ public class ShrikeTest {
 
 			System.out.println("-- Class: " + clazz.getName());
 			for (IMethod m : clazz.getDeclaredMethods()) {
-				MethodAnalyzer analyzer = new MethodAnalyzer(targetApplication.findIRMethodForMethod(m), 
-						TestUtilities.loadTestLabels("SubstringString", "StringListBuilder"));
+				try {
 
-				AnalysisResult candidates = analyzer.analyze();
+					MethodAnalyzer analyzer = new MethodAnalyzer(targetApplication.findIRMethodForMethod(m),
+							TestUtilities.loadTestLabels("SubstringString", "StringListBuilder"));
 
-				if (!candidates.isEmpty()) {
-					analysisResult.put(m.getSignature(), candidates);
+					AnalysisResult candidates = analyzer.analyze();
+
+					if (!candidates.isEmpty()) {
+						analysisResult.put(m.getSignature(), candidates);
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
-
 			}
 
 		}

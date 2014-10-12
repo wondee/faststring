@@ -10,10 +10,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.collect.Iterables;
-import com.ibm.wala.ssa.DefUse;
-import com.ibm.wala.ssa.IR;
 
-import de.unifrankfurt.faststring.analysis.AnalyzedMethod;
 import de.unifrankfurt.faststring.analysis.test.util.TestUtilities;
 import de.unifrankfurt.faststring.analysis.util.GraphUtil;
 import de.unifrankfurt.faststring.utils.BaseAnalysisTest;
@@ -110,10 +107,7 @@ public class TestDataFlowGraph extends BaseAnalysisTest {
 
 	private DataFlowGraph createGraph(String className, String methodName) {
 
-		IR ir = getIR(className, methodName);
-		DefUse defUse = new DefUse(ir);
-
-		return new DataFlowGraphBuilder(new AnalyzedMethod(ir, defUse)).createDataFlowGraph(TestUtilities.loadTestLabel("SubstringString"));
+		return new DataFlowGraphBuilder(getIRMethod(className, methodName)).createDataFlowGraph(TestUtilities.loadTestLabel("SubstringString"));
 	}
 
 }

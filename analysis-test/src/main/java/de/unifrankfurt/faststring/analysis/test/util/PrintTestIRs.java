@@ -29,73 +29,72 @@ public class PrintTestIRs {
 	/**
 	 * main method to print out all ir for the test classes
 	 * @param args no args defined
-	 * @throws IOException 
-	 * @throws WalaException 
+	 * @throws IOException
+	 * @throws WalaException
 	 */
 	public static void main(String[] args) throws IOException, WalaException {
 		String pathname = TARGET_IRS;
-		
+
 		if (args.length > 0) {
 			pathname = args[0];
 		}
-		
-		
-		TargetApplication targetApplication = TestUtilities.loadTestClasses();
-		
+
+		TargetApplication targetApplication = TestUtilities.loadTestJar();
+
 		for (IClass clazz : targetApplication.getApplicationClasses()) {
 			for (IMethod m : clazz.getDeclaredMethods()) {
 				printToPDF(pathname, targetApplication.getClassHierachy(), targetApplication.findIRForMethod(m));
 			}
 		}
 	}
-	
+
 	private static final Logger LOG = LoggerFactory.getLogger("print all IRs");
-	
+
 	private static final String PRINT_PROPERTIES = "/print.properties";
 	private static final String TARGET_IRS = "../analysis-test/target/irs";
 
-	private static void printToPDF(String pathname, ClassHierarchy cha, IR ir) throws WalaException, IOException {
-		
+	public static void printToPDF(String pathname, ClassHierarchy cha, IR ir) throws WalaException, IOException {
+
 		Properties wp = loadProperties();
-		
-		File file = new File(pathname);
+
+		File file = new File(TARGET_IRS);
 
 		if (!file.exists()) {
 			file.mkdirs();
 		}
 
 		wp.put(WalaProperties.OUTPUT_DIR, TARGET_IRS);
-		
-		String pdfFile = wp.getProperty(WalaProperties.OUTPUT_DIR) + 
-						 File.separatorChar + 
-						 TestUtilities.createFileName(ir.getMethod().getDeclaringClass().getName().toString(), 
-								 ir.getMethod().getName().toString()) + 
+
+		String pdfFile = wp.getProperty(WalaProperties.OUTPUT_DIR) +
+						 File.separatorChar +
+						 TestUtilities.createFileName(ir.getMethod().getDeclaringClass().getName().toString(),
+								 ir.getMethod().getName().toString()) +
 								 ".pdf";
-		
+
 		String dotFile = wp.getProperty(WalaProperties.OUTPUT_DIR)
 				+ File.separatorChar + "ir.dt";
 		if (new File(pdfFile).exists()) {
 			LOG.info("skipping {}", pdfFile);
 		} else {
 			Graph<ISSABasicBlock> g = ir.getControlFlowGraph();
-	
+
 			NodeDecorator<ISSABasicBlock> labels = PDFViewUtil.makeIRDecorator(ir);
 			g = CFGSanitizer.sanitize(ir, cha);
-	
+
 			DotUtil.dotify(g, labels, dotFile, pdfFile, (String)wp.get("dot"));
 		}
 	}
 
 	private static Properties loadProperties() throws IOException {
-		
+
 		Properties wp = new Properties();
-		
+
 		InputStream in = PrintTestIRs.class.getResourceAsStream(PRINT_PROPERTIES);
 		if (in == null) {
 			throw new FileNotFoundException("no file " + PRINT_PROPERTIES + " was found on classpath");
 		}
 		wp.load(in);
 		return wp;
-		
+
 	}
 }

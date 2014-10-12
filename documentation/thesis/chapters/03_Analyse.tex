@@ -12,7 +12,7 @@ einer Methode und wird im ersten Abschnitt vorgestellt. Zu optimierende Referenz
 werden in diesem Graphen mit sogenannten \textit{Labels} versehen. Dieser Datentyp
 soll im zweiten Abschnitt beschrieben werden.
 
-\subsection{Datenfluss Graph}
+\subsection{Datenfluss Graph}\label{ssec:DFG}
 
 Eine auf einem IR basierende Methode wird vom System mittels eines Datenflussgraphen 
 repräsentiert. Dieser wird vor der eigentlichen Analyse aus einer gegeben
@@ -47,7 +47,9 @@ Die Erstellung eines \texttt{DataFlowGraph}s beginnt immer mit einer Menge an
 initialen \texttt{Reference} Objekten. Ausgehend von dieser Startmenge werden über 
 das \texttt{DefUse}-Objekt des betroffenen IRs die Definition und alle Uses in den 
 Datenflussgraphen eingefügt. Algorithmus \ref{alg:dfg} beschreibt die Erstellung des 
-Graphen.
+Graphen. Die verwendete Queue Implementierung ist eine auf einem 
+\texttt{java.util.LinkedHashSet} basierende Eigenentwicklung mit dem Namen
+\texttt{de.unifrankfurt.faststring.analysis.util.UniqueQueue}.
 
 \begin{algorithm}[H]
 	\caption{Erstellung des Datenflussgraphen}\label{alg:dfg}
@@ -165,7 +167,7 @@ programmatisch lässt sich allerdings auch die erste Alternative umsetzen. Im
 Folgenden sollen die beiden Möglichkeiten zur Definition eines \texttt{TypeLabel}s
 betrachtet werden.
 
-\subsubsection{Das TypeLabel Interface}
+\subsubsection{Das TypeLabel Interface} \label{sssec:typeLabel}
 
 Das Interface beinhaltet alle Methoden, die der Analyse- und Transformationsprozess
 benötigt. In diesem Kapitel sollen zunächst nur die Methode betrachtet werden, die
@@ -241,6 +243,11 @@ werden im Folgenden beschrieben:
 	und der entsprechende value eine Liste von Ganzzahlen. Ein Eintrag bedeutet, 
 	dass diese Methode mit einem Optimierten Typ als Parameter mit diesem Index 
 	umgehen kann. 
+	\item[optimizedParams] Ein Objekt. Dabei ist jeder key die ID einer Methode 
+	und der entsprechende value eine Parameter Liste in interner JVM Notation. 
+	Wird bei einer Optimierung einer Methode eine andere Parameter Liste erwartet
+	als die ursprüngliche der originalen Methode, so muss die neue Signatur an dieser
+	Stelle angegeben werden.
 	\item[staticFactory] Ein String. Der Name einer statischen Factory Methode mit 
 	einem Übergabeparameter vom Typ des Originalen Typs. Diese muss einen entsprechenden
 	Optimierten Typ zurückgeben.
@@ -248,6 +255,23 @@ werden im Folgenden beschrieben:
 	aus dem optimierten Objekt, ein entsprechendes vom Originalen Typ zurückgibt.
 
 \end{description}
+
+\subsection{Konventionen}\label{subs:conventions}
+
+Bei dem Erstellen von optimierten Typen sind einige Konventionen zu befolgen. Das 
+System rechnet damit, dass diese Annahmen befolgt werden. Diese Regeln sind im Folgenden
+beschrieben.
+
+\subsubsection{Methodennamen}
+
+Wird eine Methode als \textit{effectedMethod} deklariert, wird der optimierte Gegensatz
+durch den Namen identifiziert. Wenn z.B. die Methode \texttt{f()} aus dem Typ \texttt{A}
+optimiert werden soll, so muss in dem optimierten Typ \texttt{AOpt} eine Methode
+\texttt{f()} existieren. Besitzt die originale Methode eine Parameterliste, so muss
+diese mit derer der optimierten Methode in Anzahl und Typen übereinstimmen. Eine Ausnahme
+bildet dabei die Verwendung von ebenfalls optimierten Parametern. In diesem Fall muss im Feld 
+\textit{optimizedParams} in der \textit{type} Datei ein entsprechender Eintrag erfolgen.
+
 
 \section{Algorithmus}
 
@@ -315,38 +339,144 @@ ein Knoten immer nur Teil einer Bubble sein.
 Ziel des Algorithmus ist es diese Bubble so groß wie zu definieren. Als Anfangszustand 
 werden alle zu optimierenden Methodenaufrufe mit dem zu verarbeitenden Label markiert.
 
-\subsection{Umsetzung des Algorithmus}
+\subsection{Umsetzung des Algorithmus}\label{ssec:umAlg}
 
 Als Eingabe für den Algorithmus dient ein Objekt vom Typ \texttt{DataFlowGraph}, der 
-den bereits beschriebenen Datenflussgraphen darstellt, mit initial markierten
-\texttt{Reference}s. Die Implementierung ist in der Klasse \texttt{LabelAnalyzer}
-zu finden. 
+den bereits beschriebenen Datenflussgraphen darstellt. Zum Erstellen des Graphen werden
+wie in \ref{ssec:DFG} beschrieben zunächst initiale Referenzen benötigt. Diese Referenzen
+werden über die Methode \texttt{Set<Reference>} \\ \texttt{findTypeUses(AnalyzedMethod)} ermittelt, 
+welche sich in der abstrakten Klasse \texttt{BaseTypeLabel} befindet. Diese Methode ist auch Teil des 
+\texttt{TypeLabel} Interfaces. Grundlage dieser Ermittlung sind die von der in der Label 
+Definition definierten \textit{effectedMethods}, also derjenigen Methoden für die dieses 
+Label eine Optimierung darstellt. Die \texttt{findTypeUses} Methode erstellt für jede 
+Referenz, auf der in der gegebenen Methode eine der \textit{effectedMethods} aufgerufen 
+wird, ein \texttt{Reference} Objekt. Dabei wird für jede value number genau ein Referenz 
+Objekt erzeugt. Die erstellten Referenzen werden dem verwendeten Label markiert.
 
-Ausgehend von den initial markierten Knoten, wir die Definition sowie alle Uses betrachtet,
-ob diese für dieses Label
-
-Algorithmus \ref{alg:analyze} beschreibt die Implementierung der Vererbung 
-des Labels.
+Die Implementierung des Algorithmus befindet sich als statische Methode in der Klasse 
+\texttt{LabelAnalyzer}. Ausgehend von den initial markierten Knoten, wird jeweils die 
+Definition sowie alle Uses einer Referenz betrachtet, ob diese mit dem Label der Referenz 
+markiert werden können. Der Algorithmus \ref{alg:analyze} beschreibt die Implementierung 
+dieser Vererbung des Labels. Als Queue findet wieder die 
+\texttt{de.unifrankfurt.faststring.analysis.util.UniqueQueue} Verwendung.
 
 \begin{algorithm}[H]
 	\caption{Vererbung des Labels}\label{alg:analyze}
 	\begin{algorithmic}[1]
 		\STATE $q \gets$ \texttt{new Queue($initialReferences$)}
-		\STATE $g \gets$ \texttt{new DataFlowGraph()}
+		\STATE $g \gets$ der übergebene Datenflussgraph
 		\WHILE {\texttt{not $q$.isEmpty()}}
 			\STATE $r \gets q$\texttt{.remove()}
-			\IF {\texttt{not $g$.contains()}}
-
-				\STATE $def \gets$ \texttt{$defUse$.getDef($r$)}
+			\IF {\texttt{$r$.label} is not \texttt{null}}
+				\STATE $def \gets$ \texttt{$r$.getDef()}
+				\IF {\texttt{$def$.canProduce($r$.label)}}
+					\STATE \texttt{labelConnectedRefs($def$)}
+				\ENDIF
+				\FOR {$use$ \bf{in} \texttt{$r$.getUses()}}
+					\IF {\texttt{$use$.canUseAt($r$.label, $useIndex$)}}
+						\STATE \texttt{labelConnectedRefs($use$)}
+					\ENDIF
+				\ENDFOR
 			\ENDIF
 		\ENDWHILE
 		\RETURN $g$
 	\end{algorithmic}
 \end{algorithm}
 
+Eine wichtige Rolle während des Vererbungsprozesses spielen dabei die Methoden 
+\texttt{boolean Labelable.canProduce(TypeLabel)} und \\
+\texttt{boolean Labelable.canUseAt(TypeLabel, int)}. Diese beiden Methoden bestimmen 
+für eine Referenz ob ein Label auf eine Definition oder eine Benutzung vererbt werden kann.
+
+\texttt{canProduce} sagt aus ob eine Instruktion eine optimierte Referenz definieren kann. 
+Die Implementierungen der \texttt{canProduce} Methode sehen für die einzelnen \texttt{Labelable}
+Subtypen wie folgt aus:
+
+\begin{description}
+	\item[NewNode] gibt immer \texttt{true} zurück
+	\item[ConditionalBranchNode] gibt immer \texttt{false} zurück
+	\item[MethodCallNode] Delegation an die Methode \texttt{canBeDefinedAsResultOf} des 
+	übergebenen Label Objekts.
+\end{description}
+
+Die Methode \texttt{canUseAt} betrifft dagegen nur Benutzungen von Referenzen. Die Semantik
+hinter der Methode ist ob diese Instruktion eine optimierte Referenz verwenden kann. Der Index 
+stellt dabei den Parameter Index das an dem diese Referenz in dieser Instruktion verwendet wird. 
+Die Implementierung dieser Methode sieht für die einzelnen \texttt{Labelable}
+Subtypen wie folgt aus:
+
+\begin{description}
+	\item[NewNode] gibt immer \texttt{false} zurück
+	\item[ConditionalBranchNode] gibt immer \texttt{true} zurück
+	\item[MethodCallNode] Wenn die Methode nicht statisch und der Index 0 ist, wird an die Methode
+	\texttt{canBeUsedAsReceiverFor} delegiert, andernfalls an die Methode \texttt{canBeUsedAsParamFor}.
+\end{description}
+
+Ist für eine Instruktion die Prüfung für die entsprechende Methode positiv, wird diese 
+Instruktion an die Hilfsfunktion \texttt{labelConnectedRefs} weitergeleitet. Diese Methode 
+ist im folgenden dargestellt:
+
+\begin{algorithm}[H]
+	\caption{labelConnectedRefs}\label{alg:labelConnRefs}
+	\begin{algorithmic}[1]
+		\STATE \texttt{$node$.setLabel($label$)}
+		\FOR{$ref$ \bf{in} $node$\texttt{.getLabelableRefs()}}
+			\IF{\texttt{$ref$.getLabel()} is not \texttt{null}}
+				\STATE \texttt{$ref$.setLabel($label$)}
+				\STATE \texttt{$q$.add($ref$)}
+			\ENDIF 
+		\ENDFOR
+	\end{algorithmic}
+\end{algorithm}
+
+Wobei sowohl die Queue $q$, als auch das betreffende TypeLabel $label$ aus dem umgebenen Kontext
+im Algorithmus \ref{alg:analyze} auch in dieser Funktion zur Verfügung stehen. 
+
 \subsection{Umgang mit mehreren Labels}
 
-\subsection{Umgang mit Phi-Knoten}
+Es ist möglich für die Analyse mehrere Labels für die Analyse zu verwenden. Diese lassen
+sich dem \texttt{MethodAnalyzer} als \texttt{Collection} im Konstruktor zusammen 
+mit der zu analysierenden Methode übergeben. Vor der Analyse werden zuerst alle Referenzen 
+identifiziert von denen eine zu optimierende Methode verwendet wird. Diese Referenzen werden 
+zu einer Menge an Referenzen vereint. Die auf diese Weise erzeugten Referenzen besitzen 
+wie in \ref{ssec:umAlg} beschrieben jeweils das Label für das die Referenz erzeugt wurde.
+
+Ein Problem ergibt sich, stellt man der Analyse mehrere Labels zur Verfügung, die allerdings
+Optimierungen für dieselbe Methode des selben Typs beschreiben. Die erzeugten initial erzeugten 
+Referenz-Objekte, welche die zu optimierende Methode verwenden, werden bei ihrer Erzeugung
+mit dem entsprechenden Label markiert. Dieses Implementierungsdetail führt dazu, dass 
+die entsprechenden Referenzen mit demjenigen Label markiert werden, welches zuerst verarbeitet wird.
+Dieses wird immer das Label sein, welches einen geringeren Index in der Liste von Labels 
+besitzt. 
+
+Stellt man der Methode nun zwei unterschiedliche Labels zur Verfügung, die allerdings den
+selben originalen Typen verwenden, ergibt sich ein anderes Problem, wenn innerhalb der analysierten 
+Methode auf einer Referenz sowohl die eine als auch die andere Methode aufgerufen wird. Da das 
+System jeder Referenz in einer Methode nur ein Label zuweisen kann, kann diese Referenz, welche 
+beide Methoden der beiden TypeLabels verwendet, nur mit einem der TypeLabels markiert werden. 
+In diesem Szenario wird wieder dasjenige Label für die Markierung verwendet, welches den niedrigeren
+Index innerhalb der Liste besitzt.
+
+Nachdem der Datenflussgraph initial erzeugt wurde, wird der Algorithmus wie in \ref{ssec:umAlg} 
+beschrieben ausgeführt. Da Labels nur auf Knoten vererbt werden, gilt dass der entsprechende
+Knoten dasjenige Label erhält, welches zuerst auf diesen Knoten vererbt wird.  
+
+\subsection{Phi-Knoten}
 
 $\phi$-Instruktionen innerhalb des Datenflussgraphen erfordern, aufgrund ihrer Eigenheiten,
-eine besondere Behandlung.  
+eine besondere Behandlung. Da sie keine Instruktionen im eigentlichen Sinne darstellen, sondern
+nur ein Zeiger alias für andere Referenzen darstellen, lassen sich diese Knoten auch nicht
+optimieren. Obwohl sie selber nicht optimiert werden können, so lässt sich doch über diese 
+Knoten hinweg ein Label vererben. Allerdings sollte unterschieden werden zwischen denjenigen
+verbundenen Referenzen, für die eine Markierung tatsächlich sinnvoll und für welche eher
+weniger sinnvoll ist. 
+
+Daher sollten diejenigen Referenzen markiert werden, für die auch Optimierungspotenzial 
+besteht. Wohingegen diejenigen Referenzen, für die keinerlei Optimierung notwendig 
+ist, auch keine Markierung erhalten sollten. 
+
+Wenn das System beim Vererben der Markierung einen $\phi$-Knoten als Instruktion verarbeitet,
+wird dieser auf den $\phi$ Stapel gelegt und alle verbundenen Referenzen für die
+weitere Verarbeitung vorgemerkt. Nachdem alle Referenzen verarbeitet wurden, wird dieser
+Stapel durchlaufen. Für jede \texttt{PhiInstructionNode} in diesem Stapel wird entschieden
+ob und mit welchem Label diese Instruktion markiert wird. 

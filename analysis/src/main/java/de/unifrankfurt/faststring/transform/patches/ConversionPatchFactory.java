@@ -1,8 +1,11 @@
 package de.unifrankfurt.faststring.transform.patches;
 
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Sets;
 import com.ibm.wala.shrikeBT.IInvokeInstruction.Dispatch;
 import com.ibm.wala.shrikeBT.InvokeInstruction;
 import com.ibm.wala.shrikeBT.LoadInstruction;
@@ -22,11 +25,13 @@ import de.unifrankfurt.faststring.transform.TransformationInfo;
 public class ConversionPatchFactory {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ConversionPatchFactory.class);
-	
+
 	private MethodEditor editor;
 	private TransformationInfo info;
 	private TypeLabel from;
 	private TypeLabel to;
+
+	private final Set<String> PRIMITIVES = Sets.newHashSet("I", "D", "V", "B", "J", "C");
 
 
 	public ConversionPatchFactory(TransformationInfo transformationInfo, MethodEditor editor, TypeLabel from, TypeLabel to) {
@@ -77,7 +82,7 @@ public class ConversionPatchFactory {
 
 	public void replaceLoad(int local, Integer loadIndex, TypeLabel label) {
 		LOG.trace("replaceLoad({},{},{})", local, loadIndex, label);
-		
+
 		final String type = Util.makeType(label.getOptimizedType());
 
 		if (loadIndex != null) {
@@ -121,16 +126,20 @@ public class ConversionPatchFactory {
 
 		String params = to.getParams(node.getTarget());
 
-		if (params == null)  {			
+		if (params == null)  {
 			params = methodSignature.substring(0, methodSignature.indexOf(')') + 1);
-		} 
+		}
 
 		String returnType = to.getReturnType(node.getTarget());
-		
+
 		if (returnType == null) {
 			returnType = "V";
 		}
-		
+
+		if (!PRIMITIVES.contains(returnType) && !returnType.endsWith(";")) {
+			returnType += ";";
+		}
+
 		String newSignature = params + returnType;
 
 		final InvokeInstruction invokeOpt = InvokeInstruction.make(newSignature,

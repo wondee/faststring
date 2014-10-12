@@ -2,6 +2,8 @@ package de.unifrankfurt.faststring.analysis.test.util;
 
 import static org.junit.Assert.assertThat;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -13,6 +15,8 @@ import org.hamcrest.collection.IsIterableContainingInOrder;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.ibm.wala.shrikeBT.Disassembler;
+import com.ibm.wala.shrikeBT.MethodData;
 
 import de.unifrankfurt.faststring.analysis.TargetApplication;
 import de.unifrankfurt.faststring.analysis.TypeLabelConfigParser;
@@ -51,17 +55,17 @@ public final class TestUtilities {
 		assertThat(actual, IsEmptyIterable.emptyIterable());
 	}
 
-
-	public static TargetApplication loadTestClasses() {
-		return loadTestJar();
-	}
-
-	public static TargetApplication loadTestJar() {
+	public static TargetApplication loadTestJar(String jarFile) {
 		try {
-			return new TargetApplication(TEST_JAR_FILE,TEST_EXCLUSION_FILE);
+			return new TargetApplication(jarFile,TEST_EXCLUSION_FILE);
 		} catch (Exception e) {
 			throw new TestInitializingException("Failed to load testclasses", e);
 		}
+	}
+
+
+	public static TargetApplication loadTestJar() {
+		return loadTestJar(TEST_JAR_FILE);
 	}
 
 	public static String replaceInitChars(String methodName) {
@@ -74,28 +78,35 @@ public final class TestUtilities {
 
 		return name + "." + replaceInitChars(method);
 	}
-	
+
 	private static final Map<String, TypeLabel> labelCache = Maps.newHashMap();
-	
+
 	public static TypeLabel loadTestLabel(String name) {
 		TypeLabel label = labelCache.get(name);
-		
+
 		if (label == null) {
-			label = new TypeLabelConfigParser().parseFile("/" + name + ".type");
+			label = new TypeLabelConfigParser().parseFile(name + ".type");
 			labelCache.put(name, label);
 		}
-		
+
 		return label;
 	}
-	
+
 	public static List<TypeLabel> loadTestLabels(String ... names) {
 		List<TypeLabel> labels = Lists.newLinkedList();
-		
+
 		for (String name : names) {
 			labels.add(loadTestLabel(name));
 		}
-		
+
 		return labels;
 	}
-	
+
+	public static String toStringBytecode(MethodData methodData) throws IOException {
+		StringWriter writer = new StringWriter();
+		new Disassembler(methodData).disassembleTo("  ", writer);
+
+		return writer.toString();
+	}
+
 }

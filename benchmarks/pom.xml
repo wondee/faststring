@@ -67,5 +67,13 @@
 			<artifactId>jcommander</artifactId>
 			<version>1.35</version>
 		</dependency>
+
+		<dependency>
+			<groupId>de.unifrankfurt.faststring</groupId>
+			<artifactId>exampleParser</artifactId>
+			<version>0.1</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/exampleParser-opt.jar</systemPath>
+		</dependency>
 	</dependencies>
 </project>

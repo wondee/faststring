@@ -42,7 +42,7 @@ public final class TargetApplication {
 
 
 	private ClassHierarchyStore store;
-	
+
 //	private static final int LIMIT_SECONDS = 3;
 //	private ExecutorService executor = Executors.newFixedThreadPool(1);
 
@@ -77,7 +77,7 @@ public final class TargetApplication {
 		Builder<IClass> builder = new ImmutableSet.Builder<IClass>();
 
 		store = new ClassHierarchyStore();
-		
+
 		for (IClass cl : classHierarchy) {
 			if (scope.isApplicationLoader(cl.getClassLoader())) {
 
@@ -85,22 +85,24 @@ public final class TargetApplication {
 
 				builder.add(cl);
 			}
-			
-			
+
+
 			if (cl instanceof ShrikeClass) {
 				try {
 					CTUtils.addClassToHierarchy(store, ((ShrikeClass) cl).getReader());
 				} catch (InvalidClassFileException e) {
 					LOG.warn("could not add {} to class hierachy", cl);
 				}
-				
+
 			} else {
 				LOG.warn("{} is no ShrikeClass but a {}", cl, cl.getClass());
 			}
-			
+
 		}
 
+
 		applicationClasses = builder.build();
+		LOG.info("{} classes found in application scope", applicationClasses.size());
 	}
 
 	public ImmutableSet<IClass> getApplicationClasses() {
@@ -115,7 +117,6 @@ public final class TargetApplication {
 		try {
 			IInstruction[] instructions = ((IBytecodeMethod) m).getInstructions();
 			if (instructions != null) {
-
 				return cache.getSSACache().findOrCreateIR(m, Everywhere.EVERYWHERE,
 					options.getSSAOptions());
 			}
@@ -149,10 +150,10 @@ public final class TargetApplication {
 
 	public ClassHierarchyStore getClassHierarchyStore() {
 		if (store == null) {
-			throw new IllegalStateException("initApplicationClasses() was not called before"); 
+			throw new IllegalStateException("initApplicationClasses() was not called before");
 		}
-		
+
 		return store;
 	}
-	
+
 }

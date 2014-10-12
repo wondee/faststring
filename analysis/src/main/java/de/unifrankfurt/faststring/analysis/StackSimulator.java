@@ -16,11 +16,7 @@ public class StackSimulator {
 	private int size;
 	private int offset;
 	private int local = -1;
-	
-	private boolean found = false;
-	
-	private boolean finished = false;
-	
+
 	public StackSimulator(int size, int index) {
 		Preconditions.checkArgument(index > -1);
 		Preconditions.checkArgument(size > 0);
@@ -35,48 +31,41 @@ public class StackSimulator {
 		if (getPushedSize(instruction) > 0) {
 			size--;
 			if (offset == size) {
-				if (offset == size) {
-					if (instruction instanceof LoadInstruction) {
-						LoadInstruction load = (LoadInstruction) instruction;
-						local = load.getVarIndex(); 
-						return true;
-					} else {
-						finished = true;
-					}
+				if (instruction instanceof LoadInstruction) {
+					LoadInstruction load = (LoadInstruction) instruction;
+					local = load.getVarIndex();
 				}
+				return true;
 			}
-			
+
 		}
-		
+
 		size += getPoppedCount(instruction);
 		LOG.trace("stack size={}", size);
 
-		return found;
+		return false;
 	}
-	
+
 	public boolean processForward(IInstruction instruction) {
-		
+
 		if (getPoppedCount(instruction) > 0) {
 			size -= getPoppedCount(instruction);
-			
 			if (size == offset) {
 				if (instruction instanceof StoreInstruction) {
 					StoreInstruction store = (StoreInstruction) instruction;
-					
+
 					local = store.getVarIndex();
-					return true;
-				} else {
-					finished = true;
 				}
+				return true;
 			}
 
 		}
-		
+
 		if (getPushedSize(instruction) > 0) {
-			size++;	
+			size++;
 		}
 
-		return found;
+		return false;
 	}
 
 	private byte getPushedSize(IInstruction instruction) {
@@ -87,14 +76,8 @@ public class StackSimulator {
 		return (instruction instanceof DupInstruction) ? 0 : instruction.getPoppedCount();
 	}
 
-	
-	
 	public int getLocal() {
 		return local;
-	}
-	
-	public boolean isFinished() {
-		return finished;
 	}
 
 }

@@ -19,7 +19,7 @@ public abstract class InstructionNode {
 	private static final Logger LOG = LoggerFactory
 			.getLogger(InstructionNode.class);
 
-	
+
 	private int byteCodeIndex = -1;
 
 	Map<Integer, Collection<Integer>> localMap = Maps.newHashMap();
@@ -33,41 +33,21 @@ public abstract class InstructionNode {
 
 	public final List<Integer> getConnectedRefs(int inV) {
 		Set<Integer> refs = getConnectedRefs();
-		
+
 		refs.remove(inV);
-		
+
 		return ImmutableList.copyOf(refs);
 	}
 
 
 	public Set<Integer> getConnectedRefs() {
 		Set<Integer> refs = Sets.newHashSet(uses);
-		
+
 		if (def != -1) {
 			refs.add(def);
 		}
 		return refs;
 	}
-
-
-//	public boolean isCompatibleWith(TypeLabel label, int inV) {
-//		if (label == null) {
-//			if (this.label == null) {
-//				return true;
-//			} else {
-//				return false;
-//			}
-//		} else {
-//			if (this.label == null) {
-//				return isCompatibleWithActual(label, inV);
-//			} else {
-//				return this.label.compatibleWith(label);
-//			}
-//
-//		}
-//	}
-
-
 
 	public void setByteCodeIndex(int index) {
 		this.byteCodeIndex = index;
@@ -105,8 +85,9 @@ public abstract class InstructionNode {
 	public void setStore(int local, int bcIndex) {
 		int def = getDef();
 		if (def != -1) {
-			addLocalVariableIndices(def, Arrays.asList(local));
-
+			if (local != -1) {
+				addLocalVariableIndices(def, Arrays.asList(local));
+			}
 			if (storeIndex == -1) {
 				storeIndex = bcIndex;
 			} else {
@@ -119,7 +100,7 @@ public abstract class InstructionNode {
 
 	}
 
-	public Iterable<Integer> getIndicesForV(Integer valueNumber) {
+	public Iterable<Integer> getIndicesForV(int valueNumber) {
 
 		List<Integer> indices = Lists.newLinkedList();
 
@@ -144,7 +125,7 @@ public abstract class InstructionNode {
 	public int getDef() {
 		return def;
 	}
-	
+
 	public List<Integer> getUses() {
 		return uses;
 	}
@@ -157,10 +138,10 @@ public abstract class InstructionNode {
 			throw new IllegalStateException(String.format("old value was removed from loadMap index %index old %d new %d", index, old, load));
 		}
 	}
-	
+
 	public abstract void visit(Visitor visitor);
 
-	
+
 	public static class Visitor {
 
 		public void visitConstant(ConstantNode node) {}
@@ -182,7 +163,7 @@ public abstract class InstructionNode {
 		public void visitBinaryOperator(BinaryOperation binaryOperation) {}
 
 	}
-	
+
 	public static class MustCallVisitor extends Visitor {
 		public void visitConstant(ConstantNode node) { throw new UnsupportedOperationException(); }
 

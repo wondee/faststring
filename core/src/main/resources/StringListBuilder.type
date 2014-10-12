@@ -8,14 +8,14 @@
 		{ "id" : "ctor_string", 	"desc" : { "name" : "<init>", "signature" : "(Ljava/lang/String;)V" } },
 		{ "id" : "toString", 		"desc" : { "name" : "toString", "signature" : "()Ljava/lang/String;" } }
 	],
-	
+
 	"effectedMethods" : ["append"],
 	"supportedMethods" : ["ctor_default", "ctor_string", "toString"],
 	"producingMethods" : ["append"],
-	
+
 	"compatibleLabels" : ["SubstringString"],
-	
+	"optimizedParams" : {"append" : "(Lde/unifrankfurt/faststring/core/SubstringString;)" },
 	"parameterUsage" : {"valueOf" : [0]},
-	
-	"toOriginalMethod" : "toString" 
+
+	"toOriginalMethod" : "toString"
 }
