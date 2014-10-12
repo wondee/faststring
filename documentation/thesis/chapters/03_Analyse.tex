@@ -342,6 +342,7 @@ werden alle zu optimierenden Methodenaufrufe mit dem zu verarbeitenden Label mar
 \subsection{Umsetzung des Algorithmus}\label{ssec:umAlg}
 
 Als Eingabe für den Algorithmus dient ein Objekt vom Typ \texttt{DataFlowGraph}, der 
+<<<<<<< HEAD
 den bereits beschriebenen Datenflussgraphen darstellt. Zum Erstellen des Graphen werden
 wie in \ref{ssec:DFG} beschrieben zunächst initiale Referenzen benötigt. Diese Referenzen
 werden über die Methode \texttt{Set<Reference>} \\ \texttt{findTypeUses(AnalyzedMethod)} ermittelt, 
@@ -359,6 +360,14 @@ Definition sowie alle Uses einer Referenz betrachtet, ob diese mit dem Label der
 markiert werden können. Der Algorithmus \ref{alg:analyze} beschreibt die Implementierung 
 dieser Vererbung des Labels. Als Queue findet wieder die 
 \texttt{de.unifrankfurt.faststring.analysis.util.UniqueQueue} Verwendung.
+=======
+den bereits beschriebenen Datenflussgraphen darstellt, mit initial markierten
+\texttt{Reference}s. Die Implementierung ist in der Klasse \texttt{LabelAnalyzer}
+zu finden. 
+
+Algorithmus \ref{alg:analyze} beschreibt die Implementierung der Vererbung 
+des Labels.
+>>>>>>> 6494f3b77f9c7c6c3243f476ba4024cc7ac32a12
 
 \begin{algorithm}[H]
 	\caption{Vererbung des Labels}\label{alg:analyze}
@@ -367,6 +376,7 @@ dieser Vererbung des Labels. Als Queue findet wieder die
 		\STATE $g \gets$ der übergebene Datenflussgraph
 		\WHILE {\texttt{not $q$.isEmpty()}}
 			\STATE $r \gets q$\texttt{.remove()}
+<<<<<<< HEAD
 			\IF {\texttt{$r$.label} is not \texttt{null}}
 				\STATE $def \gets$ \texttt{$r$.getDef()}
 				\IF {\texttt{$def$.canProduce($r$.label)}}
@@ -377,12 +387,34 @@ dieser Vererbung des Labels. Als Queue findet wieder die
 						\STATE \texttt{labelConnectedRefs($use$)}
 					\ENDIF
 				\ENDFOR
+=======
+			\IF {$r$ nicht markiert}
+				\STATE $def \gets$ \texttt{$defUse$.getDef($r$)}
+				\IF {$def$ ist eine \texttt{PhiNode}} 
+					\STATE \texttt{$phis$.add($def$)}
+				\ELSE
+					\IF {$def$ ist vom Typ \texttt{Labelable}}
+						\STATE \texttt{processInstruction($def$)}
+					\ENDIF
+				\ENDIF
+				\FOR {$use$ \bf{in} \texttt{$defUse$.getUses($r$)}}
+					\IF {$use$ ist eine \texttt{PhiInstruction}} 
+						\STATE \texttt{$phis$.add($use$)}
+					\ELSE
+						\IF {$use$ ist vom Typ \texttt{Labelable}}
+							\STATE \texttt{processInstruction($use$)}
+						\ENDIF
+					\ENDIF
+				\ENDFOR
+
+>>>>>>> 6494f3b77f9c7c6c3243f476ba4024cc7ac32a12
 			\ENDIF
 		\ENDWHILE
 		\RETURN $g$
 	\end{algorithmic}
 \end{algorithm}
 
+<<<<<<< HEAD
 Eine wichtige Rolle während des Vererbungsprozesses spielen dabei die Methoden 
 \texttt{boolean Labelable.canProduce(TypeLabel)} und \\
 \texttt{boolean Labelable.canUseAt(TypeLabel, int)}. Diese beiden Methoden bestimmen 
@@ -462,6 +494,27 @@ beschrieben ausgeführt. Da Labels nur auf Knoten vererbt werden, gilt dass der 
 Knoten dasjenige Label erhält, welches zuerst auf diesen Knoten vererbt wird.  
 
 \subsection{Phi-Knoten}
+=======
+Es werden ausgehend von den bereits markierten Referenzen alle verbundenen Instruktionen
+(die Definition und alle Uses) betrachtet. Diese werden, soweit sie keine \texttt{PhiNode}s
+sind, mittels der Funktion \texttt{processInstruction} behandelt. Diese Funktion setzt
+für den gegebenen Instruktions-Knoten das aktuell verarbeitete Label, wenn es bisher 
+noch nicht markiert wurde. Wird dieser Knoten markiert, werden über Methode 
+\texttt{getLabelableRefs} im Typ \texttt{InstructionNode} alle mit diesem Knoten 
+verbundenen Referenzen gesucht. Im Abschnitt \ref{ssec:labelRefs} wird diese Methode 
+vorgestellt. Stellt die betrachtete Instruktion eine $\phi$-Instruktion dar, wird 
+diese separat betrachtet und wird in einer temporären Sammlung \texttt{phis} hinzugefügt.
+Die Verarbeitung von $\phi$-Knoten innerhalb des Graphen wird im Abschnitt \ref{ssec:phis}
+betrachtet.
+
+\subsection{getLabelableRefs}\label{ssec:labelRefs}
+
+Bei der Methode im Typ 
+
+\subsection{Umgang mit mehreren Labels}
+
+\subsection{Umgang mit Phi-Knoten}\label{ssec:phis}
+>>>>>>> 6494f3b77f9c7c6c3243f476ba4024cc7ac32a12
 
 $\phi$-Instruktionen innerhalb des Datenflussgraphen erfordern, aufgrund ihrer Eigenheiten,
 eine besondere Behandlung. Da sie keine Instruktionen im eigentlichen Sinne darstellen, sondern
