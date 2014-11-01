@@ -87,18 +87,22 @@ die es benutzt. Darüber hinaus noch Informationen zu Bytecode Spezifika, die
 im Kapitel \ref{sec:locals} betrachtet werden.
 
 Für verschiedene \texttt{SSAInstruction} Typen existieren entsprechende 
-\texttt{InstructionNode} Subtypen. Allerdings gibt es auch Typen die nicht
+\texttt{InstructionNode} Subtypen. Allerdings können nicht alle dieser Typen 
 einer \texttt{SSAInstruction} zugeordnet werden können. Im Folgenden sollen die
 wichtigsten Knotentypen vorgestellt werden. Es existieren darüber hinaus weitere
-für die das System zur Zeit keine Unterstützung bietet, da es ausschließlich für 
-String Typen und komplexe Objekte ausgelegt ist.
+Typen von Instruktionen für die das System zur Zeit keine Unterstützung bietet, 
+da es ausschließlich für komplexe Objekte ausgelegt ist.
+
+Ein weiteren Subtyp bildet die \texttt{LabelableNode}. Dieser Typ stellt eine
+speziellen Knoten dar, der mit einem Label markiert und damit auch
+optimiert werden kann. 
 
 \subsubsection{MethodCallNode}
 
 Eine \texttt{MethodCallNode} repräsentiert einen Methoden Aufruf. Es besitzt, wenn
 vorhanden, eine Definition, welche den Rückgabewert repräsentiert, einen Receiver, 
 wenn es keine statische Methode ist und eine Liste an Parametern. Zusätzlich die 
-aufgerufene Methode. 
+aufgerufene Methode. Dieser Typ ist eine \texttt{LabelableNode}.
 
 \subsubsection{ContantNode}
 
@@ -117,7 +121,7 @@ repräsentiert. Für diesen Typ existiert keine entsprechende \texttt{SSAInstruc
 
 Dieser Typ entspricht einer \texttt{NEW} Anweisung, die ein neues Objekt eines 
 gegebenen Typen erstellt. Es besitzt eine Definition und den Typ des instanziierten
-Objekts. 
+Objekts. Dieser Typ ist eine \texttt{LabelableNode}.
 
 \subsubsection{ReturnNode}
 
@@ -128,7 +132,7 @@ zurückgeben. Dieser Typ kann keine Definition darstellen.
 \subsubsection{PhiNode}
 
 Die \texttt{PhiNode} steht für eine $\phi$-Instruktion aus dem IR. Sie besitzt eine
-Referenz als Definition und 2 bis $n$ Uses.
+Referenz als Definition und 2 bis $n$ Uses. Dieser Typ ist eine \texttt{LabelableNode}.
 
 \subsection{Label}
 
@@ -151,11 +155,11 @@ Optimierten Typen existieren. Dazu gehören
 	\item die Methoden für die Optimierungen im optimierten Typ angeboten werden
 	\item alle Methoden die darüber hinaus vom Optimierten Typ unterstützt werden
 	\item Methoden, die den optimierten Typ als Rückgabewert zurückgeben
-	\item kompatible Label
+	\item zu dem beschriebenen Label kompatible Label
 \end{itemize}
 
-Dabei ist diese Liste bereits eine Abstraktion zu den Methoden, die das Interface 
-besitzt. Im System lassen sich Label Definition auf 2 Arten erstellen:
+Dabei werden die Aspekte dieser Liste durch Methoden des Interface abgedeckt. 
+Im System lassen sich Label Definition auf 2 Arten erstellen:
 
 \begin{enumerate} 
 	\item Durch das Implementieren des Interfaces \texttt{TypeLabel}
@@ -323,7 +327,7 @@ Methodenaufruf erfolgen. Eine Umwandlung vom optimierten Typ allerdings muss vor
 nicht kompatiblen Benutzung dieser Referenz erfolgen um bei dieser den originalen Typ 
 zu verwenden.
 
-\subsection{Die "Bubble"}
+\subsection{Die Bubble}
 
 Da Konvertierungen zusätzliche Laufzeit erfordern, muss es das Ziel sein die Anzahl 
 der durchgeführten Konvertierungen zu minimieren. Dies wird erreicht indem man den
@@ -342,7 +346,6 @@ werden alle zu optimierenden Methodenaufrufe mit dem zu verarbeitenden Label mar
 \subsection{Umsetzung des Algorithmus}\label{ssec:umAlg}
 
 Als Eingabe für den Algorithmus dient ein Objekt vom Typ \texttt{DataFlowGraph}, der 
-<<<<<<< HEAD
 den bereits beschriebenen Datenflussgraphen darstellt. Zum Erstellen des Graphen werden
 wie in \ref{ssec:DFG} beschrieben zunächst initiale Referenzen benötigt. Diese Referenzen
 werden über die Methode \texttt{Set<Reference>} \\ \texttt{findTypeUses(AnalyzedMethod)} ermittelt, 
@@ -360,14 +363,6 @@ Definition sowie alle Uses einer Referenz betrachtet, ob diese mit dem Label der
 markiert werden können. Der Algorithmus \ref{alg:analyze} beschreibt die Implementierung 
 dieser Vererbung des Labels. Als Queue findet wieder die 
 \texttt{de.unifrankfurt.faststring.analysis.util.UniqueQueue} Verwendung.
-=======
-den bereits beschriebenen Datenflussgraphen darstellt, mit initial markierten
-\texttt{Reference}s. Die Implementierung ist in der Klasse \texttt{LabelAnalyzer}
-zu finden. 
-
-Algorithmus \ref{alg:analyze} beschreibt die Implementierung der Vererbung 
-des Labels.
->>>>>>> 6494f3b77f9c7c6c3243f476ba4024cc7ac32a12
 
 \begin{algorithm}[H]
 	\caption{Vererbung des Labels}\label{alg:analyze}
@@ -376,7 +371,6 @@ des Labels.
 		\STATE $g \gets$ der übergebene Datenflussgraph
 		\WHILE {\texttt{not $q$.isEmpty()}}
 			\STATE $r \gets q$\texttt{.remove()}
-<<<<<<< HEAD
 			\IF {\texttt{$r$.label} is not \texttt{null}}
 				\STATE $def \gets$ \texttt{$r$.getDef()}
 				\IF {\texttt{$def$.canProduce($r$.label)}}
@@ -387,34 +381,12 @@ des Labels.
 						\STATE \texttt{labelConnectedRefs($use$)}
 					\ENDIF
 				\ENDFOR
-=======
-			\IF {$r$ nicht markiert}
-				\STATE $def \gets$ \texttt{$defUse$.getDef($r$)}
-				\IF {$def$ ist eine \texttt{PhiNode}} 
-					\STATE \texttt{$phis$.add($def$)}
-				\ELSE
-					\IF {$def$ ist vom Typ \texttt{Labelable}}
-						\STATE \texttt{processInstruction($def$)}
-					\ENDIF
-				\ENDIF
-				\FOR {$use$ \bf{in} \texttt{$defUse$.getUses($r$)}}
-					\IF {$use$ ist eine \texttt{PhiInstruction}} 
-						\STATE \texttt{$phis$.add($use$)}
-					\ELSE
-						\IF {$use$ ist vom Typ \texttt{Labelable}}
-							\STATE \texttt{processInstruction($use$)}
-						\ENDIF
-					\ENDIF
-				\ENDFOR
-
->>>>>>> 6494f3b77f9c7c6c3243f476ba4024cc7ac32a12
 			\ENDIF
 		\ENDWHILE
 		\RETURN $g$
 	\end{algorithmic}
 \end{algorithm}
 
-<<<<<<< HEAD
 Eine wichtige Rolle während des Vererbungsprozesses spielen dabei die Methoden 
 \texttt{boolean Labelable.canProduce(TypeLabel)} und \\
 \texttt{boolean Labelable.canUseAt(TypeLabel, int)}. Diese beiden Methoden bestimmen 
@@ -494,27 +466,6 @@ beschrieben ausgeführt. Da Labels nur auf Knoten vererbt werden, gilt dass der 
 Knoten dasjenige Label erhält, welches zuerst auf diesen Knoten vererbt wird.  
 
 \subsection{Phi-Knoten}
-=======
-Es werden ausgehend von den bereits markierten Referenzen alle verbundenen Instruktionen
-(die Definition und alle Uses) betrachtet. Diese werden, soweit sie keine \texttt{PhiNode}s
-sind, mittels der Funktion \texttt{processInstruction} behandelt. Diese Funktion setzt
-für den gegebenen Instruktions-Knoten das aktuell verarbeitete Label, wenn es bisher 
-noch nicht markiert wurde. Wird dieser Knoten markiert, werden über Methode 
-\texttt{getLabelableRefs} im Typ \texttt{InstructionNode} alle mit diesem Knoten 
-verbundenen Referenzen gesucht. Im Abschnitt \ref{ssec:labelRefs} wird diese Methode 
-vorgestellt. Stellt die betrachtete Instruktion eine $\phi$-Instruktion dar, wird 
-diese separat betrachtet und wird in einer temporären Sammlung \texttt{phis} hinzugefügt.
-Die Verarbeitung von $\phi$-Knoten innerhalb des Graphen wird im Abschnitt \ref{ssec:phis}
-betrachtet.
-
-\subsection{getLabelableRefs}\label{ssec:labelRefs}
-
-Bei der Methode im Typ 
-
-\subsection{Umgang mit mehreren Labels}
-
-\subsection{Umgang mit Phi-Knoten}\label{ssec:phis}
->>>>>>> 6494f3b77f9c7c6c3243f476ba4024cc7ac32a12
 
 $\phi$-Instruktionen innerhalb des Datenflussgraphen erfordern, aufgrund ihrer Eigenheiten,
 eine besondere Behandlung. Da sie keine Instruktionen im eigentlichen Sinne darstellen, sondern
@@ -532,4 +483,13 @@ Wenn das System beim Vererben der Markierung einen $\phi$-Knoten als Instruktion
 wird dieser auf den $\phi$ Stapel gelegt und alle verbundenen Referenzen für die
 weitere Verarbeitung vorgemerkt. Nachdem alle Referenzen verarbeitet wurden, wird dieser
 Stapel durchlaufen. Für jede \texttt{PhiInstructionNode} in diesem Stapel wird entschieden
-ob und mit welchem Label diese Instruktion markiert wird. 
+ob und mit welchem Label diese Instruktion markiert wird. Diese Entscheidung wird über
+die Häufigkeit einer Label-Markierung in der Menge aller verbundenen Referenzen 
+getroffen. 
+
+Seien $L = \{l_1,...,l_n\}$ alle Labels der aktuellen Analyse, inklusive des Labels 
+für keine Optimierung, in ihrer natürlichen Reihenfolge und die Funktion 
+$anzahl: L \rightarrow \mathbb{N}$ die Anzahl der Markierungen aller verbunden Referenzen. 
+Dann ist $m = max(\{anzahl(l_i) | l_i \in L\})$ die Markierung für den verarbeiteten $\phi$-Knoten, 
+wenn $m$ eindeutig ist. Ist das Maximum nicht eindeutig so wird aus der Menge der 
+Labels mit der größten Häufigkeit, dasjenige gewählt, welches den geringsten Index besitzt.

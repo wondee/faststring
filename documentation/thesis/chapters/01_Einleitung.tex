@@ -1,16 +1,20 @@
 \chapter{Einleitung}
 
-Die Verwendung von optimierten Datentypen beim Entwickeln eines Programms ist schwierig. 
-Um eine Optimierung optimal einzusetzen, muss der Entwickler nicht nur deren API  
-kennen und nutzen. Zusätzlich muss der richtige Einsatzzweck der entsprechenden
-Optimierung auch bekannt und ebenso verwendet werden. Des weiteren sind ihnen die 
-ursprünglichen Datentypen eher vertraut als diejenigen Typen, die für ein spezielles 
-Problem entworfen worden sind. Daraus folgend ergibt sich das Problem spezielle 
-Optimierungen richtig im Quellcode zu verwenden. 
+Die Verwendung von optimierten Datentypen beim Entwickeln eines Programms ist schwierig.
+Die eingesetzten Implementierungen von Standarddatentypen decken zumeist allgemeine 
+Fälle ab, sind aber nicht optimal für spezielle Szenarien. Zudem sind spezielle
+optimierte Datentypen den Anwendern meist nicht oder zumindest nur begrenzt bekannt.
+So wird bei der Entwicklung von Software der Datentyp verwendet oder zwischen den 
+Datentypen gewählt, der dem Entwickler bekannt ist. Dabei ist nicht nur die fehlende 
+Kenntnis über diese optimierten Typen ein Grund für das Übergehen ebendieser. Die 
+Entscheidungsfindung bis hin zu Wahl einer Entscheidung für oder gegen einen speziellen
+Typ verzögert die Arbeit während der Entwicklung von Systemen. 
 
-Ähnliches gilt für den Code von bestehenden Altsystemen. Dabei ergibt sich allein 
-durch die Menge an Code die refaktorisiert werden müsste um eine oder mehrere
-Optimierungen einzufügen, ein nicht unerheblicher Aufwand.
+Ein weiteres Problem ergibt sich bei der Betrachtung von Altsystemen. Bei bereits 
+lang bestehenden Anwendung, besteht das Problem der Wartbarkeit von eingesetzten Datentypen. 
+Durch die Weiterentwicklung von eingesetzten Bibliothek können Optimierungspotentiale
+erst nach der aktiven Entwicklung von einzelnen Modulen entstehen. Hierbei ergibt sich
+wieder das Problem, dass diese Potentiale bekannt und auch richtig umgesetzt werden.
 
 Ziel dieser Arbeit ist es daher zu untersuchen, ob sich Programme durch Auswahl und 
 Substitution von alternativen Datentypen automatisiert optimieren lassen. Diese 
@@ -28,7 +32,8 @@ Programm erwartet, dass bei gleicher Eingabe eine geringere Ausführungszeit bes
 als das originale Programm.
 
 In Kapitel 2 werden die Werkzeuge und Grundlagen beschrieben, auf denen das in dieser Arbeit
-entwickelte System aufbaut. Kapitel 3 erläutert den Analyse Prozess des Systems, indem
+entwickelte System aufbaut. Darauf folgt Kapitel 3, welches die optimierten String Typen vorstellt
+die in dieser Arbeit entwickelt wurden. Kapitel 3 erläutert den Analyse Prozess des Systems, indem
 die Datenstrukturen sowie der Algorithmus für die statische Code Analyse beschrieben wird.
 In Kapitel 4 wird basierend auf den Analyse Ergebnissen die Transformation des Bytecodes 
 beschrieben. Kapitel 5 widmet sich der Auswertung der Tests in Form von Benchmarks

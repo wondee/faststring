@@ -123,3 +123,21 @@ werden können.
 
 In dem von mir entwickelten System werden alle Bytecode Manipulationen mit Hilfe von Shrike umgesetzt. 
 
+\chapter{Optimierte Stringtypen}\label{stringLabels}
+
+Im Rahmen dieser Arbeit wurden zwei alternative String Typen die Optimierungen der ursprünglichen
+\texttt{java.lang.String} API darstellen. Diese Typen umgehen das Design der String Repräsentationen
+in Java, die \textit{nicht veränderbare} Objekte darstellen. Durch diesen Umstand führen alle
+Manipulationsoperationen auf String Typen dazu, dass die Daten auf denen diese Objekte basieren
+(ein \texttt{char} Array, dass die einzelnen Zeichen der Zeichenkette hält) kopiert werden müssen.
+Es sind über die hier vorgestellten Typen durchaus weitere Optimierungen für den String Typ denkbar, 
+doch wurden im Rahmen dieser Arbeit nur diese beiden Typen betrachtet. Diese Typen befinden sich
+im Maven Artefakt \textit{faststring-core}.
+
+\section{SubstringString} 
+
+Der Typ \texttt{de.unifrankfurt.faststring.core.SubstringString} dient als Optimierung für
+die Methode \texttt{java.lang.String.substring(..)}. Dabei dient das \texttt{char} Array als
+Daten für die repräsentierte Zeichenkette. 
+
+\section{StringListBuilder} 

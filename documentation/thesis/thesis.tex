@@ -1,8 +1,10 @@
 \documentclass[12pt]{report}
 
 
-\usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc} 
+\usepackage[ngerman]{babel}
+
 \usepackage{setspace}
 \usepackage{xcolor}
 \usepackage{listings}
@@ -10,6 +12,17 @@
 \usepackage{algorithmic}
 \usepackage{float}
 \usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage{titlesec}
+\usepackage[linktoc=all]{hyperref}
+\hypersetup{
+    colorlinks,
+    citecolor=black,
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+
 
 \lstset{basicstyle=\ttfamily,breaklines=true}
 
@@ -58,10 +71,14 @@ showstringspaces=false}
   basicstyle=\footnotesize\ttfamily
 }
 
+\setcounter{secnumdepth}{2}
+
+\titleformat{\paragraph}{\normalfont\normalsize\bfseries}{\theparagraph}{1em}{}
+\titlespacing*{\paragraph}{0pt}{3.25ex plus 1ex minus .2ex}{1.5ex plus .2ex}
+
 \title{Optimierung mittels der Auswahl von String Repräsentationen in Java Bytecode}
 \author{Markus Wondrak\\Goethe Universität Frankfurt am Main\\http://www.sepl.informatik.uni-frankfurt.de}
 \date{\today}
-
 
 \begin{document}
 \maketitle
