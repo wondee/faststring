@@ -17,36 +17,62 @@ import org.openjdk.jmh.annotations.OutputTimeUnit;
 
 public class XalanBenchmarks {
 
-	private static XNumber xnumber = new XNumber(12345.67890);
+	private static XNumber xnumberPos = new XNumber(12.34);
+	private static XNumber xnumberNeg = new XNumber(-12.34);
+	private static XNumber xnumberInt = new XNumber(12);
+	private static XNumber xnumberE = new XNumber(0.12e-5);
 
 	private static XPathFactory factory = XPathFactory.newInstance();
 	private static XPath xpath = factory.newXPath();
+
+	private static String EXPR = "ex:addFunc(2, 3) + $xyz";
 
     @Benchmark
     @BenchmarkMode({Mode.AverageTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     public void checkAttribQNameBenchmark() {
-    	BasisLibrary.checkAttribQName("abcbcbcbcbcbcbcbcbc:cbcbcbcbcbcbcbcbcbcbcb:cbcbcbcbbcbcbcbcb");
+    	BasisLibrary.checkAttribQName("xmlns:redirect");
     }
 
     @Benchmark
     @BenchmarkMode({Mode.AverageTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     public void instantiateURIBenchmark() throws MalformedURIException {
-    	new URI("http://www.example.org:4711/this/is/a/path.html?x=123&y=Hallo+Welt");
+    	new URI("http://xml.apache.org/xalan-j/apidocs/javax/xml/transform/package-summary.html");
     }
 
     @Benchmark
     @BenchmarkMode({Mode.AverageTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
-    public void xNumberToString() {
-    	xnumber.str();
+    public void xNumberToStringPositive() {
+    	xnumberPos.str();
+    }
+
+    @Benchmark
+    @BenchmarkMode({Mode.AverageTime})
+    @OutputTimeUnit(TimeUnit.NANOSECONDS)
+    public void xNumberToStringNegative() {
+    	xnumberNeg.str();
+    }
+
+    @Benchmark
+    @BenchmarkMode({Mode.AverageTime})
+    @OutputTimeUnit(TimeUnit.NANOSECONDS)
+    public void xNumberToStringInteger() {
+    	xnumberInt.str();
+    }
+
+    @Benchmark
+    @BenchmarkMode({Mode.AverageTime})
+    @OutputTimeUnit(TimeUnit.NANOSECONDS)
+    public void xNumberToStringExponent() {
+    	xnumberE.str();
     }
 
     @Benchmark
     @BenchmarkMode({Mode.AverageTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     public void compileXPath() throws XPathExpressionException {
-        xpath.compile("//test/a[abc='xyz']");
+        xpath.compile(EXPR);
     }
 }

@@ -9,11 +9,6 @@ public final class SubstringString implements CharSequence {
 	private final int start;
 	private final int end;
 
-//	private final int id;
-//
-//	static int counter = 0;
-
-
 
 	public SubstringString(String value) {
 		this(value.toCharArray(), 0, value.length());
@@ -23,8 +18,6 @@ public final class SubstringString implements CharSequence {
 		this.string = string;
 		this.start = start;
 		this.end = end;
-//		this.id = counter++;
-//		System.out.println(id + ":ctor: " + start + " - " + end);
 	}
 
 	public SubstringString substring(int pos) {
@@ -32,12 +25,10 @@ public final class SubstringString implements CharSequence {
 	}
 
 	public SubstringString substring(int from, int to) {
-//		System.out.println(id + ":" + from + " - " + to);
 		return new SubstringString(string, from + start, start + to);
 	}
 
 	public String toString() {
-//		System.out.println(id + ":" + "toString: " + start + " - " + end);
 		return String.valueOf(Arrays.copyOfRange(string, start, end));
 	}
 

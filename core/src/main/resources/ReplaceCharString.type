@@ -1,17 +1,16 @@
 {
-	"name" : "SubstringString",
+	"name" : "ReplaceCharString",
 	"originalType" : "java.lang.String",
-	"optimizedType" : "de.unifrankfurt.faststring.core.SubstringString",
+	"optimizedType" : "de.unifrankfurt.faststring.core.ReplaceCharString",
 	"methodsDefs" : [
 		{ "id" : "substring_i", 	"desc" : { "name" : "substring", "signature" : "(I)Ljava/lang/String;" } },
 		{ "id" : "substring_ii", 	"desc" : { "name" : "substring", "signature" : "(II)Ljava/lang/String;" } },
 		{ "id" : "length", 			"desc" : { "name" : "length", "signature" : "()I" } },
-		{ "id" : "charAt", 			"desc" : { "name" : "charAt", "signature" : "(I)C" } },
 		{ "id" : "valueOf", 		"desc" : { "name" : "valueOf", "signature" : "(Ljava/lang/Object;)Ljava/lang/String;" } }
 	],
 
 	"effectedMethods" : ["substring_i", "substring_ii"],
-	"supportedMethods" : ["length", "charAt"],
+	"supportedMethods" : ["length"],
 	"producingMethods" : ["substring_i", "substring_ii"],
 
 	"compatibleLabels" : ["StringListBuilder"],

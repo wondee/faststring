@@ -138,6 +138,68 @@ im Maven Artefakt \textit{faststring-core}.
 
 Der Typ \texttt{de.unifrankfurt.faststring.core.SubstringString} dient als Optimierung für
 die Methode \texttt{java.lang.String.substring(..)}. Dabei dient das \texttt{char} Array als
-Daten für die repräsentierte Zeichenkette. 
+Daten für die repräsentierte Zeichenkette. Zusätzlich besitzt der Typ zwei Zeiger \texttt{start}
+und \texttt{end} die jeweils auf den Anfang und das Ende der repräsentierten Zeichenkette zeigen.
+Beim Aufruf von \texttt{substring} auf eine Instanz dieses Typs wird jeweils eine neue Instanz
+erzeugt, der eine Referenz auf das \texttt{char} Array, sowie die neu errechneten Zeiger auf
+den Anfang und das Ende der neu errechneten Zeichenkette, übergeben. 
+
+Um eine größere Kompatibilität mit der ursprünglichen String API zu erlangen wurden zusätzliche
+Methode, die einfach auf der neuen Datenstruktur zu implementieren waren zu diesem Typ hinzugefügt.
+Dazu gehört zum einen das \texttt{java.lang.CharSequence} Interface, zum anderen einige 
+weitere Methoden, die gewöhnlich im Zusammenhang mit \texttt{substring} aufgerufen werden.
+
+Zu den Methoden aus dem \texttt{CharSequence} Interface gehören:
+
+\begin{itemize}
+	\item \texttt{length()}: Implementiert durch \texttt{ende - start}
+	\item \texttt{charAt(i)}: Implementiert durch \texttt{value[start + i]}
+	\item \texttt{subSeqeunce(start, end)}: Implementiert durch \texttt{substring(start, end)}
+\end{itemize}
+
+Zusätzliche Methoden werden benötigt um eine Umwandlung von einem String zu einem SubstringString, sowie 
+in die andere Richtung, zu ermöglichen. Dazu gehören:
+
+\begin{itemize}
+	\item \texttt{<init>(String)}: Konstruktor um eine neue Instanz mit dem Wert der übergebenen
+	Strings zu erzeugen.
+	\item \texttt{String toString()}: überschriebene \texttt{java.lang.Objeçt.toString()} Methode
+	um eine Umwandlung von einem \texttt{SubstringString} zu einem String zu ermöglichen.
+	\item \texttt{SubstringString valueOf(String)}: statische Factory Methode zum statischen 
+	erzeugen einer neuen Instanz. (Wird für einfachere Bytecode Generierung verwendet) 
+\end{itemize}
 
 \section{StringListBuilder} 
+
+String Konkatenation in Java kann mit dem \texttt{+} Operator vorgenommen werden. Allerdings 
+wird in zahlreichen Java Coding Guidelines der \texttt{StringBuilder} bzw. \texttt{StringBuffer}
+als Alternative für den \texttt{+} Operator empfohlen. Grund für die Empfehlung ist,
+dass, wie bereits beschrieben, die Manipulationen von Strings zu dem Kopieren der 
+Zeichen des \texttt{char} Arrays führt. Angesichts dieser Problematik werden der auf Strings 
+angewandte \texttt{+} Operator seid Java 6 zu einem Aufruf von \texttt{StringBuilder.append()} 
+kompiliert.  
+
+Die \texttt{StringBuilder} Implementierung basiert auf einem \texttt{char} Array, welches
+mit den über \texttt{append} übergebenen Zeichenketten befüllt wird. Ist dieses Array voll,
+so wird ein neues Array mit doppelter Größe angelegt und die Werte des alten Array in das 
+neue kopiert.
+
+Diesen Kopiervorgang umgeht der \texttt{de.unifrankfurt.faststring.\\core.StringListBuilder} 
+indem er eine verkettete Liste von Strings verwaltet und dieser bei jedem \texttt{append} Aufruf 
+ein neues Element hinzufügt. Als Anker werden Kopf sowie das Letzte Element der Liste gespeichert.
+
+Allerdings erfüllt dieser Datentyp nicht den eigentlichen Kontrakt des \texttt{java.langStringBuilder}s.
+Der \texttt{StringListBuilder} erfüllt den Zweck Instanzen vom Typ \texttt{SubstringString} 
+zu konkatenieren. Daher ist existiert auch nur die Methode \texttt{append(SubstringString)}.
+
+Da die Absicht dieses Typs weniger die Konvertierung innerhalb des Programmflusses, als die komplette
+lokale Ersetzung des ursprünglichen \texttt{StringBuilders} innerhalb einer Methode. Daher 
+werden die Methoden zur Konvertierung wie im \texttt{SubstringString} nicht benötigt. Zusätzlich 
+existieren die Methoden:
+
+\begin{itemize}
+	\item \texttt{<init>()}: Default Konstruktor
+	\item \texttt{<init>(SubstringString)}: Zum Erzeugen einer Instanz mit einer Vorbelegung.
+	\item \texttt{toString()}: wie auch \texttt{java.lang.StringBuilder.toString()} erzeugt die Methode 
+	den erstellten String.
+\end{itemize}

@@ -1,0 +1,21 @@
+{
+	"name" : "StringListBuffer",
+	"originalType" : "java.lang.StringBuilder",
+	"optimizedType" : "de.unifrankfurt.faststring.core.StringListBuilder",
+	"methodsDefs" : [
+		{ "id" : "append", 			"desc" : { "name" : "append", "signature" : "(Ljava/lang/String;)Ljava/lang/StringBuilder;" } },
+		{ "id" : "ctor_default", 	"desc" : { "name" : "<init>", "signature" : "()V" } },
+		{ "id" : "ctor_string", 	"desc" : { "name" : "<init>", "signature" : "(Ljava/lang/String;)V" } },
+		{ "id" : "toString", 		"desc" : { "name" : "toString", "signature" : "()Ljava/lang/String;" } }
+	],
+
+	"effectedMethods" : ["append"],
+	"supportedMethods" : ["ctor_default", "ctor_string", "toString"],
+	"producingMethods" : ["append"],
+
+	"compatibleLabels" : ["SubstringString"],
+	"optimizedParams" : {"append" : "(Lde/unifrankfurt/faststring/core/SubstringString;)" },
+	"parameterUsage" : {"valueOf" : [0]},
+
+	"toOriginalMethod" : "toString"
+}

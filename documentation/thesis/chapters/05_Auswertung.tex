@@ -114,9 +114,9 @@ vor und nach der Optimierung durch das System.
 	
 	\begin{table}[H]
 	\centering
-		\begin{tabular}{|l|r|r|r|}
+		\begin{tabular}{|r|r|r|r|}
 			\hline
-		   		 	  & Mittelwert & Median & \bf{$\pm$ $0,1\%$} \\
+		   	in $ns$   & Mittelwert & Median & \bf{$\pm$ $0,1\%$} \\
 		 	\hline
 		 	\hline
 		 	normal    & 864,41 & 865,10 & 2,689 \\ 
@@ -155,7 +155,7 @@ oder statisch) aus der Benchmark Methode aufrufbar waren. So viel die Wahl auf d
 Methoden:
 
 \begin{description}
-	\item [\texttt{org.apache.xalan.xsltc.runtime.BasisLibrary.checkAttribQName(java.lang.String)}]
+	\item [\texttt{org.apache.xalan.xsltc.runtime.BasisLibrary.checkAttribQName(String)}]
 		Prüft ob der gegebene XML-Attribut Name syntaktisch valide ist.
 	\item [\texttt{org.apache.xml.utils.URI.new(java.lang.String)}]
 		Erzeugt ein neues URI Objekt. 
@@ -164,10 +164,10 @@ Methoden:
 	\item [\texttt{javax.xml.xpath.XPath.compile(java.lang.String)}]
 		Kompiliert den gegebenen XPath Ausdruck in ein auswertbares XPath-Objekt.
 		
-		Die eigentlich identifizierte Methode war \texttt{tokenize} des verwendeten 
+		Die eigentlich identifizierte Methode ist \texttt{tokenize} des verwendeten 
 		Lexers. Da dieser aber die Sichtbarkeit package-private
-		besitzt wurde den kompletten Use Case, in dem dieser Lexer verwendet wird, 
-		zu benutzen.
+		besitzt wurde der kompletter Use Case, in dem dieser Lexer verwendet wird, 
+		für die Auswertung benutzt.
 \end{description}
 
 Als Eingaben dienten Werte, die der im Projekt enthaltenen Beispiel XML Dateien entnommen wurden 
@@ -192,9 +192,9 @@ die Ergebnisse der Messung.
 
 	\begin{table}[H]
 	\centering
-		\begin{tabular}{|l|r|r|r|}
+		\begin{tabular}{|r|r|r|r|}
 			\hline
-		   		 	  & Mittelwert & Median & \bf{$\pm$ $0,1\%$} \\
+		   	in $ns$  & Mittelwert & Median & \bf{$\pm$ $0,1\%$} \\
 		 	\hline
 		 	\hline
 		  	normal & 50,99 & 50,92 & 0,104 \\
@@ -240,9 +240,9 @@ die Ergebnisse dieses Benchmarks.
 
 	\begin{table}[H]
 	\centering
-		\begin{tabular}{|l|r|r|r|}
+		\begin{tabular}{|r|r|r|r|}
 			\hline
-		   		 	  & Mittelwert & Median & \bf{$\pm$ $0,1\%$} \\
+		   	in $ns$  & Mittelwert & Median & \bf{$\pm$ $0,1\%$} \\
 		 	\hline
 		 	\hline
 		  	normal 	  & 498,79 & 498,30 & 0,965 \\
@@ -325,9 +325,9 @@ Ergebnisse folgt auf diese Darstellungen.
 	}
 	\begin{table}[H]
 	\centering
-		\begin{tabular}{|l|r|r|r|}
+		\begin{tabular}{|r|r|r|r|}
 			\hline
-		   		 	  & Mittelwert & Median & \bf{$\pm$ $0,1\%$} \\
+		   	in $ns$  & Mittelwert & Median & \bf{$\pm$ $0,1\%$} \\
 		 	\hline
 		 	\hline
 		  	normal 	  & 121,38 & 121,17 & 0,425 \\
@@ -337,7 +337,7 @@ Ergebnisse folgt auf diese Darstellungen.
 		\end{tabular}
 	\end{table}
 
-	\caption{Ergebnis des xNumberToString Benchmarks (positive Dezimalzahl)}\label{bp:instURIBench}
+	\caption{Ergebnis des xNumberToString Benchmarks (positive Dezimalzahl)}\label{bp:xNumPos}
 \end{figure}
 
 
@@ -351,9 +351,9 @@ Ergebnisse folgt auf diese Darstellungen.
 	}
 	\begin{table}[H]
 	\centering
-		\begin{tabular}{|l|r|r|r|}
+		\begin{tabular}{|r|r|r|r|}
 			\hline
-		   		 	  & Mittelwert & Median & \bf{$\pm$ $0,1\%$} \\
+		   	in $ns$   & Mittelwert & Median & \bf{$\pm$ $0,1\%$} \\
 		 	\hline
 		 	\hline
 		  	normal 	  & 122,78 & 122,54 & 0,359 \\
@@ -363,7 +363,7 @@ Ergebnisse folgt auf diese Darstellungen.
 		\end{tabular}
 	\end{table}
 
-	\caption{Ergebnis des xNumberToString Benchmarks (negative Dezimalzahl)}\label{bp:instURIBench}
+	\caption{Ergebnis des xNumberToString Benchmarks (negative Dezimalzahl)}\label{bp:xNumNeg}
 \end{figure}
 
 
@@ -377,9 +377,9 @@ Ergebnisse folgt auf diese Darstellungen.
 
 	\begin{table}[H]
 	\centering
-		\begin{tabular}{|l|r|r|r|}
+		\begin{tabular}{|r|r|r|r|}
 			\hline
-		   		 	  & Mittelwert & Median & \bf{$\pm$ $0,1\%$} \\
+		   	in $ns$   & Mittelwert & Median & \bf{$\pm$ $0,1\%$} \\
 		 	\hline
 		 	\hline
 		  	normal 	  & 66,69 & 66,91 & 0,488 \\
@@ -389,7 +389,7 @@ Ergebnisse folgt auf diese Darstellungen.
 		\end{tabular}
 	\end{table}
 
-	\caption{Ergebnis des xNumberToString Benchmarks (positive Ganzzahl)}\label{bp:instURIBench}
+	\caption{Ergebnis des xNumberToString Benchmarks (positive Ganzzahl)}\label{bp:xNumInt}
 \end{figure}
 
 
@@ -403,9 +403,9 @@ Ergebnisse folgt auf diese Darstellungen.
 
 	\begin{table}[H]
 	\centering
-		\begin{tabular}{|l|r|r|r|}
+		\begin{tabular}{|r|r|r|r|}
 			\hline
-		   		 	  & Mittelwert & Median & \bf{$\pm$ $0,1\%$} \\
+		   	in $ns$   & Mittelwert & Median & \bf{$\pm$ $0,1\%$} \\
 		 	\hline
 		 	\hline
 		  	normal 	  & 569,85 & 568,86 & 1.530 \\
@@ -415,7 +415,7 @@ Ergebnisse folgt auf diese Darstellungen.
 		\end{tabular}
 	\end{table}
 
-	\caption{Ergebnis des xNumberToString Benchmarks (positive Dezimalzahl)}\label{bp:instURIBench}
+	\caption{Ergebnis des xNumberToString Benchmarks (positive Dezimalzahl)}\label{bp:xNumExp}
 \end{figure}
 
 \paragraph{Auswertung}
@@ -445,3 +445,64 @@ einer beträchtlichen Anstieg der Laufzeit in der optimierten Variante dieser Me
 
 
 \subsubsection{compileXPath}
+
+Ein XPath Ausdruck (XML Path Language) stellt eine Abfrage gegen einen XML-Baum dar. Die Sprache
+ist ein Standard des W3C und stellt einen wichtigen Baustein bei der XML Transformation dar.
+Xalan bietet eine API die es ermöglicht XPath Abfragen auf DOM-Bäume auszuführen. Teil dieser
+API ist es einen gegebenen String in eine Ausführbare Objektstruktur umzuwandeln. Zu diesem Zweck
+wird der gegebene String zunächst von einem Lexer in einzelne Token geteilt, die verwendet werden
+um den abstrakten Syntax Baum des Ausdrucks zu erstellen.
+
+Die Methode \texttt{org.apache.xpath.compiler.Lexer.tokenize(String, \\Vector)} führt das Zerteilen 
+des Eingabe Strings in einzelne Token durch. Dieser Benchmark kompiliert den XPath Ausdruck
+'\texttt{ex:addFunc(2, 3) + \$xyz}' indem die Methode \texttt{javax.xml.xpath.XPath.compile(String)}
+mit dem entsprechenden String aufgerufen wird. Abbildung \ref{bp:compile} zeigt die Ergebnisse 
+der Messung.
+
+\begin{figure}[H]
+	\centering
+
+	\centerline{
+		\includegraphics[trim=0mm 60mm 20mm 50mm,scale=0.50]{pictures/boxplot_compileXPath.pdf}
+		\includegraphics[trim=20mm 60mm 0mm 50mm,scale=0.50]{pictures/vioplot_compileXPath.pdf}
+	}
+
+	\begin{table}[H]
+	\centering
+		\begin{tabular}{|r|r|r|r|}
+			\hline
+		   	in $ns$ 	  & Mittelwert & Median & \bf{$\pm$ $0,1\%$} \\
+		 	\hline
+		 	\hline
+		  	normal 	  & 1366,91 & 1367,75 & 5,053 \\
+		 	optimiert & 1451,09 & 1450,40 & 6,346 \\ 
+		  	\hline
+		  	
+		\end{tabular}
+	\end{table}
+
+	\caption{Ergebnis des xNumberToString Benchmarks (positive Dezimalzahl)}\label{bp:compile}
+\end{figure}
+
+\paragraph{Auswertung}
+
+Diese Methode ist, im Gegensatz zu den bisher betrachteten optimierten Methoden, deutlich
+komplexer. Die einzelnen im String gefunden Token werden einer sogenannte Tokenqueue 
+hinzugefügt. Dies geschieht über die private Methode \texttt{addToTokenQueue}. Dabei 
+werden bei jedem dieser Aufrufe das Ergebnis eines \texttt{substring} Aufrufs übergeben.
+
+Eine weitere Wichtige Methode während des Erstellens der Token ist die Methode \texttt{mapNSTokens}
+der der Eingabe String übergeben wird. Innerhalb dieser Methode werden \texttt{substring}  
+Aufrufe auf dem übergebenen String ausgeführt.
+
+Abgesehen von der Übergabe als Parameter werden auf den String nur unterstützte Methoden 
+ausgeführt:
+
+\begin{itemize}
+ 	\item \texttt{length()}
+ 	\item \texttt{charAt(int)}
+\end{itemize} 
+
+Daher führen allein die Verwendungen als Übergabe Parameter zu Konvertierungen zurück originalen
+String Typ. Da diese Konvertierungen aber innerhalb einer Schleife geschieht, die über alle \texttt{char}s
+des String läuft führen diese Konvertierungen zu einer erheblichen Zunahme der Laufzeit.  

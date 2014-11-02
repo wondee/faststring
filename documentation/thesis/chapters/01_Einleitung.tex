@@ -17,11 +17,22 @@ erst nach der aktiven Entwicklung von einzelnen Modulen entstehen. Hierbei ergib
 wieder das Problem, dass diese Potentiale bekannt und auch richtig umgesetzt werden.
 
 Ziel dieser Arbeit ist es daher zu untersuchen, ob sich Programme durch Auswahl und 
-Substitution von alternativen Datentypen automatisiert optimieren lassen. Diese 
-Untersuchung kann allerdings keine allumfassende Auswertung bereitstellen und wird 
+Substitution von alternativen Datentypen automatisiert optimieren lassen. Zu diesem Zweck
+soll ein System erstellt werden, dass mittels statischer Codeanalyse und automatischer
+Transformation eine Optimierung eines Programms durchführt. 
+
+Diese Untersuchung kann allerdings keine allumfassende Auswertung bereitstellen und wird 
 sich auf die Optimierung der Laufzeit des \texttt{java.lang.String} Datentyps der 
 \textit{Java} Plattform und der Programmiersprache \textit{Java} beschränken. Nach 
-der Auswertung soll eine Aussagedarüber möglich sein, ob diese Optimierungen möglich sind.
+der Auswertung soll eine Aussage darüber möglich sein, ob diese Optimierungen möglich sind.
+Daher sollen die beiden Hypothesen untersucht werden:
+
+\begin{enumerate}
+	\item Der String Datentyp bietet viele Möglichkeiten der Optimierung
+	\item Das automatische Ersetzen durch alternative Datentypen führt zu einem
+	Performance Gewinn
+\end{enumerate}
+
 
 Im Rahmen dieser Arbeit soll ein System erstellt werden, dass String Operationen in einem
 gegebenen Java Programm mit einer entsprechenden optimierten Version auf Basis des 
@@ -33,9 +44,9 @@ als das originale Programm.
 
 In Kapitel 2 werden die Werkzeuge und Grundlagen beschrieben, auf denen das in dieser Arbeit
 entwickelte System aufbaut. Darauf folgt Kapitel 3, welches die optimierten String Typen vorstellt
-die in dieser Arbeit entwickelt wurden. Kapitel 3 erläutert den Analyse Prozess des Systems, indem
+die in dieser Arbeit entwickelt wurden. Kapitel 4 erläutert den Analyse Prozess des Systems, indem
 die Datenstrukturen sowie der Algorithmus für die statische Code Analyse beschrieben wird.
-In Kapitel 4 wird basierend auf den Analyse Ergebnissen die Transformation des Bytecodes 
-beschrieben. Kapitel 5 widmet sich der Auswertung der Tests in Form von Benchmarks
-und begründet diese Ergebnisse. Kapitel 6 zieht ein Fazit und beschreibt mögliche
+In Kapitel 5 wird basierend auf den Analyse Ergebnissen die Transformation des Bytecodes 
+beschrieben. Kapitel 6 widmet sich der Auswertung der Tests in Form von Benchmarks
+und begründet diese Ergebnisse. Kapitel 7 zieht ein Fazit und beschreibt mögliche
 Weiterentwicklungen des Systems.    

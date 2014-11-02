@@ -1,4 +1,4 @@
-\documentclass[12pt]{report}
+\documentclass[12pt,headsepline]{scrreprt}
 
 
 \usepackage[T1]{fontenc}
@@ -15,6 +15,11 @@
 \usepackage{graphicx}
 \usepackage{titlesec}
 \usepackage[linktoc=all]{hyperref}
+\usepackage{scrpage2} 
+
+\areaset{14cm}{22cm}
+\KOMAoptions{BCOR=10mm}
+
 \hypersetup{
     colorlinks,
     citecolor=black,
@@ -22,6 +27,11 @@
     linkcolor=black,
     urlcolor=black
 }
+
+\ohead{\includegraphics[scale=0.05]{pictures/goethe_logo.jpg}}
+\ihead[]{\leftmark}
+\pagestyle{scrheadings}
+\automark[section]{chapter}
 
 
 \lstset{basicstyle=\ttfamily,breaklines=true}
@@ -73,24 +83,55 @@ showstringspaces=false}
 
 \setcounter{secnumdepth}{2}
 
+\titlehead{
+  \begin{center}
+  \includegraphics[scale=0.075]{pictures/goethe_logo_sw.png}\\ \vspace{0.8cm}
+
+  {\scshape Fachbereich 12 -- Informatik und Mathematik}\\
+  {\scshape Software Engineering und Programmiersprachen}
+  \vspace{1cm}
+  \end{center}
+}
+\title{Optimierung mittels der Auswahl von String Repräsentationen in Java Bytecode}
+\author{Markus Wondrak}
+\date{\today}
+
+\subject{Masterarbeit}
+
+\lowertitleback{\small Gesetzt am \today{} um \thistime{} Uhr mit {\LaTeX}.}
+
 \titleformat{\paragraph}{\normalfont\normalsize\bfseries}{\theparagraph}{1em}{}
 \titlespacing*{\paragraph}{0pt}{3.25ex plus 1ex minus .2ex}{1.5ex plus .2ex}
-
-\title{Optimierung mittels der Auswahl von String Repräsentationen in Java Bytecode}
-\author{Markus Wondrak\\Goethe Universität Frankfurt am Main\\http://www.sepl.informatik.uni-frankfurt.de}
-\date{\today}
 
 \begin{document}
 \maketitle
 \pagenumbering{roman}
+
+\chapter*{Eidesstattliche Erklärung}
+Ich versichere an Eides statt durch meine eigene Unterschrift, dass ich die vorstehende 
+Arbeit selbständig und ohne fremde Hilfe angefertigt und alle Stellen, die wörtlich oder 
+annähernd wörtlich aus Veröffentlichungen genommen sind, als solche kenntlich gemacht 
+haben. Die Versicherung bezieht sich auch auf in der Arbeit gelieferte Zeichnungen, 
+Skizzen, bildliche Darstellungen und dergleichen.
+
+\vfill
+%\today, Frankfurt am Main
+%\vspace{3cm}
+\begin{tabular}{@{}l@{}}
+\hline
+\makebox[6cm]{(Markus Wondrak)}
+\end{tabular}
+
+%\chapter*{Danksagung}
+%Ich danke meinem Pupsebär, dass er meine Schreiberei so lange ertragen hat!!
+
 \tableofcontents
 \listoffigures
 \listofalgorithms
 
-\begin{abstract}
-Es geht um blibla blubb
-\end{abstract}
 \pagenumbering{arabic}
+
+
 
 
 \include{chapters/01_Einleitung}
@@ -98,7 +139,7 @@ Es geht um blibla blubb
 \include{chapters/03_Analyse}
 \include{chapters/04_Transformation}
 \include{chapters/05_Auswertung}
+\include{chapters/07_Fazit}
 
-\chapter{Fazit}
 
 \end{document}

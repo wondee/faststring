@@ -10,7 +10,6 @@
 
     <modules>
         <module>core</module>
-        <module>benchmarks</module>
 		<module>analysis</module>
 		<module>analysis-test</module>
 		<module>test-classes</module>

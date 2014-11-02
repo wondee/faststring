@@ -282,4 +282,13 @@ sind zu verarbeiten.
 
 \subsection{Typisierung von generiertem Bytecode} 
 
-Bei dem Erzeugen von Bytecode mit Shrike 
+Seid Java 6 können in \textit{class} Dateien sogenannte \textit{Stack Map Frames}
+verwendet werden, welche die Typisierung des Bytecodes dieser Klasse verifizieren.
+Diese \texttt{Stack Map Frames} dienen der Erfassung welche lokale Variable oder 
+Stack Position zu welcher Stelle des Programm Zählers welchen Typ enthält.
+
+Ab der Version 7 der JVM sind diese Frames nicht mehr optional, sondern zwingend. 
+Der von Shrike generierte Bytecode verpasst es allerdings diese Stack Map Frames
+für den neu generierten Code anzupassen. Dadurch lässt sich das generierte Programm 
+nur mit dem JVM Flag \textit{-noverify} starten, welches die Typ Verifikation 
+unterdrückt.
