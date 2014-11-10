@@ -26,6 +26,12 @@ import de.unifrankfurt.faststring.analysis.AnalyzedMethod;
 import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 import de.unifrankfurt.faststring.analysis.util.UniqueQueue;
 
+/**
+ * This class is responsible to create a {@link DataFlowGraph}
+ *
+ * @author markus
+ *
+ */
 public class DataFlowGraphBuilder {
 
 	private static final Logger LOG = LoggerFactory.getLogger(DataFlowGraphBuilder.class);
@@ -88,10 +94,9 @@ public class DataFlowGraphBuilder {
 	private Collection<Reference> findNewRefs(Reference ref, Set<Integer> contained) {
 		Set<Reference> newRefs = Sets.newHashSet();
 
-		
 		Set<Reference> refs = Sets.newHashSet(transform(filter(ref.getConnectedRefs(), not(in(contained))), toReferences));
 		newRefs.addAll(refs);
-	
+
 		return newRefs;
 
 	}

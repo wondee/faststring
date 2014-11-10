@@ -15,6 +15,12 @@ import de.unifrankfurt.faststring.analysis.graph.MethodCallNode;
 import de.unifrankfurt.faststring.analysis.graph.Reference;
 import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 
+/**
+ * This class optimizes a given method for with a given list of {@link TypeLabel}s
+ *
+ * @author markus
+ *
+ */
 public class MethodAnalyzer {
 
 	private static final Logger LOG = LoggerFactory.getLogger(MethodAnalyzer.class);

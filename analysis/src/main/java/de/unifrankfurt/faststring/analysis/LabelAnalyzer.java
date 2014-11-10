@@ -21,6 +21,19 @@ import de.unifrankfurt.faststring.analysis.util.GraphUtil;
 import de.unifrankfurt.faststring.analysis.util.QueueUtil;
 import de.unifrankfurt.faststring.analysis.util.QueueUtil.BaseQueueProcessingStrategy;
 
+/**
+ * Holds the algorithm to build the bubble within a method.
+ * <p>
+ * Call the algorithm via the static methods
+ * <ul>
+ * <li>{@link #analyzeLabel(DataFlowGraph)}</li>
+ * <li>{@link #analyzeLabel(DataFlowGraph, PhiLabelingStrategy)}</li>
+ * <li>{@link #analyzeLabel(DataFlowGraph, Collection, PhiLabelingStrategy)}</li>
+ * </ul>
+ *
+ * @author markus
+ *
+ */
 public class LabelAnalyzer extends BaseQueueProcessingStrategy<Reference>{
 
 	private static final Logger LOG = LoggerFactory.getLogger(LabelAnalyzer.class);

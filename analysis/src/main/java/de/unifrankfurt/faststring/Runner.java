@@ -31,6 +31,15 @@ import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 import de.unifrankfurt.faststring.analysis.util.FileUtil;
 import de.unifrankfurt.faststring.transform.JarManager;
 
+/**
+ * Main class for the optimization system.
+ * <p>
+ * Takes as input a list of labels to work with, a program in form of a jar file and an optional exclusion file which
+ * holds a set of packages which will not be optimized.
+ *
+ * @author markus
+ *
+ */
 public class Runner {
 	private static final Logger LOG = LoggerFactory.getLogger(Runner.class);
 

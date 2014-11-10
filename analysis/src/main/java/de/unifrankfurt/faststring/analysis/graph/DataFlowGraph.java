@@ -8,10 +8,18 @@ import com.google.common.collect.Maps;
 
 import de.unifrankfurt.faststring.analysis.util.StringUtil;
 
+/**
+ * represents a dataflowgraph of a method.
+ * <p>
+ *
+ *
+ * @author markus
+ *
+ */
 public class DataFlowGraph {
 
 	private final Map<Integer, Reference> nodes;
-	private final Predicate<Reference> matchedLabel = new Predicate<Reference>() {
+	private static final Predicate<Reference> matchedLabel = new Predicate<Reference>() {
 		@Override
 		public boolean apply(Reference ref) {
 			return ref.getLabel() != null;

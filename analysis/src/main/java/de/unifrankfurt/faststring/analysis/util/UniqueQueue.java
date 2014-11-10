@@ -6,6 +6,13 @@ import java.util.LinkedHashSet;
 import java.util.NoSuchElementException;
 import java.util.Queue;
 
+/**
+ * Queue implementation that (like a set) can only unique elements
+ *
+ * @author markus
+ *
+ * @param <E> the managed type
+ */
 public class UniqueQueue<E> extends LinkedHashSet<E> implements Queue<E> {
 
 	private static final long serialVersionUID = 381094002085132334L;
@@ -13,7 +20,7 @@ public class UniqueQueue<E> extends LinkedHashSet<E> implements Queue<E> {
 	public UniqueQueue(Collection<E> coll) {
 		super(coll);
 	}
-	
+
 	@Override
 	public boolean offer(E e) {
 		return add(e);
@@ -26,7 +33,7 @@ public class UniqueQueue<E> extends LinkedHashSet<E> implements Queue<E> {
 			throw new NoSuchElementException();
 		}
 		return e;
-		
+
 	}
 
 	@Override

@@ -1,4 +1,4 @@
-\documentclass[12pt,headsepline]{scrreprt}
+\documentclass[12pt,headsepline,abstract=on]{scrreprt}
 
 
 \usepackage[T1]{fontenc}
@@ -28,10 +28,10 @@
     urlcolor=black
 }
 
-\ohead{\includegraphics[scale=0.05]{pictures/goethe_logo.jpg}}
-\ihead[]{\leftmark}
-\pagestyle{scrheadings}
-\automark[section]{chapter}
+%\ohead{\includegraphics[scale=0.05]{pictures/goethe_logo.jpg}}
+\ohead[]{\rightmark}
+\pagestyle{myheadings}
+\automark[chapter]{chapter}
 
 
 \lstset{basicstyle=\ttfamily,breaklines=true}
@@ -103,8 +103,11 @@ showstringspaces=false}
 \titleformat{\paragraph}{\normalfont\normalsize\bfseries}{\theparagraph}{1em}{}
 \titlespacing*{\paragraph}{0pt}{3.25ex plus 1ex minus .2ex}{1.5ex plus .2ex}
 
+\renewcommand\abstractname{Zusammenfassung} 
+
 \begin{document}
 \maketitle
+
 \pagenumbering{roman}
 
 \chapter*{Eidesstattliche Erklärung}
@@ -125,14 +128,20 @@ Skizzen, bildliche Darstellungen und dergleichen.
 %\chapter*{Danksagung}
 %Ich danke meinem Pupsebär, dass er meine Schreiberei so lange ertragen hat!!
 
+\begin{abstract}
+Diese Masterarbeit untersucht, ob es möglich ist mittels statischer Code Analyse und
+automatisierter Transformationen von Programmen eine Optimierung des Java-\texttt{String} 
+Typs zu erlangen. Dabei wurde ein System entwickelt, das es ermöglicht anhand von 
+definierten Regeln zu einem optimierten Datentyp ein Programm in der Art anzupassen, dass
+der optimierte Datentyp anstatt des originalen verwendet wird. Die Auswertung am Ende der 
+Arbeit zeigt, dass eine Optimierung mit den gewählten Datentypen und Einschränkungen des 
+Algorithmus nicht möglich ist. Es werden aber mögliche Weiterentwicklungen skizziert,
+die die aufgetretenen Probleme adressieren.
+\end{abstract}
+
 \tableofcontents
 \listoffigures
-\listofalgorithms
-
-\pagenumbering{arabic}
-
-
-
+\listof{algorithm}{Algorithmenverzeichnis}
 
 \include{chapters/01_Einleitung}
 \include{chapters/02_Werkzeuge}
@@ -140,6 +149,13 @@ Skizzen, bildliche Darstellungen und dergleichen.
 \include{chapters/04_Transformation}
 \include{chapters/05_Auswertung}
 \include{chapters/07_Fazit}
+
+\begin{thebibliography}{99}
+  \bibitem{coco} CoCo: Sound and Adaptive Replacement of Java Collections, Guoqing Xu, ECOOP 2013
+  \bibitem{cham} Chameleon: Adaptive Selection of Collections, Ohad Schacham, Martin Vechev, Eran Yahav, PLDI 2009
+  \bibitem{brain} Brainy: Effective Selection of Data Structures, Changhee Jung, S. Rus, B. Railing, N. Clark, Santosh Pande, PLDI 2011
+  \bibitem{wala} \url{http://wala.sourceforge.net/wiki/index.php/Main_Page} (Stand 10.11.2014)
+\end{thebibliography}
 
 
 \end{document}

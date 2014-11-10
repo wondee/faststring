@@ -9,6 +9,14 @@ import com.ibm.wala.ipa.callgraph.AnalysisScope;
 import com.ibm.wala.util.config.AnalysisScopeReader;
 import com.ibm.wala.util.config.FileOfClasses;
 
+/**
+ * Factory for creating a {@link AnalysisScope} based on a input jar file.
+ * <p>
+ * Little hack because WALA only supports input files for creating a scope
+ *
+ * @author markus
+ *
+ */
 public class AnalysisScopeFactory {
 
 	@SuppressWarnings("resource")

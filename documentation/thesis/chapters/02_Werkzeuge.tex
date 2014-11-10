@@ -11,12 +11,12 @@ ist vor allem mit der Rolle der Java Virtual Machine zu erklären. Java Programm
 in einen Zwischencode, den Java Bytecode, übersetzt, welcher von der System spezifischen 
 JVM ausgeführt wird. Dabei ist Programmiersprache Java nicht die einzige in Bytecode 
 übersetzbare Sprache. Es existieren neben den bekanntesten Scala, Jython, Groovy,
-JavaScript noch viele weitere. Einmal in Bytecode übersetzt können, in diesen Sprachen 
-geschriebene, Programme auf jeder, der Java Spezifikation entsprechenden, JVM ausgeführt 
+JavaScript noch viele weitere. Einmal in Bytecode übersetzt können in diesen Sprachen 
+geschriebene Programme auf jeder der Java Spezifikation entsprechenden JVM ausgeführt 
 werden. 
 
-Bytecode ist eine Sammlung von Instruktionen welche durch \textit{opcodes} von 2 Byte Länge definiert 
-werden. Zusätzlich können noch 1 bis $n$ Parameter verwendet werden. Die Sprache ist Stack-orientiert, das 
+Bytecode ist eine Sammlung von Instruktionen, welche durch \textit{opcodes} von 2 Byte Länge definiert 
+werden. Zusätzlich können noch 1 bis $n$ Parameter verwendet werden. Die Sprache ist Stack-orientiert was 
 bedeutet, dass von Operationen verwendete Parameter über einen internen Stack übergeben werden. Als Beispiel 
 dient der folgende Bytecode:
 
@@ -46,7 +46,7 @@ folgende Kategorien einordnen:
 
 \section{WALA}
 
-Bei \textit{WALA} handelt es sich um die "T.J. Watson Library for Analysis". Eine ehemals von IBM 
+Bei \textit{WALA} \cite{wala} handelt es sich um die "T.J. Watson Library for Analysis", eine ehemals von IBM 
 entwickelte Bibliothek für die statische Codeanalyse von Java- und JavaScript Programmen. Das Framework 
 übernimmt dabei das Einlesen von \textit{class} Dateien und stellt eine Repräsentation, die sogenannte 
 \textit{Intermediate Representation}, des Bytecodes zur Verfügung. Diese IR stellt die zentrale 
@@ -58,65 +58,70 @@ Für die Manipulation des Bytecodes existiert innerhalb des Frameworks ein Unter
 \subsection{IR}
 
 Die \textit{Intermediate Representation} (IR) ist eine Abstraktion zum Stack basierten Bytecode. Ein IR ist
-in Single Static Assignment Form, welche sich dadurch auszeichnet, dass jeder Variablen immer genau 
+in \textit{Single Static Assignment Form}, welche sich dadurch auszeichnet, dass jeder Variablen 
 \textbf{einmal} ein Wert zugewiesen wird. Zusätzlich besteht die IR aus dem Kontrollflussgraphen der 
-Methode, welcher wiederum aus Basic Blocks zusammengesetzt ist. Ein Basic Block ist eine Zusammenfassung 
-von aufeinander Folgende Instruktionen, welche in jedem Fall nach einander ausgeführt werden.
+Methode, welcher wiederum aus \textit{Basic Blocks} (den Knoten) zusammengesetzt ist. Ein Basic Block ist eine 
+Zusammenfassung von aufeinander folgenden Instruktionen, welche in jedem Fall nacheinander ausgeführt werden.
 
-Die Variablen innerhalb des IRs nennt WALA \textit{value numbers}. Diese beziehen sich immer auf eine 
-Referenz, allerdings kann sich eine Referenz sich auf mehrere tatsächliche value numbers in der IR beziehen.
-Dies folgt aus der SSA Form, wird eine Variable im Bytecode zweimal ein Wert zugewiesen, wird diese 
-doppelte Zuweisung in der SSA Form durch das Einführen einer neuen value number entfernt. Die Operationen
-werden auch nur mit Bezug auf die value numbers beschrieben.   
+Die Variablen innerhalb des IRs nennt WALA \textit{value numbers}. Diese beziehen sich auf eine 
+Referenz, allerdings kann sich eine Referenz auf mehrere tatsächliche \textit{value number}s beziehen.
+Dies folgt aus der SSA Form, wird einer Variable im Bytecode mehr als einmal ein Wert zugewiesen, werden 
+diese mehrfachen Zuweisungen in der SSA Form durch das Einführen einer neuen \textit{value number} entfernt. 
+Die Operationen innerhalb des IRs verwenden ausschließlich \textit{value number}s um Instruktionen des Bytecodes 
+darzustellen.   
  
-Da die Zwischendarstellung vom Stack abstrahieren soll, werden auch alle Operationen, die den Stack betreffen
-(wie z.B. \texttt{LOAD}, \texttt{STORE}, \texttt{PUSH} oder \texttt{POP}) nicht nicht mit in diese 
-Repräsentation übernommen. Dabei werden die Bytecode Indices der übrig gebliebenen Instruktionen 
-berücksichtigt und alle anderen Stellen in dem beinhaltenden Array mit \texttt{null} Werten aufgefüllt.
-Instruktionen werden von Objekten vom Typ \texttt{SSAInstruction} und dessen Untertypen dargestellt.
+Da die Zwischendarstellung eine Abstraktion zum Stack darstellen soll, werden alle Operationen, 
+die den Stack betreffen(wie z.B. \texttt{LOAD}, \texttt{STORE}, \texttt{PUSH} oder \texttt{POP}) 
+nicht in dieser Repräsentation dargestellt. Dabei werden die Bytecode Indices der übrig gebliebenen 
+Instruktionen berücksichtigt und alle anderen Stellen in dem beinhaltenden Array mit \texttt{null} 
+Werten aufgefüllt. Instruktionen werden von Objekten vom Typ \texttt{SSAInstruction} und dessen 
+Untertypen dargestellt.
 
-Die Verwaltung der value numbers wird von einem Typ namens \texttt{SymbolTable} übernommen. Es kommt bei der
+Die Verwaltung der \textit{value number}s wird von einem Typ namens \texttt{SymbolTable} übernommen. Es kommt bei der
 IR Erstellung zum Einsatz, wenn bei der Simulation des Bytecodes neue Variablen verwendet werden, um neue 
-value numbers zu erzeugen.
+\textit{value number}s zu erzeugen.
 
-Aufgrund der SSA Form der IR lässt sich für jede value number genau eine Definition bestimmen. Zu diesem 
+Aufgrund der SSA Form der IR lässt sich für jede \textit{value number} genau eine \textit{Definition} bestimmen. Zu diesem 
 Zweck bietet WALA den Typ \texttt{DefUse} an, welcher für jedes IR-Objekt erstellt werden kann. Er ermöglicht
-einen einfachen Zugriff aus die Instruktionen, die eine value number definiert (\textit{def}; z.B. als 
-Rückgabe aus einem Methodenaufruf), und eine Menge an Instruktionen, die die entsprechende value number 
-verwenden (\textit{use}; z.B. als Rückgabewert in einem \texttt{RETURN} Statement).
+einen einfachen Zugriff auf die Instruktion, die eine \textit{value number} erzeugt (\textit{Definition} 
+einer \textit{value number}; z.B. als Rückgabe aus einem Methodenaufruf), und auf die Menge an Instruktionen, die 
+diese \textit{value number} verwenden (\textit{Use} einer \textit{value number}; z.B. Parameter in einem Methodenaufruf 
+oder als Rückgabewert in einem \texttt{RETURN} Statement).
 
-Besitzt ein Block im Kontrollflussgraphen mehrere eingehende Kanten und werden aus diesen Vorgänger Blöcken
-Variablen mitgebracht die synonym in diesem Block verwendet werden, werden in SSA-Form sogenannte $\phi$ 
-Funktionen verwendet. Eine Instruktion der Form $v_3 = \phi(v_1, v_2)$ sagt aus, dass im Folgenden 
-die Referenz $v_3$ sowohl $v_1$, als auch $v_2$ sein kann. Da die statische Code Analyse nicht feststellen
-kann von welchem Block aus dieser Block betreten wurde, werden diese $\phi$-Funktionen verwendet, um
-die Zusammenführungen von mehreren Variablen aus Vorgängerblöcken darzustellen.
+Besitzt ein Block im Kontrollflussgraphen mehrere eingehende Kanten und werden aus diesen Vorgängern 
+Referenzen in den Geltungsbereich des Blockes übernommen, die in diesem Block über den selben Zeiger 
+referenziert werden, so werden in SSA Form sogenannten $\phi$ Funktionen verwendet. Eine Instruktion 
+der Form $v_3 = \phi(v_1, v_2)$ sagt aus, dass im folgenden Programmfluss die Referenz $v_3$ sowohl $v_1$, als 
+auch $v_2$ sein kann. Da die statische Code Analyse nicht feststellen kann, von welchem Block aus dieser 
+Block betreten wurde, werden $\phi$-Funktionen verwendet, um die Zusammenführungen von mehreren 
+Variablen aus Vorgängerblöcken darzustellen.
 
-Das IR und das dazugehörige DefUse Objekt werden in dem System internen Datentyp \texttt{AnalyzedMethod} 
+Das IR und das dazugehörige DefUse Objekt werden in dem systeminternen Datentyp \texttt{AnalyzedMethod} 
 zusammengefasst.
 
 \subsubsection{Anpassungen}
 
-In WALA werden beim Erstellen des IR für alle Konstanten mit demselben Wert dieselbe value numbers erzeugt. 
-Da für die \textit{Analyse} verschiedenen Referenzen getrennt getrennt untersucht werden mussten, wurde 
-für die Erzeugung einer value number für eine Konstante der eingebaute caching Mechanismus umgangen. 
+In WALA werden beim Erstellen des IR für alle Konstanten mit demselben Wert dieselbe \textit{value number}s erzeugt. 
+Da für die \textit{Analyse} verschiedenen Referenzen getrennt untersucht werden, wird 
+für die Erzeugung einer \textit{value number} für eine Konstante der eingebaute caching Mechanismus umgangen. 
 
-Darüber hinaus war für die \textit{Transformation} die Information nötig, an welcher Stelle im Bytecode eine
-entsprechende Konstante erzeugt wird (z.B. mittels \texttt{LCD}). Um dies zu Erreichen wurde dieser Bytecode 
-Index während dem Durchlaufen der Instruktionen innerhalb der \texttt{SymbolTable} gespeichert, sodass er 
-beim Klienten des IRs zur Verfügung steht.
+Darüber hinaus ist für die \textit{Transformation} die Information nötig, an welcher Stelle im Bytecode eine
+entsprechende Konstante erzeugt wird (z.B. mittels \texttt{LCD}). Um dies zu erreichen, wurde der Bytecode 
+Index während der Durchlaufens der Instruktionen innerhalb der \texttt{SymbolTable} gespeichert, 
+sodass der Index beim Klienten des IRs zur Verfügung steht.
 
-Da diese Änderungen nicht in den Haupt Branch von WALA eingepflegt werden durften, benötigt das System den 
+Da diese Änderungen nicht in den Haupt-Branch von WALA eingepflegt werden durften, benötigt das System den 
 Fork des WALA Projektes \footnote{Dieser ist unter \texttt{http://github.com/wondee/WALA} zu finden.}.
 
 
 \subsection{Shrike}
 
-Shrike ist ein Unterprojekt innerhalb des WALA Frameworks. Shrike übernimmt dabei das Lesen und das 
-Schreiben von Bytecode aus bzw. in class Dateien. Dabei wird es zum einen beim Erstellen eines IR aus einer 
-Methode verwendet, zum Anderen bietet es eine "Patch-based" API an um den Bytecode einer eingelesenen 
-Methode zu verändern. Dies geschieht über das Einfügen von \texttt{Patch}es, welche über einen 
-entsprechenden \texttt{MethodEditor} überall im Bytecode einer Methode eingefügt werden oder auch 
+Shrike ist ein Unterprojekt innerhalb des WALA Frameworks. Shrike übernimmt das Lesen und  
+Schreiben von Bytecode aus bzw. in \textit{class} Dateien. Dabei wird es zum einen beim 
+Erstellen eines IR aus einer Methode verwendet, zum Anderen bietet es eine auf Patches 
+basierende API an, um den Bytecode einer eingelesenen Methode zu verändern. Dies geschieht 
+über das Einfügen von \texttt{Patch}es, welche über einen 
+entsprechenden \texttt{MethodEditor} überall im Bytecode einer Methode eingefügt werden, oder auch 
 ursprüngliche Instruktionen komplett ersetzen. Zusätzlich enthält es einen \texttt{Verifier}, der erzeugten 
 Bytecode überprüft, so dass ungültige Stack Zustände oder Typfehler noch während der Manipulation erkannt 
 werden können. 
@@ -125,27 +130,28 @@ In dem von mir entwickelten System werden alle Bytecode Manipulationen mit Hilfe
 
 \chapter{Optimierte Stringtypen}\label{stringLabels}
 
-Im Rahmen dieser Arbeit wurden zwei alternative String Typen die Optimierungen der ursprünglichen
-\texttt{java.lang.String} API darstellen. Diese Typen umgehen das Design der String Repräsentationen
+Im Rahmen dieser Arbeit wurden zwei alternative String Repräsentationen erstellt, 
+die Optimierungen der ursprünglichen \texttt{java.lang.String} API darstellen. Diese 
+Typen umgehen das Design der String Repräsentationen
 in Java, die \textit{nicht veränderbare} Objekte darstellen. Durch diesen Umstand führen alle
-Manipulationsoperationen auf String Typen dazu, dass die Daten auf denen diese Objekte basieren
+Manipulationsoperationen auf String Typen dazu, dass die Daten, auf denen diese Objekte basieren
 (ein \texttt{char} Array, dass die einzelnen Zeichen der Zeichenkette hält) kopiert werden müssen.
-Es sind über die hier vorgestellten Typen durchaus weitere Optimierungen für den String Typ denkbar, 
-doch wurden im Rahmen dieser Arbeit nur diese beiden Typen betrachtet. Diese Typen befinden sich
-im Maven Artefakt \textit{faststring-core}.
+Es sind außer den hier vorgestellten Typen weitere Optimierungen für den String Typ denkbar, 
+doch wurden im Rahmen dieser Arbeit nur diese im folgenden beschriebenen Typen betrachtet. 
+Diese befinden sich im Maven Artefakt \textit{faststring-core}.
 
 \section{SubstringString} 
 
 Der Typ \texttt{de.unifrankfurt.faststring.core.SubstringString} dient als Optimierung für
-die Methode \texttt{java.lang.String.substring(..)}. Dabei dient das \texttt{char} Array als
-Daten für die repräsentierte Zeichenkette. Zusätzlich besitzt der Typ zwei Zeiger \texttt{start}
-und \texttt{end} die jeweils auf den Anfang und das Ende der repräsentierten Zeichenkette zeigen.
-Beim Aufruf von \texttt{substring} auf eine Instanz dieses Typs wird jeweils eine neue Instanz
-erzeugt, der eine Referenz auf das \texttt{char} Array, sowie die neu errechneten Zeiger auf
-den Anfang und das Ende der neu errechneten Zeichenkette, übergeben. 
+die Methode \texttt{java.lang.String.substring(..)}. Ein \texttt{char} Array dient als
+Wert für die repräsentierte Zeichenkette. Zusätzlich besitzt der Typ zwei Zeiger \texttt{start}
+und \texttt{end}, die jeweils auf den Anfang und das Ende der repräsentierten Zeichenkette zeigen.
+Beim Aufruf von \texttt{substring} wird eine neue Instanz dieses Typs erzeugt, der eine Referenz 
+auf das \texttt{char} Array, sowie die neu errechneten Zeiger auf den Anfang und das Ende 
+der neu errechneten Zeichenkette im Konstruktor übergeben werden. 
 
-Um eine größere Kompatibilität mit der ursprünglichen String API zu erlangen wurden zusätzliche
-Methode, die einfach auf der neuen Datenstruktur zu implementieren waren zu diesem Typ hinzugefügt.
+Um eine größere Kompatibilität mit der ursprünglichen String API zu erlangen, wurden zusätzliche
+Methoden, die einfach für die neuen Datenstruktur zu implementieren waren, zu diesem Typ hinzugefügt.
 Dazu gehört zum einen das \texttt{java.lang.CharSequence} Interface, zum anderen einige 
 weitere Methoden, die gewöhnlich im Zusammenhang mit \texttt{substring} aufgerufen werden.
 
@@ -157,43 +163,44 @@ Zu den Methoden aus dem \texttt{CharSequence} Interface gehören:
 	\item \texttt{subSeqeunce(start, end)}: Implementiert durch \texttt{substring(start, end)}
 \end{itemize}
 
-Zusätzliche Methoden werden benötigt um eine Umwandlung von einem String zu einem SubstringString, sowie 
-in die andere Richtung, zu ermöglichen. Dazu gehören:
+Zusätzliche Methoden werden benötigt, um eine Umwandlung von einem String zu einem \texttt{SubstringString},
+sowie in die entgegengesetzte Richtung, zu ermöglichen. Dazu gehören:
 
 \begin{itemize}
-	\item \texttt{<init>(String)}: Konstruktor um eine neue Instanz mit dem Wert der übergebenen
-	Strings zu erzeugen.
-	\item \texttt{String toString()}: überschriebene \texttt{java.lang.Objeçt.toString()} Methode
-	um eine Umwandlung von einem \texttt{SubstringString} zu einem String zu ermöglichen.
-	\item \texttt{SubstringString valueOf(String)}: statische Factory Methode zum statischen 
-	erzeugen einer neuen Instanz. (Wird für einfachere Bytecode Generierung verwendet) 
+	\item \texttt{<init>(String)}: Konstruktor, um eine neue Instanz mit dem Wert der übergebenen
+	Zeichenkette zu erzeugen
+	\item \texttt{String toString()}: überschriebene \texttt{java.lang.Object.toString()} Methode,
+	um eine Umwandlung von einem \texttt{SubstringString} zu einem String zu ermöglichen
+	\item \texttt{SubstringString valueOf(String)}: statische \textit{Factory Methode} zum statischen 
+	erzeugen einer neuen Instanz (Wird für simplere Bytecode Generierung verwendet) 
 \end{itemize}
 
 \section{StringListBuilder} 
 
-String Konkatenation in Java kann mit dem \texttt{+} Operator vorgenommen werden. Allerdings 
-wird in zahlreichen Java Coding Guidelines der \texttt{StringBuilder} bzw. \texttt{StringBuffer}
+Die Konkatenation von Strings kann in Java mit dem \texttt{+} Operator vorgenommen werden. Allerdings 
+wird in zahlreichen Java Coding Guidelines der \texttt{String\\Builder} bzw. \texttt{StringBuffer}
 als Alternative für den \texttt{+} Operator empfohlen. Grund für die Empfehlung ist,
 dass, wie bereits beschrieben, die Manipulationen von Strings zu dem Kopieren der 
-Zeichen des \texttt{char} Arrays führt. Angesichts dieser Problematik werden der auf Strings 
-angewandte \texttt{+} Operator seid Java 6 zu einem Aufruf von \texttt{StringBuilder.append()} 
+Zeichen des \texttt{char} Arrays führt. Aufgrund dieser Problematik wird ein auf Strings 
+angewandter \texttt{+} Operator seit Java 6 zu einem Aufruf von \texttt{StringBuilder.append()} 
 kompiliert.  
 
 Die \texttt{StringBuilder} Implementierung basiert auf einem \texttt{char} Array, welches
-mit den über \texttt{append} übergebenen Zeichenketten befüllt wird. Ist dieses Array voll,
-so wird ein neues Array mit doppelter Größe angelegt und die Werte des alten Array in das 
+durch den Aufruf der \texttt{append} mit den übergebenen Werten befüllt wird. Ist dieses Feld voll,
+so wird ein neues Feld mit doppelter Größe angelegt und die Werte des alten Arrays in das 
 neue kopiert.
 
-Diesen Kopiervorgang umgeht der \texttt{de.unifrankfurt.faststring.\\core.StringListBuilder} 
+Diesen Kopiervorgang umgeht der \texttt{de.unifrankfurt.faststring.\\core.StringListBuilder}, 
 indem er eine verkettete Liste von Strings verwaltet und dieser bei jedem \texttt{append} Aufruf 
-ein neues Element hinzufügt. Als Anker werden Kopf sowie das Letzte Element der Liste gespeichert.
+ein neues Element hinzufügt. Als Anker werden der Kopf sowie das Letzte Element der Liste gespeichert.
 
-Allerdings erfüllt dieser Datentyp nicht den eigentlichen Kontrakt des \texttt{java.langStringBuilder}s.
+Allerdings erfüllt dieser Datentyp nicht die Schnittstelle des \texttt{java.lang.\\StringBuilder}s.
 Der \texttt{StringListBuilder} erfüllt den Zweck Instanzen vom Typ \texttt{SubstringString} 
-zu konkatenieren. Daher ist existiert auch nur die Methode \texttt{append(SubstringString)}.
+zu konkatenieren. Daher existiert die Methode \texttt{append(\\SubstringString)}, aber keine entsprechende
+Methode für \texttt{java.lang.String}.
 
-Da die Absicht dieses Typs weniger die Konvertierung innerhalb des Programmflusses, als die komplette
-lokale Ersetzung des ursprünglichen \texttt{StringBuilders} innerhalb einer Methode. Daher 
+Da dieser Typ weniger auf Konvertierung innerhalb des Programmflusses, als eher auf die komplette
+lokale Ersetzung des ursprünglichen \texttt{StringBuilders} innerhalb einer Methode abzielt, 
 werden die Methoden zur Konvertierung wie im \texttt{SubstringString} nicht benötigt. Zusätzlich 
 existieren die Methoden:
 

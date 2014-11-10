@@ -9,6 +9,12 @@ import de.unifrankfurt.faststring.analysis.label.TypeLabel;
 import de.unifrankfurt.faststring.analysis.label.TypeLabelConfig
 import groovy.json.JsonSlurper;
 
+/**
+ * parser for {@code .type} files. Creates a {@link TypeLabelConfig}
+ *
+ * @author markus
+ *
+ */
 class TypeLabelConfigParser {
 
 	def typeRef
@@ -20,7 +26,7 @@ class TypeLabelConfigParser {
 
 		def json = new JsonSlurper().parse(reader)
 
-		def config = new TypeLabelConfig();
+		def config = new TypeLabelConfig()
 
 		config.name = json.name
 		config.originalType = Class.forName(json.originalType)

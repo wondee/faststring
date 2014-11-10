@@ -42,12 +42,6 @@
 			<artifactId>faststring-analysis</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
-		<dependency>
-			<groupId>org.apache.derby</groupId>
-			<artifactId>derby</artifactId>
-			<version>10.3.1.4</version>
-		</dependency>
 	</dependencies>
 
 </project>

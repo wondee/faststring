@@ -44,10 +44,13 @@ public class AnalyzedMethod {
 	private IR ir;
 	private DefUse defUse;
 
+	/** mapping instruction -> bytecode index */
 	private Map<SSAInstruction, Integer> instructionToIndexMap;
 
+	/** map value number (phi instruction) -> block index */
 	private Map<Integer, Integer> phi2BlockMap;
 
+	/** all instructions of this method */
 	private IInstruction[] bytecodeInstructions;
 
 	public AnalyzedMethod(IR ir, DefUse defUse) {
@@ -78,10 +81,16 @@ public class AnalyzedMethod {
 
 	}
 
+	/**
+	 * @return the name of the method analyzed
+	 */
 	public String getMethodName() {
 		return ir.getMethod().getName().toString();
 	}
 
+	/**
+	 * @return the signiture of the method analyzed
+	 */
 	public String getSignature() {
 		return ir.getMethod().getSignature();
 	}
@@ -237,6 +246,10 @@ public class AnalyzedMethod {
 		return null;
 	}
 
+	/**
+	 * Named pair (local, bytecodeIndex)
+	 *
+	 */
 	public class LocalInfo extends Pair<Integer, Integer> {
 		protected LocalInfo(Integer fst, Integer snd) {
 			super(fst, snd);
@@ -270,14 +283,25 @@ public class AnalyzedMethod {
 		return Sets.newHashSet(Ints.asList(ir.getParameterValueNumbers()));
 	}
 
+	/**
+	 * @return the {@link SSAInstruction} array
+	 */
 	public SSAInstruction[] getInstructions() {
 		return ir.getInstructions();
 	}
 
+	/**
+	 * @param v a value number
+	 * @return <code>true</code> if the given value number is a constant, <code>false</code> otherwise
+	 */
 	public boolean isConstant(int v) {
 		return ir.getSymbolTable().isConstant(v);
 	}
 
+	/**
+	 * @param v a value number representing a constant value
+	 * @return the value of the constant
+	 */
 	public Object getConstantValue(int v) {
 		return ir.getSymbolTable().getConstantValue(v);
 	}

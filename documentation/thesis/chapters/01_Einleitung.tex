@@ -1,5 +1,5 @@
 \chapter{Einleitung}
-
+\pagenumbering{arabic}
 Die Verwendung von optimierten Datentypen beim Entwickeln eines Programms ist schwierig.
 Die eingesetzten Implementierungen von Standarddatentypen decken zumeist allgemeine 
 Fälle ab, sind aber nicht optimal für spezielle Szenarien. Zudem sind spezielle
@@ -19,20 +19,21 @@ wieder das Problem, dass diese Potentiale bekannt und auch richtig umgesetzt wer
 Ziel dieser Arbeit ist es daher zu untersuchen, ob sich Programme durch Auswahl und 
 Substitution von alternativen Datentypen automatisiert optimieren lassen. Zu diesem Zweck
 soll ein System erstellt werden, dass mittels statischer Codeanalyse und automatischer
-Transformation eine Optimierung eines Programms durchführt. 
+Transformation eine Optimierung eines Programms durchführt \footnote{Der Quellcode zu 
+dem System (inklusive Tests) sowie die Benchmarks und Auswertungsskripte sind unter 
+\texttt{http://github.com/wondee/faststring} zu finden.}.
 
 Diese Untersuchung kann allerdings keine allumfassende Auswertung bereitstellen und wird 
 sich auf die Optimierung der Laufzeit des \texttt{java.lang.String} Datentyps der 
 \textit{Java} Plattform und der Programmiersprache \textit{Java} beschränken. Nach 
 der Auswertung soll eine Aussage darüber möglich sein, ob diese Optimierungen möglich sind.
 Daher sollen die beiden Hypothesen untersucht werden:
-
+\\
 \begin{enumerate}
 	\item Der String Datentyp bietet viele Möglichkeiten der Optimierung
 	\item Das automatische Ersetzen durch alternative Datentypen führt zu einem
 	Performance Gewinn
 \end{enumerate}
-
 
 Im Rahmen dieser Arbeit soll ein System erstellt werden, dass String Operationen in einem
 gegebenen Java Programm mit einer entsprechenden optimierten Version auf Basis des 
@@ -41,6 +42,11 @@ lokalisieren, an denen eine Optimierung angewendet werden kann, und mittels der 
 Bytecodes des Programms diese Optimierungen anwenden. Als Ergebnis wird ein lauffähiges
 Programm erwartet, dass bei gleicher Eingabe eine geringere Ausführungszeit besitzt 
 als das originale Programm.
+
+Es existieren Arbeiten, die Optimierungen ebenfalls durch die Auswahl von alternativen
+Datentypen anstreben \cite{coco, cham, brain}. Diese setzen entgegen der in dieser Arbeit 
+verwendeten statischen auf dynamische Codeanalyse und beschränken sich auf die Auswahl von 
+Container Typen, um diese zur Laufzeit zu ersetzen um eine Optimierung des Programms zu erreichen.
 
 In Kapitel 2 werden die Werkzeuge und Grundlagen beschrieben, auf denen das in dieser Arbeit
 entwickelte System aufbaut. Darauf folgt Kapitel 3, welches die optimierten String Typen vorstellt

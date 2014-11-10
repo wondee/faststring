@@ -22,6 +22,12 @@ import com.ibm.wala.shrikeCT.InvalidClassFileException;
 import de.unifrankfurt.faststring.analysis.AnalysisResult;
 import de.unifrankfurt.faststring.analysis.util.FileUtil;
 
+/**
+ * processes a input jar file for the analysis and tranformation process
+ *
+ * @author markus
+ *
+ */
 public class JarManager {
 
 	private static final Logger LOG = LoggerFactory.getLogger(JarManager.class);
@@ -30,6 +36,7 @@ public class JarManager {
 	private Map<String, AnalysisResult> analysisResult;
 
 	private ClassHierarchyStore store;
+
 
 
 	public static JarManager createForJar(String folderName, String jarBaseName, Map<String, AnalysisResult> analysisResult) {

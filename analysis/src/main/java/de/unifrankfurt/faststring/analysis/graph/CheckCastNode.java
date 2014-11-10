@@ -9,8 +9,7 @@ public class CheckCastNode extends InstructionNode {
 
 	@Override
 	public void visit(Visitor visitor) {
-		// TODO Auto-generated method stub
-
+		// empty
 	}
 
 }

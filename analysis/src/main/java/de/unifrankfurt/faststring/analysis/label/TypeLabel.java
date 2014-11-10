@@ -15,8 +15,6 @@ import de.unifrankfurt.faststring.analysis.graph.Reference;
  * The {@link BaseTypeLabel} class provides some preimplemented methods
  *
  * @see DataFlowGraphBuilder
- * @see BuiltInTypes
- * @see SubstringStringType
  *
  * @author Markus Wondrak
  *
@@ -64,19 +62,44 @@ public interface TypeLabel {
 	 */
 	Collection<Reference> findTypeUses(AnalyzedMethod ir);
 
+	/**
+	 * @return the optimized type of the optimization
+	 */
 	Class<?> getOptimizedType();
 
+	/**
+	 * @return the name of the static method with exactly one parameter of the original type to create a new
+	 * optimized instance of that original instance
+	 */
 	String getCreationMethodName();
 
+	/**
+	 * @param label
+	 * @return <code>true</code> if this label is compatible with the given label, <code>false</code> otherwise
+	 */
 	boolean compatibleWith(TypeLabel label);
 
+	/**
+	 * @return the class object of the original type
+	 */
 	Class<?> getOriginalType();
 
+	/**
+	 * @return the name of the method with no parameters to get a original instance of the optimized instance
+	 */
 	String getToOriginalMethodName();
 
+	/**
+	 * @param target
+	 * @return the type in internal jvm notation of the return type of the given method
+	 */
 	String getReturnType(MethodReference target);
-	
 
+	/**
+	 *
+	 * @param target
+	 * @return
+	 */
 	String getParams(MethodReference target);
 
 
