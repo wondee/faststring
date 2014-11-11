@@ -1,36 +1,35 @@
 \chapter{Fazit}
 
 Dieses Kapitel fasst die Ergebnisse dieser Arbeit zusammen, zieht ein Fazit über
-die Ergebnisse der Auswertungen und gibt Ausblicke auf zukünftige Arbeit an dem System 
+die Ergebnisse der Auswertungen und gibt Ausblicke auf zukünftige Arbeit an dem System, 
 um die hier gezeigten Ergebnisse zu verbessern. 
 
-In dieser Arbeit wurde ein System erstellt, das anhand statische Codeanalyse und
-automatischer Transformation, Optimierungen anwenden kann. Es wurde die Analyse des
-Systems vorgestellt und das Konzept des \textit{TypeLabel}s erläutert. Das Ersetzen der 
-originalen Datentypen durch optimierte Alternativen, sowie das hinzufügen von Code
+In dieser Arbeit wurde ein System erstellt, das anhand statischer Codeanalyse und
+automatischer Transformation Optimierungen anwenden kann. Es wurde die Analyse des
+Systems vorgestellt, in welchem Konzept des \textit{TypeLabel}s erläutert. Das Ersetzen der 
+originalen Datentypen durch optimierte Alternativen, sowie das Hinzufügen von Code
 zum Konvertieren der beiden Datentypen untereinander, wurde betrachtet und beschrieben.
-Schließlich wurde das System, sowie die entwickelten String Optimierungen, anhand eines 
+Schließlich wurde das System und die entwickelten String Optimierungen anhand eines 
 einfachen Beispiels und eines komplexen Software Systems (der \textit{Xalan} Bibliothek)
-getestet und die Laufzeit der transformierten Programme gemessen. 
+getestet, indem die Laufzeit der transformierten Programme gemessen wurde. 
 
-Die Auswertung zeigt, dass die Optimierung mittels automatischer Transformation von Programmen
-nicht einfach ist. Zwar lässt sich mittels des \textit{ExampleParser} Benchmarks zeigen,
-dass generell Optimierungen mit dem System möglich sind, doch ergeben sich Problematiken
-bei der Anwendung auf komplexere Programme, wie die \textit{Xalan} Benchmarks belegen. 
-Es zeigt sich, dass in komplexen Programmen die Kontexte in denen Referenzen verwendet
-werden einen starken Einfluss auf die Möglichkeiten des Systems nehmen, Optimierungen
-vorzunehmen. 
+Die Auswertung zeigt, dass die Optimierung durch automatischer Transformation von Programmen
+schwierig ist. Zwar lässt sich mit dem \textit{ExampleParser} Benchmark zeigen,
+dass Optimierungen generell mit dem System möglich sind, doch ergeben sich Probleme
+bei der Anwendung in komplexeren Programmen. Das belegen die \textit{Xalan} Benchmarks. 
+Es zeigt sich, dass in komplexen Programmen die Kontexte, in denen Referenzen verwendet
+werden, die Optimierungsmöglichkeiten des Systems stark beeinflussen. 
 
-Wie in den Benchmarks \textit{instantiateURI} und \textit{compileXPath} zu sehen
-ergeben sich Schwierigkeiten bei der Übergabe zu optimierende Referenzen als Parameter
-an Methoden zu übergeben. Da die hier erarbeitete Lösung ausschließlich intraprozeduraler
+Wie in den Benchmarks \textit{instantiateURI} und \textit{compileXPath} zu sehen ist,
+ergeben sich Schwierigkeiten bei der Übergabe von optimierten Referenzen als Parameter. 
+Da die hier erarbeitete Lösung ausschließlich intraprozeduraler
 Natur ist, führen derartige Benutzungen von Referenzen zwangsläufig zu zusätzlichen 
 Konvertierungen. Der \textit{compileXPath} Test zeigt darüber hinaus, dass zu
 optimierende Referenzen innerhalb des eingebetteten Methodenaufrufs ebenfalls von 
-der Optimierung betroffen sind. Eine Implementierung eines Interprozeduralen Expansion
-einer \textit{Bubble} birgt daher zusätzliches Potenzial Optimierungen effizienter zu gestalten.
+Optimierungen betroffen sind. Die Implementierung einer interprozeduralen Expansion
+der \textit{Bubble} weist daher zusätzliches Potenzial auf, Optimierungen effizienter zu gestalten.
 
-Die Implementierung der Intraprozeduralen Analyse, sowie Transformation birgt zusätzliche
+Die Implementierung der interprozeduralen Analyse und Transformation birgt zusätzliche
 Herausforderungen. So ist zunächst in der Analyse festzustellen, welche Implementierung einer 
 Methode aufgerufen wird. Durch den Polymorphismus, die Nutzung der \textit{Reflections} API und
 dynamisches Klassenladen zur Laufzeit, ist dies nicht über statische Code Analyse alleine zu 
@@ -38,24 +37,24 @@ lösen, sondern erfordert eine Analyse zur Laufzeit des Programms. Mittels diese
 es möglich die Ziele von abstrakten Methodenaufrufen zu identifizieren und diese für die 
 Analyse zu verwenden. 
 
-Eine weiteres Problem ergibt sich bei der Transformation in einem Interprozeduralen Kontext. Bei Methoden 
-deren Parameter in optimierter Form übergeben werden, muss die Signatur angepasst werden um
+Ein weiteres Problem ergibt sich bei der Transformation in einem interprozeduralen Kontext. Bei Methoden, 
+deren Parameter in optimierter Form übergeben werden, muss die Signatur angepasst werden, um
 kompatibel mit dem optimierten Typ zu sein. Handelt es sich bei der Methode allerdings um einen
-Teil der öffentlichen API, so darf diese Signatur nicht ersetzt werden, da somit Klienten Code
-der diese Methode verwendet und nicht optimiert wurde, zu Laufzeitfehler führen würde.  
+Teil der öffentlichen API, so darf diese Signatur nicht ersetzt werden. Damit würde ein Klienten Programm,
+das diese Methode verwendet und selber nicht optimiert wurde, zu Laufzeitfehler führen.  
 
 Das in dieser Arbeit erstellte System bietet durch die \textit{TypeLabel} Schnittstelle, die 
-Möglichkeit verschiedenste Optimierungen zu verschiedensten Typen zu verarbeiten. Daher ist
-das System nicht auf die Optimierung von Strings beschränkt. Da diese Arbeit sich 
-ausschließlich auf die Betrachtung von Optimierungen für die String API beschränkt, wurden
+Möglichkeit verschiedenste Optimierungen von Typen zu verarbeiten. Daher ist
+es nicht auf die Optimierung von Strings beschränkt. Da diese Arbeit 
+ausschließlich auf die von Optimierungen für die String API eingeht, wurden
 auch keine anderen Optionen in Erwägung gezogen. Dabei schließt das System die Anwendung 
-alternativer Optimierungen nicht aus. Im Gegenteil ist das System anwendbar auf alle 
-möglichen Typen des Java Typ Systems. 
+alternativer Optimierungen nicht aus, sondern ist auf alle Typen des Java Typ Systems anwendbar. 
 
 Als Kandidaten wäre die Dezimalzahl Repräsentation \texttt{java.math.BigDecimal} zu betrachten,
-der zwar exakte Darstellung Nachkommastellen, aber nicht die Performanz eines \texttt{float} oder
-\texttt{double} Wertes bietet. Es wäre eine Repräsentation des \texttt{BigDecimal} Wertes denkbar,
-die für Darstellung einer Ganzzahl optimiert ist. Dabei ergebe sich die Problematik, dass mittels
-statischer Code Analyse nicht identifizierbar ist, ob eine Variable einen Ganzzahl oder eine
-Dezimalzahl darstellt. Für diese Analyse müsste ebenfalls die dynamische Codeanalyse verwendet werden.
+die zwar exakte Darstellung von Nachkommastellen, aber nicht die Performanz eines \texttt{float} oder
+\texttt{double} Wertes, bietet. Es wäre eine Repräsentation des \texttt{BigDecimal} Wertes denkbar,
+die für Darstellung einer Ganzzahl optimiert ist. Dabei ergibt sich die Schwierigkeit, dass mit Hilfe von
+statischer Code Analyse nicht identifizierbar ist, ob eine Variable eine Ganzzahl oder eine
+Dezimalzahl darstellt. Für eine solche Analyse müsste ebenfalls die dynamische Code Analyse verwendet werden, 
+die feststellt, wie eine Referenz während der Laufzeit verwendet wird und welche Werte sie annimmt.
 

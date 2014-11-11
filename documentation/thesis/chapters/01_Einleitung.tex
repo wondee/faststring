@@ -4,21 +4,21 @@ Die Verwendung von optimierten Datentypen beim Entwickeln eines Programms ist sc
 Die eingesetzten Implementierungen von Standarddatentypen decken zumeist allgemeine 
 Fälle ab, sind aber nicht optimal für spezielle Szenarien. Zudem sind spezielle
 optimierte Datentypen den Anwendern meist nicht oder zumindest nur begrenzt bekannt.
-So wird bei der Entwicklung von Software der Datentyp verwendet oder zwischen den 
-Datentypen gewählt, der dem Entwickler bekannt ist. Dabei ist nicht nur die fehlende 
-Kenntnis über diese optimierten Typen ein Grund für das Übergehen ebendieser. Die 
-Entscheidungsfindung bis hin zu Wahl einer Entscheidung für oder gegen einen speziellen
+So wird bei der Entwicklung von Software einer aus den Datentypen 
+gewählt, die dem Entwickler bekannt sind. Dabei ist nicht nur die fehlende 
+Kenntnis über diese optimierten Typen ein Grund für das Übergehen eben dieser. Die 
+Entscheidungsfindung bis hin zur Wahl für oder gegen einen speziellen
 Typ verzögert die Arbeit während der Entwicklung von Systemen. 
 
 Ein weiteres Problem ergibt sich bei der Betrachtung von Altsystemen. Bei bereits 
 lang bestehenden Anwendung, besteht das Problem der Wartbarkeit von eingesetzten Datentypen. 
-Durch die Weiterentwicklung von eingesetzten Bibliothek können Optimierungspotentiale
+Durch die Weiterentwicklung von eingesetzten Bibliotheken können Optimierungspotentiale
 erst nach der aktiven Entwicklung von einzelnen Modulen entstehen. Hierbei ergibt sich
-wieder das Problem, dass diese Potentiale bekannt und auch richtig umgesetzt werden.
+wieder das Problem, dass diese Potentiale bekannt und auch richtig umgesetzt werden müssten.
 
 Ziel dieser Arbeit ist es daher zu untersuchen, ob sich Programme durch Auswahl und 
 Substitution von alternativen Datentypen automatisiert optimieren lassen. Zu diesem Zweck
-soll ein System erstellt werden, dass mittels statischer Codeanalyse und automatischer
+soll ein System erstellt werden, das durch statische Code Analyse und automatische
 Transformation eine Optimierung eines Programms durchführt \footnote{Der Quellcode zu 
 dem System (inklusive Tests) sowie die Benchmarks und Auswertungsskripte sind unter 
 \texttt{http://github.com/wondee/faststring} zu finden.}.
@@ -30,14 +30,14 @@ der Auswertung soll eine Aussage darüber möglich sein, ob diese Optimierungen 
 Daher sollen die beiden Hypothesen untersucht werden:
 \\
 \begin{enumerate}
-	\item Der String Datentyp bietet viele Möglichkeiten der Optimierung
-	\item Das automatische Ersetzen durch alternative Datentypen führt zu einem
-	Performance Gewinn
+	\item Der String Datentyp bietet viele Möglichkeiten der Optimierung.
+	\item Das automatische Ersetzen von Standard-Datentypen durch alternative Datentypen führt zu einem
+	Performance Gewinn.
 \end{enumerate}
 
-Im Rahmen dieser Arbeit soll ein System erstellt werden, dass String Operationen in einem
+Im Rahmen dieser Arbeit soll ein System erstellt werden, das String Operationen in einem
 gegebenen Java Programm mit einer entsprechenden optimierten Version auf Basis des 
-Java Bytecodes ersetzt. Dabei soll das System anhand statischer Code Analyse die Stellen
+Java Bytecodes ersetzt. Dabei soll das System anhand statischer Code Analyse jene Stellen
 lokalisieren, an denen eine Optimierung angewendet werden kann, und mittels der Transformation des 
 Bytecodes des Programms diese Optimierungen anwenden. Als Ergebnis wird ein lauffähiges
 Programm erwartet, dass bei gleicher Eingabe eine geringere Ausführungszeit besitzt 
@@ -45,14 +45,14 @@ als das originale Programm.
 
 Es existieren Arbeiten, die Optimierungen ebenfalls durch die Auswahl von alternativen
 Datentypen anstreben \cite{coco, cham, brain}. Diese setzen entgegen der in dieser Arbeit 
-verwendeten statischen auf dynamische Codeanalyse und beschränken sich auf die Auswahl von 
-Container Typen, um diese zur Laufzeit zu ersetzen um eine Optimierung des Programms zu erreichen.
+verwendeten statischen Code Analyse auf eine dynamische und beschränken sich auf die Auswahl von 
+Container Typen, die zur Laufzeit ersetzt werden, um eine Optimierung des Programms zu erreichen.
 
 In Kapitel 2 werden die Werkzeuge und Grundlagen beschrieben, auf denen das in dieser Arbeit
 entwickelte System aufbaut. Darauf folgt Kapitel 3, welches die optimierten String Typen vorstellt
 die in dieser Arbeit entwickelt wurden. Kapitel 4 erläutert den Analyse Prozess des Systems, indem
 die Datenstrukturen sowie der Algorithmus für die statische Code Analyse beschrieben wird.
 In Kapitel 5 wird basierend auf den Analyse Ergebnissen die Transformation des Bytecodes 
-beschrieben. Kapitel 6 widmet sich der Auswertung der Tests in Form von Benchmarks
-und begründet diese Ergebnisse. Kapitel 7 zieht ein Fazit und beschreibt mögliche
+präsentiert. Kapitel 6 widmet sich der Auswertung der Tests in Form von Benchmarks
+und begründet die Ergebnisse. Kapitel 7 zieht ein Fazit und beschreibt mögliche
 Weiterentwicklungen des Systems.    
