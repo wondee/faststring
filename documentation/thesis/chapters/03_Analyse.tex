@@ -16,7 +16,7 @@ soll im zweiten Abschnitt beschrieben werden.
 
 Eine auf einem IR basierende Methode wird vom System mittels eines Datenflussgraphen 
 repräsentiert. Dieser wird vor der Analyse aus der zu optimierenden
-Methode und einer Menge an initialen Referenzen vom \texttt{DataFlowGraphBuilder}
+Methode und einer Menge an initialen Referenzen vom \\\texttt{DataFlowGraphBuilder}
 erzeugt. Der Graph ist gerichtet und setzt sich aus zwei verschiedenen Knoten zusammen:
 
 \begin{itemize}
@@ -36,7 +36,7 @@ genannt).
 \texttt{Reference} Knoten werden für jede betroffene \textit{value number} erzeugt. Für
 die Erzeugung von \texttt{InstructionNode} Objekten steht die 
 \texttt{InstructionNodeFactory} zur Verfügung, die für eine gegebene 
-\texttt{SSAInstruction} eine entsprechende \texttt{InstructionNode} erstellt. Um
+\texttt{SSAInstruction} eine entsprechende \\\texttt{InstructionNode} erstellt. Um
 für dieselbe \texttt{SSAInstruction} immer dasselbe \texttt{InstructionNode} 
 Objekt zu garantieren, verwendet die Factory einen internen Cache, der eine 
 Abbildung $SSAInstruction \rightarrow InstructionNode$ verwaltet, und für jede 
@@ -86,9 +86,9 @@ die diese Instruktion erzeugt, und eine Liste von \textit{Use}s, die \textit{val
 die es benutzt. Darüber hinaus besitzt es noch Informationen zu Bytecode Spezifika, die 
 im Kapitel \ref{sec:locals} betrachtet werden.
 
-Für verschiedene \texttt{SSAInstruction} Typen existieren entsprechende 
-\texttt{InstructionNode} Subtypen. Allerdings können nicht alle Typen 
-einer \texttt{SSAInstruction} zugeordnet werden. Im Folgenden sollen die
+Für verschiedene \texttt{SSAInstruction} Typen existieren entsprechende
+\\\texttt{InstructionNode} Subtypen. Allerdings können nicht alle Typen 
+einer \\\texttt{SSAInstruction} zugeordnet werden. Im Folgenden sollen die
 wichtigsten Knotentypen vorgestellt werden. Es existieren darüber hinaus weitere
 Typen von Instruktionen, für die das System zur Zeit keine Unterstützung bietet, 
 da es ausschließlich für komplexe Objekte ausgelegt ist.
@@ -187,7 +187,7 @@ für den Analyse Algorithmus verwendet werden, die übrigen werden im Abschnitt
 	\item[\texttt{canBeDefinedAsResultOf(MethodReference):boolean}] - Sagt aus, ob die 
 	gegebene Methode einen optimierten Typ zurückgeben kann. Dies impliziert, dass
 	der Methodenaufruf selber auch markiert ist.
-	\item[\texttt{findTypeUses(AnalyzedMethod):Set<Reference>}] - Gibt eine Menge an \texttt{Reference}
+	\item[\texttt{findTypeUses(AnalyzedMethod):Set<Reference>}] - Gibt eine Menge an \\\texttt{Reference}
 	Objekten zurück, auf denen innerhalb der gegebenen Methode eine der von 
 	der Optimierung betroffenen Methode aufgerufen wird. Für diesen Algorithmus 
 	existiert bereits eine Implementierung in der Klasse \texttt{BaseTypeLabel}.
@@ -232,7 +232,7 @@ werden nachfolgend erläutert. Abbildung \ref{typeFile} zeigt ein Beispiel einer
 			\item[name] Name der Methode
 			\item[signature] Signatur der Methode zusammengesetzt aus der
 			Parameterliste und den Rückgabewert. Die Typen müssen dabei in der 
-			internen JVM Form angegeben werden. (Beispiel: "\texttt{(I)Ljava/lang/String;}"
+			internen JVM Form angegeben werden. (Beispiel: '\texttt{(I)Ljava/\\lang/String;}''
 			, ein Parameter vom Typ \texttt{int} und Rückgabewert vom Typ
 			\texttt{java.lang.String})
 		\end{description}	
@@ -398,8 +398,8 @@ Bubbles darstellen.
 Als Eingabe für den Algorithmus dient ein Objekt vom Typ \texttt{DataFlowGraph}, der 
 den bereits beschriebenen Datenflussgraphen darstellt. Zum Erstellen des Graphen werden
 wie in \ref{ssec:DFG} beschrieben zunächst initiale Referenzen benötigt. Diese Referenzen
-werden über die Methode \texttt{Set<Reference>} \texttt{findTypeUses(AnalyzedMethod)} ermittelt, 
-welche sich in der abstrakten Klasse \texttt{BaseTypeLabel} befindet. Diese Methode ist auch Teil des 
+werden über die Methode \texttt{Set<Reference>} \texttt{findTypeUses\\(AnalyzedMethod)} ermittelt, 
+welche sich in der abstrakten Klasse \\\texttt{BaseTypeLabel} befindet. Diese Methode ist auch Teil des 
 \texttt{TypeLabel} Interfaces. Die betreffenden Methoden werden mittels der in der Label 
 Definition definierten \textit{effectedMethods} identifiziert, also derjenigen Methoden, für die dieses 
 Label eine Optimierung darstellt. Die \texttt{findTypeUses} Methode erstellt für jede 
@@ -439,7 +439,7 @@ der Vererbung des Labels. Als Queue findet die
 
 Eine wichtige Rolle während des Vererbungsprozesses spielen dabei die Methoden 
 \texttt{boolean Labelable.canProduce(TypeLabel)} und
-\texttt{boolean Labelable.canUseAt(TypeLabel, int)}. Diese beiden Methoden bestimmen 
+\texttt{boolean Labelable\\.canUseAt(TypeLabel, int)}. Diese beiden Methoden bestimmen 
 für eine Referenz, ob ein Label auf eine \textit{Definition} oder ein \textit{Use} vererbt werden kann.
 
 \texttt{canProduce} sagt aus, ob eine Instruktion eine optimierte Referenz definieren kann. 
